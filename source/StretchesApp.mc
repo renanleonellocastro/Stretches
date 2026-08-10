@@ -24,12 +24,12 @@ class StretchesApp extends Application.AppBase {
         return [new StretchesServiceDelegate()];
     }
 
-    // Delivered when the background service exits while the app is running
-    // (or immediately after launch): show the alert prompt.
+    // Delivered when the background service exits — including during a
+    // cold launch (the user accepted the wake prompt), when no view exists
+    // yet, so pushing a view here would crash. The service already flagged
+    // the alarm in Storage: getInitialView shows the prompt on launch, and
+    // HomeView's poll picks it up when the app was already open.
     function onBackgroundData(data as Application.PersistableType) as Void {
-        if (data != null && AlertKit.hasPendingAlert()) {
-            AlertFlow.push();
-        }
     }
 
     function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
