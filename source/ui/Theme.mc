@@ -100,6 +100,22 @@ module Theme {
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
+    // Truncates text with an ellipsis so it fits within maxW pixels for the
+    // given font. Keeps the whole string when it already fits.
+    function fitText(dc as Dc, text as String, font as Graphics.FontDefinition,
+                     maxW as Number) as String {
+        if (dc.getTextWidthInPixels(text, font) <= maxW) {
+            return text;
+        }
+        var ell = "…";
+        var s = text;
+        while (s.length() > 1 &&
+               dc.getTextWidthInPixels(s + ell, font) > maxW) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return s + ell;
+    }
+
     // Splits a label into at most two lines that fit narrow screens.
     function splitTwoLines(text as String, maxChars as Number) as Array {
         if (text.length() <= maxChars) {

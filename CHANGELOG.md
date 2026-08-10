@@ -15,10 +15,20 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
   workout and the celebration screens.
 - Reworked the workout screen so the stretch name, illustration and
   countdown never overlap.
-- Illustrations now ship at eight per-resolution sizes (108–216 px) and each
-  device pulls the bucket matching its screen, so the artwork is crisp and
+- Redrew every stretch illustration as a friendly filled human figure (white
+  body with a dark outline, orange two-piece outfit, hair and red motion
+  arrows) in the spirit of a printed stretching chart — far clearer than the
+  previous stick figures.
+- Illustrations ship at nine per-resolution sizes (98–196 px); each device
+  pulls the bucket matching its screen, so the artwork is crisp and
   proportional from the 208x208 Forerunner 55 up to the 416x416 Venu 2.
   Poses are authored in a fixed logical space so nothing is clipped.
+- Workout screen layout fixed so the position ("2/8"), stretch name and
+  countdown always stay inside the progress ring and never overlap the
+  illustration or each other.
+- The per-stretch 3-second lead-in now mirrors the initial 5-second
+  get-ready: a big centered countdown with the stretch name and no progress
+  ring, so you can read what's coming next.
 - Muscle-group colors are now used only where meaningful (illustration
   borders and the in-workout progress ring), not as decoration.
 
