@@ -8,10 +8,11 @@ module Theme {
     const COLOR_BG = 0x000000;
     const COLOR_TEXT = 0xFFFFFF;
     const COLOR_TEXT_DIM = 0xAAAAAA;
-    const COLOR_ACCENT = 0x00AAFF;   // primary (cyan)
-    const COLOR_WARM = 0xFFAA00;     // secondary (amber)
-    const COLOR_SUCCESS = 0x00FF00;
-    const COLOR_DANGER = 0xFF0000;
+    const COLOR_FRAME = 0x555555;    // subtle rings / dividers
+    const COLOR_ACCENT = 0x00AAAA;   // single brand accent (calm teal)
+    const COLOR_WARM = 0xFFAA00;     // amber (used sparingly, e.g. snooze)
+    const COLOR_SUCCESS = 0x00AA55;
+    const COLOR_DANGER = 0xFF5500;
     const COLOR_PURPLE = 0xAA55FF;
 
     // One accent per muscle group; keep in sync with the illustrations.
@@ -47,20 +48,56 @@ module Theme {
         dc.setPenWidth(1);
     }
 
-    // Decorative multi-color ring used on the home screen: five arc
-    // segments, one per muscle group.
-    function drawGroupRing(dc as Dc) as Void {
+    // Thin, subtle frame ring hugging the screen edge.
+    function drawFrameRing(dc as Dc) as Void {
         var cx = dc.getWidth() / 2;
         var cy = dc.getHeight() / 2;
-        var r = (cx < cy ? cx : cy) - 5;
-        dc.setPenWidth(7);
-        var span = 360 / GROUP_COLORS.size();
-        for (var i = 0; i < GROUP_COLORS.size(); i++) {
-            var start = 90 - i * span - 2;
-            dc.setColor(GROUP_COLORS[i] as Number, Graphics.COLOR_TRANSPARENT);
-            dc.drawArc(cx, cy, r, Graphics.ARC_CLOCKWISE, start, start - span + 4);
-        }
+        var r = (cx < cy ? cx : cy) - 3;
+        dc.setPenWidth(2);
+        dc.setColor(COLOR_FRAME, Graphics.COLOR_TRANSPARENT);
+        dc.drawCircle(cx, cy, r);
         dc.setPenWidth(1);
+    }
+
+    // Short accent arc centered at 12 o'clock — a quiet brand mark that
+    // sits on top of the frame ring.
+    function drawBrandArc(dc as Dc, color as Number) as Void {
+        var cx = dc.getWidth() / 2;
+        var cy = dc.getHeight() / 2;
+        var r = (cx < cy ? cx : cy) - 3;
+        dc.setPenWidth(5);
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.drawArc(cx, cy, r, Graphics.ARC_CLOCKWISE, 106, 74);
+        dc.setPenWidth(1);
+    }
+
+    // Rounded "pill" button hint with centered text. Returns nothing; the
+    // caller positions it by center point.
+    function drawPill(dc as Dc, cx as Number, cy as Number, text as String,
+                      font as Graphics.FontDefinition, color as Number,
+                      filled as Boolean) as Void {
+        var tw = dc.getTextWidthInPixels(text, font);
+        var th = dc.getFontHeight(font);
+        var padX = th / 2 + 2;
+        var padY = th / 6;
+        var boxW = tw + padX * 2;
+        var boxH = th + padY * 2;
+        var x = cx - boxW / 2;
+        var y = cy - boxH / 2;
+        var radius = boxH / 2;
+        if (filled) {
+            dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(x, y, boxW, boxH, radius);
+            dc.setColor(COLOR_BG, Graphics.COLOR_TRANSPARENT);
+        } else {
+            dc.setPenWidth(2);
+            dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+            dc.drawRoundedRectangle(x, y, boxW, boxH, radius);
+            dc.setPenWidth(1);
+            dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        }
+        dc.drawText(cx, cy, font, text,
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     // Splits a label into at most two lines that fit narrow screens.

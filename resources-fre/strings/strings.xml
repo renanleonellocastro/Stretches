@@ -23,7 +23,7 @@
     <string id="HomeNext">PROCHAINE SÉANCE</string>
     <string id="HomeStretchesUnit">étirements ·</string>
     <string id="HomeMinutesUnit">min</string>
-    <string id="HomeHint">START : menu</string>
+    <string id="HomeHint">MENU</string>
 
     <string id="MenuStartNow">Commencer</string>
     <string id="MenuMyStretches">Mes étirements</string>
