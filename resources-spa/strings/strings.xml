@@ -40,6 +40,7 @@
     <string id="SettingDefaultDuration">Duración por defecto</string>
     <string id="SettingSound">Sonido</string>
     <string id="SettingVibration">Vibración</string>
+    <string id="SettingLanguage">Idioma</string>
     <string id="PickerTitle">Estirar</string>
     <string id="InRoutine">En la rutina</string>
     <string id="SecondsUnit">s</string>

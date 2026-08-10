@@ -5,10 +5,10 @@ import Toybox.WatchUi;
 module SaveFlow {
     function prompt(recorder as WorkoutRecorder) as Void {
         var view = new OptionListView(
-            WatchUi.loadResource(Rez.Strings.SaveTitle) as String,
+            Strings.t("SaveTitle"),
             [
-                WatchUi.loadResource(Rez.Strings.OptSave) as String,
-                WatchUi.loadResource(Rez.Strings.OptDiscard) as String
+                Strings.t("OptSave"),
+                Strings.t("OptDiscard")
             ],
             [Theme.COLOR_SUCCESS, Theme.COLOR_DANGER],
             false
@@ -30,13 +30,13 @@ class SaveChoiceHandler {
         if (index == 0) {
             _recorder.save();
             WatchUi.switchToView(
-                new MessageView(WatchUi.loadResource(Rez.Strings.SavedMsg) as String,
+                new MessageView(Strings.t("SavedMsg"),
                                 Theme.COLOR_SUCCESS, 1800),
                 new MessageDelegate(), WatchUi.SLIDE_UP);
         } else if (index == 1) {
             _recorder.discard();
             WatchUi.switchToView(
-                new MessageView(WatchUi.loadResource(Rez.Strings.DiscardedMsg) as String,
+                new MessageView(Strings.t("DiscardedMsg"),
                                 Theme.COLOR_DANGER, 1800),
                 new MessageDelegate(), WatchUi.SLIDE_UP);
         }
