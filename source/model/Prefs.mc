@@ -15,7 +15,9 @@ module Prefs {
     const KEY_SNOOZE_UNTIL = "snoozeUntil";         // Number, epoch seconds
     const KEY_PENDING_ALERT = "pendingAlertTs";     // Number, epoch seconds
     const KEY_NEXT_ALARM = "nextAlarmEpoch";        // Number, epoch seconds
+    const KEY_LAST_CHECK = "lastCheckEpoch";        // Number, epoch of last poll
     const KEY_SEEDED = "seeded";                     // Boolean, first-run flag
+    const KEY_LANGUAGE = "language";                 // String code, or null = follow system
 
     const DEFAULT_DURATION_SECS = 30;
     const SNOOZE_SECS = 15 * 60;
@@ -116,5 +118,22 @@ module Prefs {
 
     function setNextAlarmEpoch(epoch as Number?) as Void {
         Application.Storage.setValue(KEY_NEXT_ALARM, epoch);
+    }
+
+    function getLastCheck() as Number? {
+        return Application.Storage.getValue(KEY_LAST_CHECK) as Number?;
+    }
+
+    function setLastCheck(epoch as Number?) as Void {
+        Application.Storage.setValue(KEY_LAST_CHECK, epoch);
+    }
+
+    // Runtime UI language. null means "follow the device system locale".
+    function getLanguage() as Lang.String? {
+        return Application.Storage.getValue(KEY_LANGUAGE) as Lang.String?;
+    }
+
+    function setLanguage(code as Lang.String?) as Void {
+        Application.Storage.setValue(KEY_LANGUAGE, code);
     }
 }

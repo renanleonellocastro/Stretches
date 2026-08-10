@@ -17,11 +17,11 @@ module AlertFlow {
 
     function buildView() as OptionListView {
         return new OptionListView(
-            WatchUi.loadResource(Rez.Strings.AlertTitle) as String,
+            Strings.t("AlertTitle"),
             [
-                WatchUi.loadResource(Rez.Strings.OptStart) as String,
-                WatchUi.loadResource(Rez.Strings.OptSnooze) as String,
-                WatchUi.loadResource(Rez.Strings.OptSkip) as String
+                Strings.t("OptStart"),
+                Strings.t("OptSnooze"),
+                Strings.t("OptSkip")
             ],
             [Theme.COLOR_SUCCESS, Theme.COLOR_WARM, Theme.COLOR_DANGER],
             true

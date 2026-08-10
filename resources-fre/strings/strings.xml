@@ -40,6 +40,7 @@
     <string id="SettingDefaultDuration">Durée par défaut</string>
     <string id="SettingSound">Son</string>
     <string id="SettingVibration">Vibration</string>
+    <string id="SettingLanguage">Langue</string>
     <string id="PickerTitle">Étirer</string>
     <string id="InRoutine">Dans la routine</string>
     <string id="SecondsUnit">s</string>
