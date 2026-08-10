@@ -1,0 +1,86 @@
+<!-- German -->
+<strings>
+    <string id="AppName">Dehnübungen</string>
+    <string id="WakeMessage" scope="background">Zeit zum Dehnen!</string>
+
+    <string id="AlertTitle">Zeit zum Dehnen!</string>
+    <string id="OptStart">Starten</string>
+    <string id="OptSnooze">15 Min später</string>
+    <string id="OptSkip">Überspringen</string>
+
+    <string id="GetReady">MACH DICH BEREIT</string>
+    <string id="Paused">PAUSIERT</string>
+    <string id="EndWorkoutQ">Training beenden?</string>
+    <string id="CongratsTitle">Glückwunsch!</string>
+    <string id="CongratsBody">Routine beendet</string>
+    <string id="SaveTitle">Training speichern?</string>
+    <string id="OptSave">Speichern</string>
+    <string id="OptDiscard">Verwerfen</string>
+    <string id="SavedMsg">Gespeichert!</string>
+    <string id="DiscardedMsg">Verworfen</string>
+    <string id="EmptyRoutineMsg">Erst Übungen wählen</string>
+
+    <string id="HomeNext">NÄCHSTE EINHEIT</string>
+    <string id="HomeStretchesUnit">Übungen ·</string>
+    <string id="HomeMinutesUnit">Min</string>
+    <string id="HomeHint">START: Menü</string>
+
+    <string id="MenuStartNow">Jetzt starten</string>
+    <string id="MenuMyStretches">Meine Übungen</string>
+    <string id="MenuDurations">Dauern</string>
+    <string id="MenuSchedules">Zeitpläne</string>
+    <string id="MenuSettings">Einstellungen</string>
+    <string id="MenuAbout">Info</string>
+    <string id="MenuAddTime">Zeit hinzufügen</string>
+    <string id="MenuEditTime">Zeit bearbeiten</string>
+    <string id="MenuDelete">Löschen</string>
+    <string id="MenuEnabled">Aktiviert</string>
+    <string id="StateOn">An</string>
+    <string id="StateOff">Aus</string>
+    <string id="SettingDefaultDuration">Standarddauer</string>
+    <string id="SettingSound">Ton</string>
+    <string id="SettingVibration">Vibration</string>
+    <string id="SecondsUnit">s</string>
+    <string id="AboutText">Stretches 1.0.0 MIT</string>
+
+    <string id="GroupNeck">Nacken</string>
+    <string id="GroupWrist">Handgelenk und Unterarm</string>
+    <string id="GroupShoulder">Schulter und Brust</string>
+    <string id="GroupTorso">Rumpf und Rücken</string>
+    <string id="GroupLegs">Beine</string>
+
+    <string id="s_neck_tilt_right">Nacken Neigen Rechts</string>
+    <string id="s_neck_tilt_left">Nacken Neigen Links</string>
+    <string id="s_neck_tilt_down">Nacken nach Unten</string>
+    <string id="s_neck_tilt_up">Nacken nach Oben</string>
+    <string id="s_neck_rot_right">Nacken Drehen Rechts</string>
+    <string id="s_neck_rot_left">Nacken Drehen Links</string>
+    <string id="s_neck_rot_right_down">Drehen R + Unten</string>
+    <string id="s_neck_rot_left_down">Drehen L + Unten</string>
+    <string id="s_neck_rot_right_up">Drehen R + Oben</string>
+    <string id="s_neck_rot_left_up">Drehen L + Oben</string>
+    <string id="s_neck_chest_rot_right_up">Hand Brust R Oben</string>
+    <string id="s_neck_chest_rot_left_up">Hand Brust L Oben</string>
+    <string id="s_wrist_flexor_right">Handbeuger Rechts</string>
+    <string id="s_wrist_flexor_left">Handbeuger Links</string>
+    <string id="s_wrist_extensor_right">Handstrecker Rechts</string>
+    <string id="s_wrist_extensor_left">Handstrecker Links</string>
+    <string id="s_shoulder_cross_right">Schulter Quer Rechts</string>
+    <string id="s_shoulder_cross_left">Schulter Quer Links</string>
+    <string id="s_triceps_right">Trizeps Oben Rechts</string>
+    <string id="s_triceps_left">Trizeps Oben Links</string>
+    <string id="s_chest_opener">Brustöffner</string>
+    <string id="s_upper_back_reach">Oberer Rücken</string>
+    <string id="s_side_bend_right">Seitbeuge Rechts</string>
+    <string id="s_side_bend_left">Seitbeuge Links</string>
+    <string id="s_torso_twist_right">Rumpfdrehung Rechts</string>
+    <string id="s_torso_twist_left">Rumpfdrehung Links</string>
+    <string id="s_lower_back_child_pose">Kindhaltung</string>
+    <string id="s_hamstring_fold">Vorbeuge</string>
+    <string id="s_quad_right">Oberschenkel Rechts</string>
+    <string id="s_quad_left">Oberschenkel Links</string>
+    <string id="s_calf_right">Wade Rechts</string>
+    <string id="s_calf_left">Wade Links</string>
+    <string id="s_hip_flexor_right">Hüftbeuger Rechts</string>
+    <string id="s_hip_flexor_left">Hüftbeuger Links</string>
+</strings>

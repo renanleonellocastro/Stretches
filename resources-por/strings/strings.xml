@@ -1,0 +1,86 @@
+<!-- Portuguese -->
+<strings>
+    <string id="AppName">Alongamentos</string>
+    <string id="WakeMessage" scope="background">Hora de alongar!</string>
+
+    <string id="AlertTitle">Hora de alongar!</string>
+    <string id="OptStart">Começar</string>
+    <string id="OptSnooze">Adiar 15 min</string>
+    <string id="OptSkip">Pular</string>
+
+    <string id="GetReady">PREPARE-SE</string>
+    <string id="Paused">PAUSADO</string>
+    <string id="EndWorkoutQ">Encerrar treino?</string>
+    <string id="CongratsTitle">Parabéns!</string>
+    <string id="CongratsBody">Treino concluído</string>
+    <string id="SaveTitle">Salvar treino?</string>
+    <string id="OptSave">Salvar</string>
+    <string id="OptDiscard">Descartar</string>
+    <string id="SavedMsg">Salvo!</string>
+    <string id="DiscardedMsg">Descartado</string>
+    <string id="EmptyRoutineMsg">Escolha alongamentos</string>
+
+    <string id="HomeNext">PRÓXIMA SESSÃO</string>
+    <string id="HomeStretchesUnit">alongamentos ·</string>
+    <string id="HomeMinutesUnit">min</string>
+    <string id="HomeHint">START: menu</string>
+
+    <string id="MenuStartNow">Começar agora</string>
+    <string id="MenuMyStretches">Meus alongamentos</string>
+    <string id="MenuDurations">Durações</string>
+    <string id="MenuSchedules">Horários</string>
+    <string id="MenuSettings">Ajustes</string>
+    <string id="MenuAbout">Sobre</string>
+    <string id="MenuAddTime">Adicionar horário</string>
+    <string id="MenuEditTime">Editar horário</string>
+    <string id="MenuDelete">Excluir</string>
+    <string id="MenuEnabled">Ativado</string>
+    <string id="StateOn">Ativo</string>
+    <string id="StateOff">Inativo</string>
+    <string id="SettingDefaultDuration">Duração padrão</string>
+    <string id="SettingSound">Som</string>
+    <string id="SettingVibration">Vibração</string>
+    <string id="SecondsUnit">s</string>
+    <string id="AboutText">Stretches 1.0.0 MIT</string>
+
+    <string id="GroupNeck">Pescoço</string>
+    <string id="GroupWrist">Punho e antebraço</string>
+    <string id="GroupShoulder">Ombro e peito</string>
+    <string id="GroupTorso">Tronco e costas</string>
+    <string id="GroupLegs">Pernas</string>
+
+    <string id="s_neck_tilt_right">Inclinar Pescoço Dir.</string>
+    <string id="s_neck_tilt_left">Inclinar Pescoço Esq.</string>
+    <string id="s_neck_tilt_down">Pescoço p/ Baixo</string>
+    <string id="s_neck_tilt_up">Pescoço p/ Cima</string>
+    <string id="s_neck_rot_right">Girar Pescoço Dir.</string>
+    <string id="s_neck_rot_left">Girar Pescoço Esq.</string>
+    <string id="s_neck_rot_right_down">Girar Dir. + Baixo</string>
+    <string id="s_neck_rot_left_down">Girar Esq. + Baixo</string>
+    <string id="s_neck_rot_right_up">Girar Dir. + Cima</string>
+    <string id="s_neck_rot_left_up">Girar Esq. + Cima</string>
+    <string id="s_neck_chest_rot_right_up">Mão no Peito Dir. Cima</string>
+    <string id="s_neck_chest_rot_left_up">Mão no Peito Esq. Cima</string>
+    <string id="s_wrist_flexor_right">Flexor do Punho Dir.</string>
+    <string id="s_wrist_flexor_left">Flexor do Punho Esq.</string>
+    <string id="s_wrist_extensor_right">Extensor do Punho Dir.</string>
+    <string id="s_wrist_extensor_left">Extensor do Punho Esq.</string>
+    <string id="s_shoulder_cross_right">Ombro Cruzado Dir.</string>
+    <string id="s_shoulder_cross_left">Ombro Cruzado Esq.</string>
+    <string id="s_triceps_right">Tríceps Acima Dir.</string>
+    <string id="s_triceps_left">Tríceps Acima Esq.</string>
+    <string id="s_chest_opener">Abertura de Peito</string>
+    <string id="s_upper_back_reach">Costas Altas</string>
+    <string id="s_side_bend_right">Flexão Lateral Dir.</string>
+    <string id="s_side_bend_left">Flexão Lateral Esq.</string>
+    <string id="s_torso_twist_right">Torção de Tronco Dir.</string>
+    <string id="s_torso_twist_left">Torção de Tronco Esq.</string>
+    <string id="s_lower_back_child_pose">Postura da Criança</string>
+    <string id="s_hamstring_fold">Flexão à Frente</string>
+    <string id="s_quad_right">Quadríceps Dir.</string>
+    <string id="s_quad_left">Quadríceps Esq.</string>
+    <string id="s_calf_right">Panturrilha Dir.</string>
+    <string id="s_calf_left">Panturrilha Esq.</string>
+    <string id="s_hip_flexor_right">Flexor do Quadril Dir.</string>
+    <string id="s_hip_flexor_left">Flexor do Quadril Esq.</string>
+</strings>

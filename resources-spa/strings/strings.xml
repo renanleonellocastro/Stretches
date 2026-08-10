@@ -1,0 +1,86 @@
+<!-- Spanish -->
+<strings>
+    <string id="AppName">Estiramientos</string>
+    <string id="WakeMessage" scope="background">¡Hora de estirar!</string>
+
+    <string id="AlertTitle">¡Hora de estirar!</string>
+    <string id="OptStart">Empezar</string>
+    <string id="OptSnooze">Posponer 15 min</string>
+    <string id="OptSkip">Omitir</string>
+
+    <string id="GetReady">PREPÁRATE</string>
+    <string id="Paused">PAUSADO</string>
+    <string id="EndWorkoutQ">¿Terminar sesión?</string>
+    <string id="CongratsTitle">¡Felicidades!</string>
+    <string id="CongratsBody">Rutina completada</string>
+    <string id="SaveTitle">¿Guardar sesión?</string>
+    <string id="OptSave">Guardar</string>
+    <string id="OptDiscard">Descartar</string>
+    <string id="SavedMsg">¡Guardado!</string>
+    <string id="DiscardedMsg">Descartado</string>
+    <string id="EmptyRoutineMsg">Elige estiramientos</string>
+
+    <string id="HomeNext">PRÓXIMA SESIÓN</string>
+    <string id="HomeStretchesUnit">estiramientos ·</string>
+    <string id="HomeMinutesUnit">min</string>
+    <string id="HomeHint">START: menú</string>
+
+    <string id="MenuStartNow">Empezar ahora</string>
+    <string id="MenuMyStretches">Mis estiramientos</string>
+    <string id="MenuDurations">Duraciones</string>
+    <string id="MenuSchedules">Horarios</string>
+    <string id="MenuSettings">Ajustes</string>
+    <string id="MenuAbout">Acerca de</string>
+    <string id="MenuAddTime">Añadir horario</string>
+    <string id="MenuEditTime">Editar horario</string>
+    <string id="MenuDelete">Eliminar</string>
+    <string id="MenuEnabled">Activado</string>
+    <string id="StateOn">Activo</string>
+    <string id="StateOff">Inactivo</string>
+    <string id="SettingDefaultDuration">Duración por defecto</string>
+    <string id="SettingSound">Sonido</string>
+    <string id="SettingVibration">Vibración</string>
+    <string id="SecondsUnit">s</string>
+    <string id="AboutText">Stretches 1.0.0 MIT</string>
+
+    <string id="GroupNeck">Cuello</string>
+    <string id="GroupWrist">Muñeca y antebrazo</string>
+    <string id="GroupShoulder">Hombro y pecho</string>
+    <string id="GroupTorso">Tronco y espalda</string>
+    <string id="GroupLegs">Piernas</string>
+
+    <string id="s_neck_tilt_right">Inclinar Cuello Der.</string>
+    <string id="s_neck_tilt_left">Inclinar Cuello Izq.</string>
+    <string id="s_neck_tilt_down">Cuello Abajo</string>
+    <string id="s_neck_tilt_up">Cuello Arriba</string>
+    <string id="s_neck_rot_right">Girar Cuello Der.</string>
+    <string id="s_neck_rot_left">Girar Cuello Izq.</string>
+    <string id="s_neck_rot_right_down">Girar Der. + Abajo</string>
+    <string id="s_neck_rot_left_down">Girar Izq. + Abajo</string>
+    <string id="s_neck_rot_right_up">Girar Der. + Arriba</string>
+    <string id="s_neck_rot_left_up">Girar Izq. + Arriba</string>
+    <string id="s_neck_chest_rot_right_up">Mano en Pecho Der.</string>
+    <string id="s_neck_chest_rot_left_up">Mano en Pecho Izq.</string>
+    <string id="s_wrist_flexor_right">Flexor de Muñeca Der.</string>
+    <string id="s_wrist_flexor_left">Flexor de Muñeca Izq.</string>
+    <string id="s_wrist_extensor_right">Extensor de Muñeca Der.</string>
+    <string id="s_wrist_extensor_left">Extensor de Muñeca Izq.</string>
+    <string id="s_shoulder_cross_right">Hombro Cruzado Der.</string>
+    <string id="s_shoulder_cross_left">Hombro Cruzado Izq.</string>
+    <string id="s_triceps_right">Tríceps Arriba Der.</string>
+    <string id="s_triceps_left">Tríceps Arriba Izq.</string>
+    <string id="s_chest_opener">Apertura de Pecho</string>
+    <string id="s_upper_back_reach">Espalda Alta</string>
+    <string id="s_side_bend_right">Flexión Lateral Der.</string>
+    <string id="s_side_bend_left">Flexión Lateral Izq.</string>
+    <string id="s_torso_twist_right">Giro de Tronco Der.</string>
+    <string id="s_torso_twist_left">Giro de Tronco Izq.</string>
+    <string id="s_lower_back_child_pose">Postura del Niño</string>
+    <string id="s_hamstring_fold">Flexión Adelante</string>
+    <string id="s_quad_right">Cuádriceps Der.</string>
+    <string id="s_quad_left">Cuádriceps Izq.</string>
+    <string id="s_calf_right">Gemelo Der.</string>
+    <string id="s_calf_left">Gemelo Izq.</string>
+    <string id="s_hip_flexor_right">Flexor de Cadera Der.</string>
+    <string id="s_hip_flexor_left">Flexor de Cadera Izq.</string>
+</strings>

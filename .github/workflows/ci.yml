@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  SDK_VERSION: 9.2.0
+  # Hash of the Garmin SDK license agreement accepted for CI builds.
+  # Refresh with: connect-iq-sdk-manager agreement view
+  AGREEMENT_HASH: CC737BBBA104D7740D5BBCF27D0F6382
+
+jobs:
+  validate:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate XML resources and manifest
+        run: |
+          python3 - <<'EOF'
+          import glob
+          import sys
+          import xml.dom.minidom
+
+          files = ["manifest.xml"] + glob.glob("resources*/**/*.xml", recursive=True)
+          failed = False
+          for path in files:
+              try:
+                  xml.dom.minidom.parse(path)
+              except Exception as exc:
+                  print(f"INVALID {path}: {exc}")
+                  failed = True
+          print(f"checked {len(files)} XML files")
+          sys.exit(1 if failed else 0)
+          EOF
+
+      - name: Check string catalogs are in sync across languages
+        run: |
+          python3 - <<'EOF'
+          import glob
+          import re
+          import sys
+
+          def ids(path):
+              with open(path) as f:
+                  return set(re.findall(r'<string id="([^"]+)"', f.read()))
+
+          base = ids("resources/strings/strings.xml")
+          failed = False
+          for path in sorted(glob.glob("resources-*/strings/strings.xml")):
+              diff = base.symmetric_difference(ids(path))
+              if diff:
+                  print(f"OUT OF SYNC {path}: {sorted(diff)}")
+                  failed = True
+          print(f"base catalog has {len(base)} strings")
+          sys.exit(1 if failed else 0)
+          EOF
+
+      - name: Verify illustration generator runs and covers the catalog
+        run: |
+          pip install --quiet pillow
+          python3 scripts/generate_illustrations.py
+          python3 - <<'EOF'
+          import glob
+          import re
+          import sys
+
+          pngs = {p.split("/")[-1][:-4] for p in glob.glob("resources/drawables/stretches/*.png")}
+          with open("source/model/StretchCatalog.mc") as f:
+              catalog = set(re.findall(r'new Entry\("([a-z_0-9]+)"', f.read()))
+          missing = catalog - pngs
+          if missing:
+              print(f"catalog entries without illustration: {sorted(missing)}")
+              sys.exit(1)
+          print(f"{len(catalog)} catalog entries, {len(pngs)} illustrations - OK")
+          EOF
+
+  build-and-test:
+    name: Build & unit tests (Connect IQ)
+    runs-on: ubuntu-latest
+    # Garmin credentials are unavailable to PRs from forks; those still run
+    # the static checks above.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install connect-iq-sdk-manager
+        run: |
+          curl --silent --location \
+            https://raw.githubusercontent.com/lindell/connect-iq-sdk-manager-cli/master/install.sh \
+            | sudo sh
+
+      - name: Download SDK and device files
+        env:
+          GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+        run: |
+          connect-iq-sdk-manager agreement accept --agreement-hash "$AGREEMENT_HASH"
+          connect-iq-sdk-manager login
+          connect-iq-sdk-manager sdk set "$SDK_VERSION"
+          connect-iq-sdk-manager device download --include-fonts --manifest manifest.xml
+          echo "$(connect-iq-sdk-manager sdk current-path --bin)" >> "$GITHUB_PATH"
+
+      - name: Generate signing key
+        run: |
+          mkdir -p ~/.garmin-keys
+          openssl genrsa -out ~/.garmin-keys/developer_key.pem 4096
+          openssl pkcs8 -topk8 -inform PEM -outform DER \
+            -in ~/.garmin-keys/developer_key.pem \
+            -out ~/.garmin-keys/developer_key.der -nocrypt
+
+      - name: Compile (type check level 2, warnings on)
+        run: make build DEVICE=fr55
+
+      - name: Run unit tests on the simulator
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libusb-1.0-0 libgtk-3-0 libsm6 libwebkit2gtk-4.1-0
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1280x1024x24 &
+          "$(connect-iq-sdk-manager sdk current-path --bin)/connectiq" &
+          sleep 25
+          make test DEVICE=fr55
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stretches-fr55-prg
+          path: bin/Stretches-fr55.prg

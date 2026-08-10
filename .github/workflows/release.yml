@@ -1,0 +1,72 @@
+name: Release
+
+# Builds the store-ready .iq package when a version tag is pushed
+# (e.g. v1.0.0) and attaches it to a GitHub release. Upload the .iq to the
+# Connect IQ store from https://apps.garmin.com/developer/dashboard.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  SDK_VERSION: 9.2.0
+  AGREEMENT_HASH: CC737BBBA104D7740D5BBCF27D0F6382
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Build .iq package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install connect-iq-sdk-manager
+        run: |
+          curl --silent --location \
+            https://raw.githubusercontent.com/lindell/connect-iq-sdk-manager-cli/master/install.sh \
+            | sudo sh
+
+      - name: Download SDK and device files
+        env:
+          GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+        run: |
+          connect-iq-sdk-manager agreement accept --agreement-hash "$AGREEMENT_HASH"
+          connect-iq-sdk-manager login
+          connect-iq-sdk-manager sdk set "$SDK_VERSION"
+          connect-iq-sdk-manager device download --include-fonts --manifest manifest.xml
+          echo "$(connect-iq-sdk-manager sdk current-path --bin)" >> "$GITHUB_PATH"
+
+      - name: Import signing key
+        env:
+          # Base64-encoded developer_key.der used to sign store uploads.
+          # Keep using the SAME key for every release of the app.
+          SIGNING_KEY_B64: ${{ secrets.CIQ_SIGNING_KEY_B64 }}
+        run: |
+          mkdir -p ~/.garmin-keys
+          if [ -n "$SIGNING_KEY_B64" ]; then
+            echo "$SIGNING_KEY_B64" | base64 -d > ~/.garmin-keys/developer_key.der
+          else
+            echo "::warning::CIQ_SIGNING_KEY_B64 secret not set - using a throwaway key"
+            openssl genrsa -out ~/.garmin-keys/developer_key.pem 4096
+            openssl pkcs8 -topk8 -inform PEM -outform DER \
+              -in ~/.garmin-keys/developer_key.pem \
+              -out ~/.garmin-keys/developer_key.der -nocrypt
+          fi
+
+      - name: Build package
+        run: make package
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Stretches.iq
+          generate_release_notes: true

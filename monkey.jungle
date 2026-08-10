@@ -1,0 +1,6 @@
+project.manifest = manifest.xml
+
+# Defaults are used for source and resource paths so that per-language
+# resource folders (resources-por, resources-spa, ...) are discovered
+# automatically. Unit tests live in source/tests and are annotated with
+# (:test), so they are only included when building with --unit-test.
