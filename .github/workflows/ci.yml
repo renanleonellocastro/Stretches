@@ -100,24 +100,34 @@ jobs:
   build-and-test:
     name: Build & unit tests (Connect IQ)
     runs-on: ubuntu-latest
-    # Garmin credentials are unavailable to PRs from forks; those still run
-    # the static checks above.
+    # Only on same-repo events (fork PRs can't read secrets). Steps below are
+    # further gated on HAS_CREDS so the job stays green until the maintainer
+    # adds the GARMIN_USERNAME / GARMIN_PASSWORD secrets.
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      HAS_CREDS: ${{ secrets.GARMIN_USERNAME != '' && secrets.GARMIN_PASSWORD != '' }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Note when device builds are skipped
+        if: env.HAS_CREDS != 'true'
+        run: echo "::notice::GARMIN_USERNAME/GARMIN_PASSWORD secrets are not set — skipping device build & simulator tests. Static checks already ran. Add the secrets to enable this job."
+
       - uses: actions/setup-java@v4
+        if: env.HAS_CREDS == 'true'
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Install connect-iq-sdk-manager
+        if: env.HAS_CREDS == 'true'
         run: |
           curl --silent --location \
             https://raw.githubusercontent.com/lindell/connect-iq-sdk-manager-cli/master/install.sh \
             | sudo sh
 
       - name: Download SDK and device files
+        if: env.HAS_CREDS == 'true'
         env:
           GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
@@ -129,6 +139,7 @@ jobs:
           echo "$(connect-iq-sdk-manager sdk current-path --bin)" >> "$GITHUB_PATH"
 
       - name: Generate signing key
+        if: env.HAS_CREDS == 'true'
         run: |
           mkdir -p ~/.garmin-keys
           openssl genrsa -out ~/.garmin-keys/developer_key.pem 4096
@@ -137,9 +148,11 @@ jobs:
             -out ~/.garmin-keys/developer_key.der -nocrypt
 
       - name: Compile (type check level 2, warnings on)
+        if: env.HAS_CREDS == 'true'
         run: make build DEVICE=fr55
 
       - name: Run unit tests on the simulator
+        if: env.HAS_CREDS == 'true'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq xvfb libusb-1.0-0 libgtk-3-0 libsm6 libwebkit2gtk-4.1-0
@@ -150,6 +163,7 @@ jobs:
           make test DEVICE=fr55
 
       - name: Upload build artifact
+        if: env.HAS_CREDS == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: stretches-fr55-prg

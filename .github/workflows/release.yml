@@ -20,21 +20,33 @@ jobs:
   package:
     name: Build .iq package
     runs-on: ubuntu-latest
+    # Building the .iq needs the maintainer's Garmin login. Without the
+    # secrets the job no-ops (green) — the release can still be created and
+    # its .iq attached manually (see docs/STORE_LISTING.md).
+    env:
+      HAS_CREDS: ${{ secrets.GARMIN_USERNAME != '' && secrets.GARMIN_PASSWORD != '' }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Note when packaging is skipped
+        if: env.HAS_CREDS != 'true'
+        run: echo "::notice::GARMIN secrets not set — skipping .iq packaging. Attach dist/Stretches.iq to the release manually or add the secrets."
+
       - uses: actions/setup-java@v4
+        if: env.HAS_CREDS == 'true'
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Install connect-iq-sdk-manager
+        if: env.HAS_CREDS == 'true'
         run: |
           curl --silent --location \
             https://raw.githubusercontent.com/lindell/connect-iq-sdk-manager-cli/master/install.sh \
             | sudo sh
 
       - name: Download SDK and device files
+        if: env.HAS_CREDS == 'true'
         env:
           GARMIN_USERNAME: ${{ secrets.GARMIN_USERNAME }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
@@ -46,6 +58,7 @@ jobs:
           echo "$(connect-iq-sdk-manager sdk current-path --bin)" >> "$GITHUB_PATH"
 
       - name: Import signing key
+        if: env.HAS_CREDS == 'true'
         env:
           # Base64-encoded developer_key.der used to sign store uploads.
           # Keep using the SAME key for every release of the app.
@@ -63,9 +76,11 @@ jobs:
           fi
 
       - name: Build package
+        if: env.HAS_CREDS == 'true'
         run: make package
 
-      - name: Create GitHub release
+      - name: Attach .iq to the release
+        if: env.HAS_CREDS == 'true'
         uses: softprops/action-gh-release@v2
         with:
           files: dist/Stretches.iq
