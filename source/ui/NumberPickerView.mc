@@ -44,30 +44,40 @@ class NumberPickerView extends WatchUi.View {
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
 
+        // Outer ring reflects where the value sits between min and max.
+        var span = _max - _min;
+        var fraction = span > 0 ? (value - _min).toFloat() / span : 0.0;
+        Theme.drawProgressRing(dc, fraction, Theme.COLOR_ACCENT);
+
+        // Title near the top.
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
         var lines = Theme.splitTwoLines(_title, 18);
-        var y = h / 10;
+        var y = h * 22 / 100;
         for (var i = 0; i < lines.size(); i++) {
             dc.drawText(w / 2, y, Graphics.FONT_TINY, lines[i] as String,
                         Graphics.TEXT_JUSTIFY_CENTER);
             y += dc.getFontHeight(Graphics.FONT_TINY);
         }
 
-        dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h / 2, Graphics.FONT_NUMBER_HOT, value.toString(),
+        // Value hero + unit.
+        dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h * 50 / 100, Graphics.FONT_NUMBER_HOT, value.toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, (h * 7) / 10, Graphics.FONT_SMALL, _unit,
+        dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h * 68 / 100, Graphics.FONT_TINY, _unit,
                     Graphics.TEXT_JUSTIFY_CENTER);
 
         drawChevrons(dc, w, h);
     }
 
+    // Up/down chevron hints just inside the value ring.
     hidden function drawChevrons(dc as Dc, w as Number, h as Number) as Void {
-        dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
+        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
         var cx = w / 2;
-        var top = [[cx - 8, h / 7], [cx + 8, h / 7], [cx, h / 7 - 9]];
-        var bottom = [[cx - 8, (h * 6) / 7], [cx + 8, (h * 6) / 7], [cx, (h * 6) / 7 + 9]];
+        var topY = h * 13 / 100;
+        var botY = h * 87 / 100;
+        var top = [[cx - 8, topY], [cx + 8, topY], [cx, topY - 9]];
+        var bottom = [[cx - 8, botY], [cx + 8, botY], [cx, botY + 9]];
         dc.fillPolygon(top);
         dc.fillPolygon(bottom);
     }

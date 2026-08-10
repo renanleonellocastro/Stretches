@@ -140,53 +140,71 @@ class WorkoutView extends WatchUi.View {
     hidden function drawStretch(dc as Dc, state as Number) as Void {
         var w = dc.getWidth();
         var h = dc.getHeight();
-        var announcing = true;
-        if (state == STATE_STRETCH) {
-            announcing = false;
-        }
+        var announcing = (state != STATE_STRETCH);
+        // Amber during the get-ready lead-in, the muscle-group color while
+        // the stretch is running.
         var phaseColor = announcing ? Theme.COLOR_WARM : _groupColor;
         Theme.drawProgressRing(dc, _engine.progress(), phaseColor);
 
-        // Stretch name, up to two lines at the top.
+        // Stretch name, up to two lines near the top.
         dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        var y = h / 24;
         var lineH = dc.getFontHeight(Graphics.FONT_TINY);
+        var y = h * 6 / 100;
         for (var i = 0; i < _nameLines.size(); i++) {
             dc.drawText(w / 2, y, Graphics.FONT_TINY, _nameLines[i] as String,
                         Graphics.TEXT_JUSTIFY_CENTER);
             y += lineH;
         }
 
-        // Illustration card, centered.
+        // Countdown badge geometry (bottom-center). The illustration is a
+        // white card, so no text may sit on top of it: the name goes above
+        // and the countdown below.
+        var badgeR = h * 9 / 100;
+        var bx = w / 2;
+        var by = h - badgeR - h * 4 / 100;
+        var badgeTop = by - badgeR;
+
+        // Illustration card, centered in the band between name and badge.
         if (_image != null) {
             var img = _image as WatchUi.BitmapResource;
-            var ix = (w - img.getWidth()) / 2;
-            var iy = y + 2;
-            dc.drawBitmap(ix, iy, img);
+            var nameBottom = y + h * 1 / 100;
+            var iy = nameBottom + (badgeTop - nameBottom - img.getHeight()) / 2;
+            if (iy < nameBottom) {
+                iy = nameBottom;
+            }
+            dc.drawBitmap((w - img.getWidth()) / 2, iy, img);
         }
 
-        // Countdown badge at the bottom.
-        var badgeR = h / 9;
-        var bx = w / 2;
-        var by = h - badgeR - 4;
+        // Countdown badge.
         dc.setColor(phaseColor, Graphics.COLOR_TRANSPARENT);
         dc.fillCircle(bx, by, badgeR);
         dc.setColor(Theme.COLOR_BG, Graphics.COLOR_TRANSPARENT);
         dc.drawText(bx, by, Graphics.FONT_NUMBER_MILD, _engine.remaining().toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
-        // Position indicator ("2/8") under the name, small and dim.
+        // Position ("2/8"), quiet, in the black area beside the badge.
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 8, h / 2, Graphics.FONT_TINY,
+        dc.drawText(w * 20 / 100, by, Graphics.FONT_XTINY,
                     _engine.position().toString() + "/" + _engine.total().toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
         if (_engine.isPaused()) {
-            dc.setColor(Theme.COLOR_WARM, Graphics.COLOR_TRANSPARENT);
-            dc.drawText(w / 2, h / 2, Graphics.FONT_MEDIUM,
-                        WatchUi.loadResource(Rez.Strings.Paused) as String,
-                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            drawPausedOverlay(dc, w, h);
         }
+    }
+
+    hidden function drawPausedOverlay(dc as Dc, w as Number, h as Number) as Void {
+        var barH = h / 5;
+        dc.setColor(Theme.COLOR_BG, Graphics.COLOR_TRANSPARENT);
+        dc.fillRectangle(0, h / 2 - barH / 2, w, barH);
+        dc.setPenWidth(2);
+        dc.setColor(Theme.COLOR_WARM, Graphics.COLOR_TRANSPARENT);
+        dc.drawLine(w / 4, h / 2 - barH / 2, w * 3 / 4, h / 2 - barH / 2);
+        dc.drawLine(w / 4, h / 2 + barH / 2, w * 3 / 4, h / 2 + barH / 2);
+        dc.setPenWidth(1);
+        dc.drawText(w / 2, h / 2, Graphics.FONT_MEDIUM,
+                    WatchUi.loadResource(Rez.Strings.Paused) as String,
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }
 

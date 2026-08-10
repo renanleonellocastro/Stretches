@@ -6,6 +6,19 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Refreshed the whole UI into one clean, cohesive design system: black
+  background, a single calm-teal accent, a subtle frame ring with a small
+  brand arc, consistent typography and rounded "pill" controls. Applied to
+  the home, alarm prompt, save prompt, messages, duration/time pickers, the
+  workout and the celebration screens.
+- Reworked the workout screen so the stretch name, illustration and
+  countdown never overlap; illustrations are sized to fit the smallest
+  target screen (Forerunner 55).
+- Muscle-group colors are now used only where meaningful (illustration
+  borders and the in-workout progress ring), not as decoration.
+
 ## [1.0.0] - 2026-08-10
 
 ### Added

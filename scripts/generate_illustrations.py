@@ -24,8 +24,12 @@ from PIL import Image, ImageDraw, ImageOps
 # Rendering constants
 # ---------------------------------------------------------------------------
 
-SCALE = 4               # supersampling factor
-OUT = 140               # final image edge in pixels
+SCALE = 5               # supersampling factor
+OUT = 108               # final image edge in pixels; sized so the workout
+                        # screen fits name + illustration + countdown on the
+                        # smallest target (Forerunner 55, 208x208) with no
+                        # overlap. Rendered at 5x then downscaled for crisp
+                        # strokes.
 S = OUT * SCALE         # working canvas edge (560)
 
 INK = (10, 10, 10, 255)             # figure strokes

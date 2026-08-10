@@ -41,17 +41,26 @@ class MessageView extends WatchUi.View {
         var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
+
+        // Quiet frame with a colored sweep at the top matching the message
+        // tone (success / danger / accent).
+        Theme.drawFrameRing(dc);
         var cx = w / 2;
         var cy = h / 2;
-        var r = (cx < cy ? cx : cy) - 6;
-        dc.setPenWidth(6);
+        var r = (cx < cy ? cx : cy) - 3;
+        dc.setPenWidth(5);
         dc.setColor(_color, Graphics.COLOR_TRANSPARENT);
-        dc.drawCircle(cx, cy, r);
+        dc.drawArc(cx, cy, r, Graphics.ARC_CLOCKWISE, 118, 62);
         dc.setPenWidth(1);
+
+        // A small colored dot above the text as a gentle focal point.
+        dc.setColor(_color, Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(cx, h * 34 / 100, w / 40 + 2);
+
         dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
         var lines = Theme.splitTwoLines(_text, 16);
         var lineH = dc.getFontHeight(Graphics.FONT_MEDIUM);
-        var y = cy - (lines.size() * lineH) / 2;
+        var y = cy - (lines.size() * lineH) / 2 + h / 20;
         for (var i = 0; i < lines.size(); i++) {
             dc.drawText(cx, y, Graphics.FONT_MEDIUM, lines[i] as String, Graphics.TEXT_JUSTIFY_CENTER);
             y += lineH;
