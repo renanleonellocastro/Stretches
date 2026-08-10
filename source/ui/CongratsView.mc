@@ -78,11 +78,11 @@ class CongratsView extends WatchUi.View {
         var h = dc.getHeight();
         dc.setColor(Theme.COLOR_SUCCESS, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 56 / 100, Graphics.FONT_MEDIUM,
-                    WatchUi.loadResource(Rez.Strings.CongratsTitle) as String,
+                    Strings.t("CongratsTitle"),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 70 / 100, Graphics.FONT_TINY,
-                    WatchUi.loadResource(Rez.Strings.CongratsBody) as String,
+                    Strings.t("CongratsBody"),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }

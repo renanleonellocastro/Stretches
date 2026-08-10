@@ -40,6 +40,7 @@
     <string id="SettingDefaultDuration">Standarddauer</string>
     <string id="SettingSound">Ton</string>
     <string id="SettingVibration">Vibration</string>
+    <string id="SettingLanguage">Sprache</string>
     <string id="PickerTitle">Dehnen</string>
     <string id="InRoutine">In der Routine</string>
     <string id="SecondsUnit">s</string>

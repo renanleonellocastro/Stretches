@@ -10,7 +10,7 @@ module WorkoutFlow {
         var ids = RoutineModel.selectedIds();
         if (ids.size() == 0) {
             var msg = new MessageView(
-                WatchUi.loadResource(Rez.Strings.EmptyRoutineMsg) as String,
+                Strings.t("EmptyRoutineMsg"),
                 Theme.COLOR_WARM, 2500);
             if (replaceCurrent) {
                 WatchUi.switchToView(msg, new MessageDelegate(), WatchUi.SLIDE_LEFT);

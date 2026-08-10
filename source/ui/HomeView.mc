@@ -54,7 +54,7 @@ class HomeView extends WatchUi.View {
         Theme.drawBrandArc(dc, Theme.COLOR_ACCENT);
         dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 15 / 100, Graphics.FONT_XTINY,
-                    (WatchUi.loadResource(Rez.Strings.AppName) as String).toUpper(),
+                    (Strings.t("AppName")).toUpper(),
                     Graphics.TEXT_JUSTIFY_CENTER);
     }
 
@@ -64,7 +64,7 @@ class HomeView extends WatchUi.View {
         var hasAlarm = Prefs.getNextAlarmEpoch() != null;
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 27 / 100, Graphics.FONT_XTINY,
-                    WatchUi.loadResource(Rez.Strings.HomeNext) as String,
+                    Strings.t("HomeNext"),
                     Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(hasAlarm ? Theme.COLOR_TEXT : Theme.COLOR_TEXT_DIM,
                     Graphics.COLOR_TRANSPARENT);
@@ -76,7 +76,7 @@ class HomeView extends WatchUi.View {
         var count = RoutineModel.selectedIds().size();
         var summary;
         if (count == 0) {
-            summary = WatchUi.loadResource(Rez.Strings.EmptyRoutineMsg) as String;
+            summary = Strings.t("EmptyRoutineMsg");
             dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
         } else {
             summary = routineSummary(count);
@@ -90,14 +90,14 @@ class HomeView extends WatchUi.View {
     hidden function routineSummary(count as Number) as String {
         var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
         return count.toString() + " " +
-               (WatchUi.loadResource(Rez.Strings.HomeStretchesUnit) as String) +
+               (Strings.t("HomeStretchesUnit")) +
                " " + mins.toString() + " " +
-               (WatchUi.loadResource(Rez.Strings.HomeMinutesUnit) as String);
+               (Strings.t("HomeMinutesUnit"));
     }
 
     hidden function drawMenuHint(dc as Dc) as Void {
         Theme.drawPill(dc, dc.getWidth() / 2, dc.getHeight() * 83 / 100,
-                       WatchUi.loadResource(Rez.Strings.HomeHint) as String,
+                       Strings.t("HomeHint"),
                        Graphics.FONT_XTINY, Theme.COLOR_ACCENT, false);
     }
 

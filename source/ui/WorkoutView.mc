@@ -138,7 +138,7 @@ class WorkoutView extends WatchUi.View {
         _imageId = id;
         _image = WatchUi.loadResource(entry.imageRes) as WatchUi.BitmapResource;
         _groupColor = Theme.groupColor(entry.group);
-        _fullName = WatchUi.loadResource(entry.nameRes) as String;
+        _fullName = Strings.t(entry.nameKey);
         _nameLines = Theme.splitTwoLines(_fullName, 17);
     }
 
@@ -147,7 +147,7 @@ class WorkoutView extends WatchUi.View {
         dc.clear();
         var state = _engine.state;
         if (state == STATE_PREP) {
-            drawCountdown(dc, WatchUi.loadResource(Rez.Strings.GetReady) as String);
+            drawCountdown(dc, Strings.t("GetReady"));
         } else if (state == STATE_ANNOUNCE) {
             // Preview the upcoming stretch: name + big centered countdown,
             // no progress ring (mirrors the initial get-ready screen).
@@ -246,7 +246,7 @@ class WorkoutView extends WatchUi.View {
         dc.drawLine(w / 4, h / 2 + barH / 2, w * 3 / 4, h / 2 + barH / 2);
         dc.setPenWidth(1);
         dc.drawText(w / 2, h / 2, Graphics.FONT_MEDIUM,
-                    WatchUi.loadResource(Rez.Strings.Paused) as String,
+                    Strings.t("Paused"),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }
@@ -286,7 +286,7 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     function onBack() as Boolean {
         _view.engine().pause();
         var dialog = new WatchUi.Confirmation(
-            WatchUi.loadResource(Rez.Strings.EndWorkoutQ) as String);
+            Strings.t("EndWorkoutQ"));
         WatchUi.pushView(dialog, new EndWorkoutConfirmDelegate(_view), WatchUi.SLIDE_UP);
         return true;
     }
