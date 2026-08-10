@@ -1,0 +1,88 @@
+<!-- Italian -->
+<strings>
+    <string id="AppName">Stretching</string>
+    <string id="WakeMessage" scope="background">Ora di fare stretching!</string>
+
+    <string id="AlertTitle">Ora di stretching!</string>
+    <string id="OptStart">Inizia</string>
+    <string id="OptSnooze">Rimanda 15 min</string>
+    <string id="OptSkip">Salta</string>
+
+    <string id="GetReady">PREPARATI</string>
+    <string id="Paused">IN PAUSA</string>
+    <string id="EndWorkoutQ">Terminare la sessione?</string>
+    <string id="CongratsTitle">Congratulazioni!</string>
+    <string id="CongratsBody">Routine completata</string>
+    <string id="SaveTitle">Salvare la sessione?</string>
+    <string id="OptSave">Salva</string>
+    <string id="OptDiscard">Elimina</string>
+    <string id="SavedMsg">Salvato!</string>
+    <string id="DiscardedMsg">Eliminato</string>
+    <string id="EmptyRoutineMsg">Scegli gli esercizi</string>
+
+    <string id="HomeNext">PROSSIMA SESSIONE</string>
+    <string id="HomeStretchesUnit">esercizi ·</string>
+    <string id="HomeMinutesUnit">min</string>
+    <string id="HomeHint">MENU</string>
+
+    <string id="MenuStartNow">Inizia ora</string>
+    <string id="MenuMyStretches">I miei esercizi</string>
+    <string id="MenuDurations">Durate</string>
+    <string id="MenuSchedules">Orari</string>
+    <string id="MenuSettings">Impostazioni</string>
+    <string id="MenuAbout">Info</string>
+    <string id="MenuAddTime">Aggiungi orario</string>
+    <string id="MenuEditTime">Modifica orario</string>
+    <string id="MenuDelete">Elimina</string>
+    <string id="MenuEnabled">Attivato</string>
+    <string id="StateOn">Attivo</string>
+    <string id="StateOff">Disattivo</string>
+    <string id="SettingDefaultDuration">Durata predefinita</string>
+    <string id="SettingSound">Suono</string>
+    <string id="SettingVibration">Vibrazione</string>
+    <string id="PickerTitle">Stretch</string>
+    <string id="InRoutine">Nella routine</string>
+    <string id="SecondsUnit">s</string>
+    <string id="AboutText">Stretches 1.0.0 MIT</string>
+
+    <string id="GroupNeck">Collo</string>
+    <string id="GroupWrist">Polso e avambraccio</string>
+    <string id="GroupShoulder">Spalla e petto</string>
+    <string id="GroupTorso">Tronco e schiena</string>
+    <string id="GroupLegs">Gambe</string>
+
+    <string id="s_neck_tilt_right">Inclina Collo Destra</string>
+    <string id="s_neck_tilt_left">Inclina Collo Sinistra</string>
+    <string id="s_neck_tilt_down">Collo in Basso</string>
+    <string id="s_neck_tilt_up">Collo in Alto</string>
+    <string id="s_neck_rot_right">Ruota Collo Destra</string>
+    <string id="s_neck_rot_left">Ruota Collo Sinistra</string>
+    <string id="s_neck_rot_right_down">Ruota Dx + Basso</string>
+    <string id="s_neck_rot_left_down">Ruota Sx + Basso</string>
+    <string id="s_neck_rot_right_up">Ruota Dx + Alto</string>
+    <string id="s_neck_rot_left_up">Ruota Sx + Alto</string>
+    <string id="s_neck_chest_rot_right_up">Mano Petto Dx Alto</string>
+    <string id="s_neck_chest_rot_left_up">Mano Petto Sx Alto</string>
+    <string id="s_wrist_flexor_right">Flessore Polso Dx</string>
+    <string id="s_wrist_flexor_left">Flessore Polso Sx</string>
+    <string id="s_wrist_extensor_right">Estensore Polso Dx</string>
+    <string id="s_wrist_extensor_left">Estensore Polso Sx</string>
+    <string id="s_shoulder_cross_right">Spalla Incrociata Dx</string>
+    <string id="s_shoulder_cross_left">Spalla Incrociata Sx</string>
+    <string id="s_triceps_right">Tricipite Alto Dx</string>
+    <string id="s_triceps_left">Tricipite Alto Sx</string>
+    <string id="s_chest_opener">Apertura del Petto</string>
+    <string id="s_upper_back_reach">Parte Alta Schiena</string>
+    <string id="s_side_bend_right">Flessione Laterale Dx</string>
+    <string id="s_side_bend_left">Flessione Laterale Sx</string>
+    <string id="s_torso_twist_right">Torsione Busto Dx</string>
+    <string id="s_torso_twist_left">Torsione Busto Sx</string>
+    <string id="s_lower_back_child_pose">Posizione del Bambino</string>
+    <string id="s_hamstring_fold">Flessione in Avanti</string>
+    <string id="s_quad_right">Quadricipite Dx</string>
+    <string id="s_quad_left">Quadricipite Sx</string>
+    <string id="s_calf_right">Polpaccio Dx</string>
+    <string id="s_calf_left">Polpaccio Sx</string>
+    <string id="s_hip_flexor_right">Flessore Anca Dx</string>
+    <string id="s_hip_flexor_left">Flessore Anca Sx</string>
+</strings>

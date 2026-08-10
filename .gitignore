@@ -1,0 +1,26 @@
+# Build output
+bin/
+dist/
+*.prg
+*.prg.debug.xml
+*.iq
+
+# Developer signing keys — never commit these
+*.der
+*.pem
+developer_key*
+
+# Connect IQ tooling
+.Garmin/
+GarminDeviceLogs/
+
+# Python tooling (illustration generator)
+__pycache__/
+*.pyc
+.venv/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

@@ -1,0 +1,88 @@
+<!-- French -->
+<strings>
+    <string id="AppName">Étirements</string>
+    <string id="WakeMessage" scope="background">C'est l'heure de s'étirer !</string>
+
+    <string id="AlertTitle">Heure de s'étirer !</string>
+    <string id="OptStart">Commencer</string>
+    <string id="OptSnooze">Reporter 15 min</string>
+    <string id="OptSkip">Ignorer</string>
+
+    <string id="GetReady">PRÉPAREZ-VOUS</string>
+    <string id="Paused">EN PAUSE</string>
+    <string id="EndWorkoutQ">Terminer la séance ?</string>
+    <string id="CongratsTitle">Félicitations !</string>
+    <string id="CongratsBody">Routine terminée</string>
+    <string id="SaveTitle">Enregistrer ?</string>
+    <string id="OptSave">Enregistrer</string>
+    <string id="OptDiscard">Supprimer</string>
+    <string id="SavedMsg">Enregistré !</string>
+    <string id="DiscardedMsg">Supprimé</string>
+    <string id="EmptyRoutineMsg">Choisissez des étirements</string>
+
+    <string id="HomeNext">PROCHAINE SÉANCE</string>
+    <string id="HomeStretchesUnit">étirements ·</string>
+    <string id="HomeMinutesUnit">min</string>
+    <string id="HomeHint">MENU</string>
+
+    <string id="MenuStartNow">Commencer</string>
+    <string id="MenuMyStretches">Mes étirements</string>
+    <string id="MenuDurations">Durées</string>
+    <string id="MenuSchedules">Horaires</string>
+    <string id="MenuSettings">Réglages</string>
+    <string id="MenuAbout">À propos</string>
+    <string id="MenuAddTime">Ajouter un horaire</string>
+    <string id="MenuEditTime">Modifier l'horaire</string>
+    <string id="MenuDelete">Supprimer</string>
+    <string id="MenuEnabled">Activé</string>
+    <string id="StateOn">Actif</string>
+    <string id="StateOff">Inactif</string>
+    <string id="SettingDefaultDuration">Durée par défaut</string>
+    <string id="SettingSound">Son</string>
+    <string id="SettingVibration">Vibration</string>
+    <string id="PickerTitle">Étirer</string>
+    <string id="InRoutine">Dans la routine</string>
+    <string id="SecondsUnit">s</string>
+    <string id="AboutText">Stretches 1.0.0 MIT</string>
+
+    <string id="GroupNeck">Cou</string>
+    <string id="GroupWrist">Poignet et avant-bras</string>
+    <string id="GroupShoulder">Épaule et poitrine</string>
+    <string id="GroupTorso">Tronc et dos</string>
+    <string id="GroupLegs">Jambes</string>
+
+    <string id="s_neck_tilt_right">Incliner Cou Droite</string>
+    <string id="s_neck_tilt_left">Incliner Cou Gauche</string>
+    <string id="s_neck_tilt_down">Cou vers le Bas</string>
+    <string id="s_neck_tilt_up">Cou vers le Haut</string>
+    <string id="s_neck_rot_right">Tourner Cou Droite</string>
+    <string id="s_neck_rot_left">Tourner Cou Gauche</string>
+    <string id="s_neck_rot_right_down">Tourner Dr. + Bas</string>
+    <string id="s_neck_rot_left_down">Tourner Ga. + Bas</string>
+    <string id="s_neck_rot_right_up">Tourner Dr. + Haut</string>
+    <string id="s_neck_rot_left_up">Tourner Ga. + Haut</string>
+    <string id="s_neck_chest_rot_right_up">Main Poitrine Dr. Haut</string>
+    <string id="s_neck_chest_rot_left_up">Main Poitrine Ga. Haut</string>
+    <string id="s_wrist_flexor_right">Fléchisseur Poignet Dr.</string>
+    <string id="s_wrist_flexor_left">Fléchisseur Poignet Ga.</string>
+    <string id="s_wrist_extensor_right">Extenseur Poignet Dr.</string>
+    <string id="s_wrist_extensor_left">Extenseur Poignet Ga.</string>
+    <string id="s_shoulder_cross_right">Épaule Croisée Dr.</string>
+    <string id="s_shoulder_cross_left">Épaule Croisée Ga.</string>
+    <string id="s_triceps_right">Triceps au-dessus Dr.</string>
+    <string id="s_triceps_left">Triceps au-dessus Ga.</string>
+    <string id="s_chest_opener">Ouverture Poitrine</string>
+    <string id="s_upper_back_reach">Haut du Dos</string>
+    <string id="s_side_bend_right">Flexion Latérale Dr.</string>
+    <string id="s_side_bend_left">Flexion Latérale Ga.</string>
+    <string id="s_torso_twist_right">Rotation Tronc Dr.</string>
+    <string id="s_torso_twist_left">Rotation Tronc Ga.</string>
+    <string id="s_lower_back_child_pose">Posture de l'Enfant</string>
+    <string id="s_hamstring_fold">Flexion Avant</string>
+    <string id="s_quad_right">Quadriceps Droit</string>
+    <string id="s_quad_left">Quadriceps Gauche</string>
+    <string id="s_calf_right">Mollet Droit</string>
+    <string id="s_calf_left">Mollet Gauche</string>
+    <string id="s_hip_flexor_right">Fléchisseur Hanche Dr.</string>
+    <string id="s_hip_flexor_left">Fléchisseur Hanche Ga.</string>
+</strings>
