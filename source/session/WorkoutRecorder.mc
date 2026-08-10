@@ -23,16 +23,19 @@ class WorkoutRecorder {
             :sport => Activity.SPORT_TRAINING,
             :subSport => Activity.SUB_SPORT_FLEXIBILITY_TRAINING
         });
+        _countField = createCountField(_session as ActivityRecording.Session);
+        (_session as ActivityRecording.Session).start();
+    }
+
+    hidden function createCountField(session as ActivityRecording.Session) as FitContributor.Field? {
         try {
-            _countField = (_session as ActivityRecording.Session).createField(
+            return session.createField(
                 "stretches_completed", STRETCH_COUNT_FIELD_ID,
                 FitContributor.DATA_TYPE_UINT16,
-                {:mesgType => FitContributor.MESG_TYPE_SESSION, :units => "count"}
-            );
+                {:mesgType => FitContributor.MESG_TYPE_SESSION, :units => "count"});
         } catch (e) {
-            _countField = null;
+            return null;
         }
-        (_session as ActivityRecording.Session).start();
     }
 
     function isActive() as Boolean {

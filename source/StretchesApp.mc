@@ -53,28 +53,44 @@ class StretchesServiceDelegate extends System.ServiceDelegate {
 
     function onTemporalEvent() as Void {
         var nowEpoch = Time.now().value();
-        var next = Prefs.getNextAlarmEpoch();
-        // Temporal events also fire for clamped/fallback registrations;
-        // only alert when a real alarm time has been reached.
-        if (next != null && nowEpoch >= (next as Number) - 60) {
-            Prefs.setPendingAlertTs(nowEpoch);
-            var snooze = Prefs.getSnoozeUntil();
-            if (snooze != null && (snooze as Number) <= nowEpoch) {
-                Prefs.setSnoozeUntil(null);
-            }
-            Scheduler.registerNext();
-            if (Background has :requestApplicationWake) {
-                try {
-                    Background.requestApplicationWake(
-                        Application.loadResource(Rez.Strings.WakeMessage) as String);
-                } catch (e) {
-                    // Wake requests can be rejected (e.g. during an activity).
-                }
-            }
-            Background.exit(true);
+        if (alarmReached(nowEpoch)) {
+            triggerAlarm(nowEpoch);
         } else {
             Scheduler.registerNext();
             Background.exit(null);
+        }
+    }
+
+    // Temporal events also fire for clamped/fallback registrations; only
+    // alert when a real alarm time has actually been reached.
+    hidden function alarmReached(nowEpoch as Number) as Boolean {
+        var next = Prefs.getNextAlarmEpoch();
+        return next != null && nowEpoch >= (next as Number) - 60;
+    }
+
+    hidden function triggerAlarm(nowEpoch as Number) as Void {
+        Prefs.setPendingAlertTs(nowEpoch);
+        clearExpiredSnooze(nowEpoch);
+        Scheduler.registerNext();
+        requestWake();
+        Background.exit(true);
+    }
+
+    hidden function clearExpiredSnooze(nowEpoch as Number) as Void {
+        var snooze = Prefs.getSnoozeUntil();
+        if (snooze != null && (snooze as Number) <= nowEpoch) {
+            Prefs.setSnoozeUntil(null);
+        }
+    }
+
+    hidden function requestWake() as Void {
+        if (Background has :requestApplicationWake) {
+            try {
+                Background.requestApplicationWake(
+                    Application.loadResource(Rez.Strings.WakeMessage) as String);
+            } catch (e) {
+                // Wake requests can be rejected (e.g. during an activity).
+            }
         }
     }
 }

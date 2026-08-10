@@ -53,19 +53,25 @@ module AlertKit {
     // Foreground poll: fires the alarm flow when the cached next-alarm time
     // has been reached while the app is open. Returns true when due.
     function checkForegroundDue() as Boolean {
-        var next = Prefs.getNextAlarmEpoch();
-        if (next == null) {
+        if (!nextAlarmReached()) {
             return false;
         }
-        if (Time.now().value() < (next as Number)) {
-            return false;
-        }
-        Prefs.setPendingAlertTs(Time.now().value());
-        var snooze = Prefs.getSnoozeUntil();
-        if (snooze != null && (snooze as Number) <= Time.now().value()) {
-            Prefs.setSnoozeUntil(null);
-        }
+        var now = Time.now().value();
+        Prefs.setPendingAlertTs(now);
+        clearExpiredSnooze(now);
         Scheduler.registerNext();
         return true;
+    }
+
+    function nextAlarmReached() as Boolean {
+        var next = Prefs.getNextAlarmEpoch();
+        return next != null && Time.now().value() >= (next as Number);
+    }
+
+    function clearExpiredSnooze(now as Number) as Void {
+        var snooze = Prefs.getSnoozeUntil();
+        if (snooze != null && (snooze as Number) <= now) {
+            Prefs.setSnoozeUntil(null);
+        }
     }
 }

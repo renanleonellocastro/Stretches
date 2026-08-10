@@ -16,14 +16,23 @@ illustrated stretches, and save every session to Garmin Connect.
 [![Devices](https://img.shields.io/badge/devices-28-ffaa00)](#-supported-devices)
 [![Languages](https://img.shields.io/badge/languages-6-ff5500)](#-languages)
 
-<img src="docs/images/catalog-preview.png" alt="All 34 stretch illustrations" width="720"/>
-
-*34 stretches · 5 muscle groups · clean line-art illustrations rendered for
-every screen, including 64-color MIP displays like the Forerunner 55.*
+<img src="docs/images/store-hero.png" alt="Stretches on Garmin — guided stretching coach" width="820"/>
 
 </div>
 
 ---
+
+## 📷 Screenshots
+
+<div align="center">
+
+| Home | My stretches | Guided stretch | Get ready | Done! |
+|:---:|:---:|:---:|:---:|:---:|
+| <img src="docs/images/screenshots/home.png" width="150"/> | <img src="docs/images/screenshots/picker.png" width="150"/> | <img src="docs/images/screenshots/stretch.png" width="150"/> | <img src="docs/images/screenshots/announce.png" width="150"/> | <img src="docs/images/screenshots/congrats.png" width="150"/> |
+
+<sub>Captured on the Forerunner 55 simulator. Live heart rate appears during the stretch on a watch with a HR sensor.</sub>
+
+</div>
 
 ## ✨ Features
 
@@ -51,6 +60,15 @@ every screen, including 64-color MIP displays like the Forerunner 55.*
 - 🔋 **Battery-friendly**: reminders use Connect IQ background temporal
   events; nothing runs while you are not stretching.
 
+## 🖼 The stretch library
+
+<div align="center">
+<img src="docs/images/catalog-preview.png" alt="All 34 stretch illustrations" width="760"/>
+
+*34 stretches · 5 muscle groups · hand-crafted figures rendered per screen
+size, from the 208×208 Forerunner 55 to the 416×416 Venu 2.*
+</div>
+
 ## 🎬 How a session works
 
 ```mermaid
@@ -77,7 +95,7 @@ Stretches are shuffled every session, so routines never feel repetitive.
 |---|---|
 | Home | **START** opens the menu |
 | Menu | *Start now*, *My stretches*, *Durations*, *Schedules*, *Settings*, *About* |
-| My stretches | Checkbox list of all 34 stretches, grouped by muscle |
+| My stretches | List of all 34 stretches; tap to add/remove from your routine |
 | Durations | Per-stretch seconds picker (5–300 s, default 30 s) |
 | Schedules | Add times, then per-time: *Enabled*, *Edit time*, *Delete* |
 | Workout | **START** pause/resume · **DOWN** skip · **BACK** end early |
@@ -183,6 +201,7 @@ is a ~4-step change with a friendly checklist.
 Tag `v*` → CI builds and attaches the store-ready `Stretches.iq` to a GitHub
 release, ready to upload to the
 [Connect IQ store dashboard](https://apps.garmin.com/developer/dashboard).
+Ready-to-paste store copy lives in [docs/STORE_LISTING.md](docs/STORE_LISTING.md).
 
 ## 📄 License
 

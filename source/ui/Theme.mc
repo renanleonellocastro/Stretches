@@ -76,28 +76,34 @@ module Theme {
     function drawPill(dc as Dc, cx as Number, cy as Number, text as String,
                       font as Graphics.FontDefinition, color as Number,
                       filled as Boolean) as Void {
-        var tw = dc.getTextWidthInPixels(text, font);
         var th = dc.getFontHeight(font);
-        var padX = th / 2 + 2;
-        var padY = th / 6;
-        var boxW = tw + padX * 2;
-        var boxH = th + padY * 2;
+        var boxW = dc.getTextWidthInPixels(text, font) + (th / 2 + 2) * 2;
+        var boxH = th + (th / 6) * 2;
         var x = cx - boxW / 2;
         var y = cy - boxH / 2;
-        var radius = boxH / 2;
         if (filled) {
-            dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-            dc.fillRoundedRectangle(x, y, boxW, boxH, radius);
-            dc.setColor(COLOR_BG, Graphics.COLOR_TRANSPARENT);
+            fillPill(dc, x, y, boxW, boxH, color);
         } else {
-            dc.setPenWidth(2);
-            dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-            dc.drawRoundedRectangle(x, y, boxW, boxH, radius);
-            dc.setPenWidth(1);
-            dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+            outlinePill(dc, x, y, boxW, boxH, color);
         }
         dc.drawText(cx, cy, font, text,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    function fillPill(dc as Dc, x as Number, y as Number, w as Number, h as Number,
+                      color as Number) as Void {
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(x, y, w, h, h / 2);
+        dc.setColor(COLOR_BG, Graphics.COLOR_TRANSPARENT);
+    }
+
+    function outlinePill(dc as Dc, x as Number, y as Number, w as Number, h as Number,
+                         color as Number) as Void {
+        dc.setPenWidth(2);
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.drawRoundedRectangle(x, y, w, h, h / 2);
+        dc.setPenWidth(1);
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
     }
 
     // Truncates text with an ellipsis so it fits within maxW pixels for the
@@ -121,6 +127,15 @@ module Theme {
         if (text.length() <= maxChars) {
             return [text];
         }
+        var breakAt = lastSpaceWithin(text, maxChars);
+        if (breakAt <= 0) {
+            return [text];
+        }
+        return [text.substring(0, breakAt), text.substring(breakAt + 1, text.length())];
+    }
+
+    // Index of the last space at or before maxChars, or -1 when there is none.
+    function lastSpaceWithin(text as String, maxChars as Number) as Number {
         var chars = text.toCharArray();
         var breakAt = -1;
         for (var i = 0; i < chars.size() && i <= maxChars; i++) {
@@ -128,9 +143,6 @@ module Theme {
                 breakAt = i;
             }
         }
-        if (breakAt <= 0) {
-            return [text];
-        }
-        return [text.substring(0, breakAt), text.substring(breakAt + 1, text.length())];
+        return breakAt;
     }
 }

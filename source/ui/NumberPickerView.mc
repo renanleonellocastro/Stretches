@@ -39,35 +39,42 @@ class NumberPickerView extends WatchUi.View {
     }
 
     function onUpdate(dc as Dc) as Void {
-        var w = dc.getWidth();
-        var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
+        drawValueRing(dc);
+        drawTitle(dc);
+        drawValue(dc);
+        drawChevrons(dc, dc.getWidth(), dc.getHeight());
+    }
 
-        // Outer ring reflects where the value sits between min and max.
+    // Outer ring reflects where the value sits between min and max.
+    hidden function drawValueRing(dc as Dc) as Void {
         var span = _max - _min;
         var fraction = span > 0 ? (value - _min).toFloat() / span : 0.0;
         Theme.drawProgressRing(dc, fraction, Theme.COLOR_ACCENT);
+    }
 
-        // Title near the top.
+    hidden function drawTitle(dc as Dc) as Void {
+        var w = dc.getWidth();
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
         var lines = Theme.splitTwoLines(_title, 18);
-        var y = h * 22 / 100;
+        var y = dc.getHeight() * 22 / 100;
         for (var i = 0; i < lines.size(); i++) {
             dc.drawText(w / 2, y, Graphics.FONT_TINY, lines[i] as String,
                         Graphics.TEXT_JUSTIFY_CENTER);
             y += dc.getFontHeight(Graphics.FONT_TINY);
         }
+    }
 
-        // Value hero + unit.
+    hidden function drawValue(dc as Dc) as Void {
+        var w = dc.getWidth();
+        var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 50 / 100, Graphics.FONT_NUMBER_HOT, value.toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 68 / 100, Graphics.FONT_TINY, _unit,
                     Graphics.TEXT_JUSTIFY_CENTER);
-
-        drawChevrons(dc, w, h);
     }
 
     // Up/down chevron hints just inside the value ring.
