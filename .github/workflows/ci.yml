@@ -157,10 +157,20 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq xvfb libusb-1.0-0 libgtk-3-0 libsm6 libwebkit2gtk-4.1-0
           export DISPLAY=:99
-          Xvfb :99 -screen 0 1280x1024x24 &
-          "$(connect-iq-sdk-manager sdk current-path --bin)/connectiq" &
-          sleep 25
-          make test DEVICE=fr55
+          Xvfb :99 -screen 0 1280x1024x24 >/tmp/xvfb.log 2>&1 &
+          sleep 3
+          BIN="$(connect-iq-sdk-manager sdk current-path --bin)"
+          "$BIN/connectiq" >/tmp/sim.log 2>&1 &
+          make test-build DEVICE=fr55
+          # The headless simulator can take a while to accept connections;
+          # retry monkeydo until it reports the test summary.
+          for attempt in $(seq 1 8); do
+            sleep 12
+            "$BIN/monkeydo" bin/Stretches-tests.prg fr55 -t 2>&1 | tee /tmp/test.log || true
+            if grep -q "^PASSED" /tmp/test.log; then break; fi
+            echo "::warning::simulator not ready yet (attempt $attempt/8), retrying…"
+          done
+          grep -q "^PASSED" /tmp/test.log && ! grep -qE "^FAILED|^ERRORED" /tmp/test.log
 
       - name: Upload build artifact
         if: env.HAS_CREDS == 'true'
