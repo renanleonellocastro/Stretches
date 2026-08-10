@@ -15,6 +15,7 @@ module Prefs {
     const KEY_SNOOZE_UNTIL = "snoozeUntil";         // Number, epoch seconds
     const KEY_PENDING_ALERT = "pendingAlertTs";     // Number, epoch seconds
     const KEY_NEXT_ALARM = "nextAlarmEpoch";        // Number, epoch seconds
+    const KEY_LAST_CHECK = "lastCheckEpoch";        // Number, epoch of last poll
     const KEY_SEEDED = "seeded";                     // Boolean, first-run flag
 
     const DEFAULT_DURATION_SECS = 30;
@@ -116,5 +117,13 @@ module Prefs {
 
     function setNextAlarmEpoch(epoch as Number?) as Void {
         Application.Storage.setValue(KEY_NEXT_ALARM, epoch);
+    }
+
+    function getLastCheck() as Number? {
+        return Application.Storage.getValue(KEY_LAST_CHECK) as Number?;
+    }
+
+    function setLastCheck(epoch as Number?) as Void {
+        Application.Storage.setValue(KEY_LAST_CHECK, epoch);
     }
 }
