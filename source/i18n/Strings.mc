@@ -36,9 +36,15 @@ module Strings {
 
     function setLanguage(code as Lang.String) as Void {
         Prefs.setLanguage(code);
+        loadTables(code);
+    }
+
+    // When the active language IS English, reuse the same dictionary as the
+    // fallback instead of allocating a second identical ~80-entry table.
+    function loadTables(code as Lang.String) as Void {
         _code = code;
         _table = I18n.table(code);
-        _eng = I18n.table("eng");
+        _eng = code.equals("eng") ? _table : I18n.table("eng");
     }
 
     // Map the device system locale to one of the supported codes.
@@ -70,8 +76,6 @@ module Strings {
         if (code == null) {
             code = systemDefault();
         }
-        _code = code;
-        _table = I18n.table(code);
-        _eng = I18n.table("eng");
+        loadTables(code as Lang.String);
     }
 }

@@ -186,9 +186,13 @@ Every PR runs through CI:
 |---|---|
 | 🧾 XML validation | Manifest and all resources parse |
 | 🌐 String sync | Every language ships every string id |
-| 🖼 Illustration coverage | Every catalog entry has an image |
-| 🛠 Compile | Type-check level 2, warnings enabled, zero errors |
-| ✅ Unit tests | Scheduler math, workout engine, catalog integrity |
+| 🖼 Illustration coverage | Every catalog entry has an image in every size bucket |
+| 🔎 Device API audit | Every Toybox symbol used exists on **all 28 target devices** |
+| 🛠 Compile | Type-check level 2 across three screen shapes, zero errors |
+| ✅ Tests | Unit + on-simulator integration suite (`make test`) |
+
+The full strategy — including the on-device test pass that covers what
+simulators can't — is documented in [docs/TESTING.md](docs/TESTING.md).
 
 ## 🤝 Contributing
 

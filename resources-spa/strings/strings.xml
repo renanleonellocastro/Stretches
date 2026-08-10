@@ -43,6 +43,10 @@
     <string id="SettingLanguage">Idioma</string>
     <string id="PickerTitle">Estirar</string>
     <string id="InRoutine">En la rutina</string>
+    <string id="FitStretchesLabel">Estiramientos</string>
+    <string id="FitStretchLabel">Estiramiento</string>
+    <string id="FitHoldLabel">Duración</string>
+    <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
     <string id="AboutText">Stretches 1.0.0 MIT</string>
 
@@ -66,8 +70,8 @@
     <string id="s_neck_chest_rot_left_up">Mano en Pecho Izq.</string>
     <string id="s_wrist_flexor_right">Flexor de Muñeca Der.</string>
     <string id="s_wrist_flexor_left">Flexor de Muñeca Izq.</string>
-    <string id="s_wrist_extensor_right">Extensor de Muñeca Der.</string>
-    <string id="s_wrist_extensor_left">Extensor de Muñeca Izq.</string>
+    <string id="s_wrist_extensor_right">Extensor Muñeca Der.</string>
+    <string id="s_wrist_extensor_left">Extensor Muñeca Izq.</string>
     <string id="s_shoulder_cross_right">Hombro Cruzado Der.</string>
     <string id="s_shoulder_cross_left">Hombro Cruzado Izq.</string>
     <string id="s_triceps_right">Tríceps Arriba Der.</string>

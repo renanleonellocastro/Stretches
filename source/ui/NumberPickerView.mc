@@ -1,5 +1,6 @@
 import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.System;
 import Toybox.WatchUi;
 
 // Simple button-friendly value picker (UP increments, DOWN decrements,
@@ -116,6 +117,20 @@ class NumberPickerDelegate extends WatchUi.BehaviorDelegate {
         WatchUi.popView(WatchUi.SLIDE_DOWN);
         _onValue.invoke(_view.value);
         return true;
+    }
+
+    // Touch devices: map taps by screen zone — top third increments, bottom
+    // third decrements, the middle confirms (same roles as UP/DOWN/START).
+    function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
+        var h = System.getDeviceSettings().screenHeight;
+        var y = clickEvent.getCoordinates()[1];
+        if (y < h / 3) {
+            return onPreviousPage();
+        }
+        if (y > (h * 2) / 3) {
+            return onNextPage();
+        }
+        return onSelect();
     }
 
     function onBack() as Boolean {

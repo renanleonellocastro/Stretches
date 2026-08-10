@@ -1,5 +1,6 @@
 import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.System;
 import Toybox.WatchUi;
 
 // A colorful vertical option chooser used for the alarm prompt
@@ -51,16 +52,43 @@ class OptionListView extends WatchUi.View {
     hidden function drawOptions(dc as Dc) as Void {
         var w = dc.getWidth();
         var h = dc.getHeight();
-        var rowH = h / 6;
+        var rowH = rowHeight(h);
         var gap = rowH / 3;
-        var totalH = _labels.size() * rowH + (_labels.size() - 1) * gap;
-        var y = h * 34 / 100 + (h * 60 / 100 - totalH) / 2;
+        var y = firstRowTop(h);
         var boxW = (w * 72) / 100;
         var x = (w - boxW) / 2;
         for (var i = 0; i < _labels.size(); i++) {
             drawOption(dc, i, x, y, boxW, rowH);
             y += rowH + gap;
         }
+    }
+
+    // Shared row geometry, used by both drawing and touch hit-testing.
+    hidden function rowHeight(h as Number) as Number {
+        return h / 6;
+    }
+
+    hidden function firstRowTop(h as Number) as Number {
+        var rowH = rowHeight(h);
+        var gap = rowH / 3;
+        var totalH = _labels.size() * rowH + (_labels.size() - 1) * gap;
+        return h * 34 / 100 + (h * 60 / 100 - totalH) / 2;
+    }
+
+    // Index of the option row containing screen y, or -1. Rows get a small
+    // halo of half the gap so taps just off a pill still count.
+    function rowAt(y as Number) as Number {
+        var h = System.getDeviceSettings().screenHeight;
+        var rowH = rowHeight(h);
+        var gap = rowH / 3;
+        var top = firstRowTop(h);
+        for (var i = 0; i < _labels.size(); i++) {
+            var rowTop = top + i * (rowH + gap);
+            if (y >= rowTop - gap / 2 && y < rowTop + rowH + gap / 2) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     // Only the highlighted choice is a colored pill; the rest recede as quiet
@@ -105,6 +133,24 @@ class OptionListDelegate extends WatchUi.BehaviorDelegate {
 
     function onSelect() as Boolean {
         _onChosen.invoke(_view.selected);
+        return true;
+    }
+
+    // Touch devices: BehaviorDelegate.onSelect discards tap coordinates, so
+    // hit-test them here. First tap on a row highlights it; tapping the
+    // highlighted row confirms — a stray tap can never trigger the wrong
+    // action on the alarm or save prompts.
+    function onTap(clickEvent as WatchUi.ClickEvent) as Boolean {
+        var row = _view.rowAt(clickEvent.getCoordinates()[1]);
+        if (row < 0) {
+            return true;
+        }
+        if (row == _view.selected) {
+            _onChosen.invoke(row);
+        } else {
+            _view.selected = row;
+            WatchUi.requestUpdate();
+        }
         return true;
     }
 
