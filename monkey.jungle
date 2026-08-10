@@ -1,6 +1,48 @@
 project.manifest = manifest.xml
 
-# Defaults are used for source and resource paths so that per-language
-# resource folders (resources-por, resources-spa, ...) are discovered
-# automatically. Unit tests live in source/tests and are annotated with
-# (:test), so they are only included when building with --unit-test.
+# Source and base resources use the default paths (source, resources), so
+# per-language string folders (resources-por, resources-spa, ...) are picked
+# up automatically. Base resources hold strings and the launcher icon.
+#
+# Stretch illustrations ship at several pixel sizes (see
+# scripts/generate_illustrations.py). Each product appends the illustration
+# bucket that matches its screen resolution, so the artwork stays crisp and
+# proportional from the 208x208 Forerunner 55 up to the 416x416 Venu 2.
+# This mapping is generated into scripts/resource_paths.jungle; keep it in
+# sync by re-running the generator.
+
+fr55.resourcePath = $(fr55.resourcePath);assets/illus108
+
+fr255s.resourcePath = $(fr255s.resourcePath);assets/illus113
+fr255sm.resourcePath = $(fr255sm.resourcePath);assets/illus113
+vivoactive4s.resourcePath = $(vivoactive4s.resourcePath);assets/illus113
+
+fr245.resourcePath = $(fr245.resourcePath);assets/illus125
+fr245m.resourcePath = $(fr245m.resourcePath);assets/illus125
+fr745.resourcePath = $(fr745.resourcePath);assets/illus125
+fr945.resourcePath = $(fr945.resourcePath);assets/illus125
+fenix6s.resourcePath = $(fenix6s.resourcePath);assets/illus125
+fenix6spro.resourcePath = $(fenix6spro.resourcePath);assets/illus125
+fenix7s.resourcePath = $(fenix7s.resourcePath);assets/illus125
+venusq.resourcePath = $(venusq.resourcePath);assets/illus125
+venusqm.resourcePath = $(venusqm.resourcePath);assets/illus125
+
+fr255.resourcePath = $(fr255.resourcePath);assets/illus135
+fr255m.resourcePath = $(fr255m.resourcePath);assets/illus135
+fr955.resourcePath = $(fr955.resourcePath);assets/illus135
+fenix6.resourcePath = $(fenix6.resourcePath);assets/illus135
+fenix6pro.resourcePath = $(fenix6pro.resourcePath);assets/illus135
+fenix7.resourcePath = $(fenix7.resourcePath);assets/illus135
+vivoactive4.resourcePath = $(vivoactive4.resourcePath);assets/illus135
+
+fenix6xpro.resourcePath = $(fenix6xpro.resourcePath);assets/illus146
+fenix7x.resourcePath = $(fenix7x.resourcePath);assets/illus146
+
+venusq2.resourcePath = $(venusq2.resourcePath);assets/illus187
+venusq2m.resourcePath = $(venusq2m.resourcePath);assets/illus187
+venu2s.resourcePath = $(venu2s.resourcePath);assets/illus187
+
+venu.resourcePath = $(venu.resourcePath);assets/illus203
+
+venu2.resourcePath = $(venu2.resourcePath);assets/illus216
+venu2plus.resourcePath = $(venu2plus.resourcePath);assets/illus216
