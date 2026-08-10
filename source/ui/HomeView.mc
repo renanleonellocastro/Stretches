@@ -39,22 +39,28 @@ class HomeView extends WatchUi.View {
     }
 
     function onUpdate(dc as Dc) as Void {
-        var w = dc.getWidth();
-        var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
+        drawBrand(dc);
+        drawNextSession(dc);
+        drawSummary(dc);
+        drawMenuHint(dc);
+    }
 
-        // Quiet frame with a single accent brand mark at the top.
+    hidden function drawBrand(dc as Dc) as Void {
+        var w = dc.getWidth();
+        var h = dc.getHeight();
         Theme.drawFrameRing(dc);
         Theme.drawBrandArc(dc, Theme.COLOR_ACCENT);
-
-        // App name, small and understated just below the brand arc.
         dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 15 / 100, Graphics.FONT_XTINY,
                     (WatchUi.loadResource(Rez.Strings.AppName) as String).toUpper(),
                     Graphics.TEXT_JUSTIFY_CENTER);
+    }
 
-        // Hero block: "NEXT SESSION" label above the big next-alarm time.
+    hidden function drawNextSession(dc as Dc) as Void {
+        var w = dc.getWidth();
+        var h = dc.getHeight();
         var hasAlarm = Prefs.getNextAlarmEpoch() != null;
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 27 / 100, Graphics.FONT_XTINY,
@@ -64,26 +70,33 @@ class HomeView extends WatchUi.View {
                     Graphics.COLOR_TRANSPARENT);
         dc.drawText(w / 2, h * 50 / 100, Graphics.FONT_NUMBER_HOT, nextAlarmLabel(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
 
-        // Routine summary: "8 stretches · ~5 min", or a gentle prompt.
+    hidden function drawSummary(dc as Dc) as Void {
         var count = RoutineModel.selectedIds().size();
         var summary;
         if (count == 0) {
             summary = WatchUi.loadResource(Rez.Strings.EmptyRoutineMsg) as String;
             dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
         } else {
-            var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
-            summary = count.toString() + " " +
-                      (WatchUi.loadResource(Rez.Strings.HomeStretchesUnit) as String) +
-                      " " + mins.toString() + " " +
-                      (WatchUi.loadResource(Rez.Strings.HomeMinutesUnit) as String);
+            summary = routineSummary(count);
             dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
         }
-        dc.drawText(w / 2, h * 69 / 100, Graphics.FONT_TINY, summary,
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 69 / 100, Graphics.FONT_TINY, summary,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
 
-        // Call to action: a clean pill hinting the START button opens the menu.
-        Theme.drawPill(dc, w / 2, h * 83 / 100,
+    // e.g. "8 stretches · ~5 min".
+    hidden function routineSummary(count as Number) as String {
+        var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
+        return count.toString() + " " +
+               (WatchUi.loadResource(Rez.Strings.HomeStretchesUnit) as String) +
+               " " + mins.toString() + " " +
+               (WatchUi.loadResource(Rez.Strings.HomeMinutesUnit) as String);
+    }
+
+    hidden function drawMenuHint(dc as Dc) as Void {
+        Theme.drawPill(dc, dc.getWidth() / 2, dc.getHeight() * 83 / 100,
                        WatchUi.loadResource(Rez.Strings.HomeHint) as String,
                        Graphics.FONT_XTINY, Theme.COLOR_ACCENT, false);
     }

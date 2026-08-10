@@ -19,20 +19,26 @@ module Scheduler {
     function secondsToNext(nowSecOfDay as Number, schedules as Array) as Number? {
         var best = null;
         for (var i = 0; i < schedules.size(); i++) {
-            var entry = schedules[i] as Array;
-            if (!(entry[2] as Boolean)) {
-                continue;
-            }
-            var target = (entry[0] as Number) * 3600 + (entry[1] as Number) * 60;
-            var delta = target - nowSecOfDay;
-            if (delta <= 0) {
-                delta += SECS_PER_DAY;
-            }
-            if (best == null || delta < (best as Number)) {
+            var delta = deltaToEntry(nowSecOfDay, schedules[i] as Array);
+            if (delta != null && (best == null || (delta as Number) < (best as Number))) {
                 best = delta;
             }
         }
         return best;
+    }
+
+    // Seconds from nowSecOfDay until an enabled schedule entry fires (today
+    // or wrapped to tomorrow). Null when the entry is disabled.
+    function deltaToEntry(nowSecOfDay as Number, entry as Array) as Number? {
+        if (!(entry[2] as Boolean)) {
+            return null;
+        }
+        var target = (entry[0] as Number) * 3600 + (entry[1] as Number) * 60;
+        var delta = target - nowSecOfDay;
+        if (delta <= 0) {
+            delta += SECS_PER_DAY;
+        }
+        return delta;
     }
 
     // Epoch seconds of the next alarm: the earlier of the next schedule
@@ -55,26 +61,34 @@ module Scheduler {
     // Recompute the next alarm from Storage and (re)register the temporal
     // event. Also caches the alarm epoch so the foreground app can poll it.
     function registerNext() as Void {
-        var now = Time.now();
-        var info = Gregorian.info(now, Time.FORMAT_SHORT);
-        var nowSecOfDay = (info.hour as Number) * 3600 + (info.min as Number) * 60 + (info.sec as Number);
-        var nowEpoch = now.value();
-
-        var snooze = Prefs.getSnoozeUntil();
-        if (snooze != null && (snooze as Number) <= nowEpoch) {
-            // Expired snooze: it either fired or was missed; drop it.
-            Prefs.setSnoozeUntil(null);
-            snooze = null;
-        }
-
-        var next = nextAlarmEpoch(nowEpoch, nowSecOfDay, Prefs.getSchedules(), snooze);
+        var nowEpoch = Time.now().value();
+        var snooze = activeSnooze(nowEpoch);
+        var next = nextAlarmEpoch(nowEpoch, nowSecOfDay(), Prefs.getSchedules(), snooze);
         Prefs.setNextAlarmEpoch(next);
         if (next == null) {
             Background.deleteTemporalEvent();
             return;
         }
+        scheduleTemporalEvent(next as Number, nowEpoch);
+    }
 
-        var eventEpoch = next as Number;
+    function nowSecOfDay() as Number {
+        var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
+        return (info.hour as Number) * 3600 + (info.min as Number) * 60 + (info.sec as Number);
+    }
+
+    function activeSnooze(nowEpoch as Number) as Number? {
+        var snooze = Prefs.getSnoozeUntil();
+        if (snooze != null && (snooze as Number) <= nowEpoch) {
+            // Expired snooze: it either fired or was missed; drop it.
+            Prefs.setSnoozeUntil(null);
+            return null;
+        }
+        return snooze;
+    }
+
+    function scheduleTemporalEvent(next as Number, nowEpoch as Number) as Void {
+        var eventEpoch = next;
         if (eventEpoch < nowEpoch + MIN_LEAD_SECS) {
             // The foreground poller covers alarms due sooner than the
             // background API allows.

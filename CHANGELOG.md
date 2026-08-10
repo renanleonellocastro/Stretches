@@ -6,6 +6,21 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Live heart rate on the workout screen, read from the recording session, as
+  visible confirmation the session is being tracked (shown when a HR sensor
+  is present).
+- Store listing copy (`docs/STORE_LISTING.md`) and a marketing hero image
+  (`docs/images/store-hero.png`), plus a README screenshot gallery.
+
+### Changed
+
+- Codebase-wide Clean Code pass: long methods decomposed into small,
+  intention-revealing helpers (draw routines, menu delegates, scheduler and
+  workout-engine phases); "what" comments removed, "why" comments kept.
+  Behavior unchanged; all builds and unit tests still pass.
+
 ### Fixed
 
 - **Crash opening "My stretches"** (and toggling Sound/Vibration or a

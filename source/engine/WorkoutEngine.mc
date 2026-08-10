@@ -147,14 +147,12 @@ class WorkoutEngine {
         if (_remaining > 0) {
             return EVENT_TICK;
         }
+        return onPhaseElapsed();
+    }
+
+    hidden function onPhaseElapsed() as Number {
         if (state == STATE_PREP) {
-            if (_order.size() == 0) {
-                state = STATE_DONE;
-                return EVENT_WORKOUT_DONE;
-            }
-            state = STATE_ANNOUNCE;
-            _remaining = WORKOUT_ANNOUNCE_SECS;
-            return EVENT_WORKOUT_STARTED;
+            return startFirstStretch();
         }
         if (state == STATE_ANNOUNCE) {
             state = STATE_STRETCH;
@@ -164,6 +162,16 @@ class WorkoutEngine {
         // STATE_STRETCH finished
         completedCount += 1;
         return advance(true);
+    }
+
+    hidden function startFirstStretch() as Number {
+        if (_order.size() == 0) {
+            state = STATE_DONE;
+            return EVENT_WORKOUT_DONE;
+        }
+        state = STATE_ANNOUNCE;
+        _remaining = WORKOUT_ANNOUNCE_SECS;
+        return EVENT_WORKOUT_STARTED;
     }
 
     hidden function advance(completed as Boolean) as Number {

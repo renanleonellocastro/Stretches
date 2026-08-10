@@ -40,33 +40,42 @@ class CongratsView extends WatchUi.View {
     }
 
     function onUpdate(dc as Dc) as Void {
-        var w = dc.getWidth();
-        var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
+        drawSuccessRing(dc);
+        drawCheckmark(dc);
+        drawMessage(dc);
+    }
 
-        // Clean success ring: a full frame with a bright accent sweep.
+    // A full frame ring with a bright success sweep at the top.
+    hidden function drawSuccessRing(dc as Dc) as Void {
         Theme.drawFrameRing(dc);
-        var cx = w / 2;
-        var cy = h / 2;
+        var cx = dc.getWidth() / 2;
+        var cy = dc.getHeight() / 2;
         var r = (cx < cy ? cx : cy) - 3;
         dc.setPenWidth(5);
         dc.setColor(Theme.COLOR_SUCCESS, Graphics.COLOR_TRANSPARENT);
         dc.drawArc(cx, cy, r, Graphics.ARC_CLOCKWISE, 135, 45);
         dc.setPenWidth(1);
+    }
 
-        // Centered checkmark badge.
-        var badgeR = h / 9;
+    hidden function drawCheckmark(dc as Dc) as Void {
+        var cx = dc.getWidth() / 2;
+        var by = dc.getHeight() * 30 / 100;
+        var badgeR = dc.getHeight() / 9;
         dc.setColor(Theme.COLOR_SUCCESS, Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(cx, h * 30 / 100, badgeR);
+        dc.fillCircle(cx, by, badgeR);
         dc.setColor(Theme.COLOR_BG, Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(4);
         var bx = cx - badgeR / 2;
-        var by = h * 30 / 100;
         dc.drawLine(bx, by, bx + badgeR * 4 / 10, by + badgeR * 5 / 10);
         dc.drawLine(bx + badgeR * 4 / 10, by + badgeR * 5 / 10, bx + badgeR, by - badgeR * 5 / 10);
         dc.setPenWidth(1);
+    }
 
+    hidden function drawMessage(dc as Dc) as Void {
+        var cx = dc.getWidth() / 2;
+        var h = dc.getHeight();
         dc.setColor(Theme.COLOR_SUCCESS, Graphics.COLOR_TRANSPARENT);
         dc.drawText(cx, h * 56 / 100, Graphics.FONT_MEDIUM,
                     WatchUi.loadResource(Rez.Strings.CongratsTitle) as String,

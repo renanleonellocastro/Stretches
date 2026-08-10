@@ -34,44 +34,49 @@ class OptionListView extends WatchUi.View {
     }
 
     function onUpdate(dc as Dc) as Void {
-        var w = dc.getWidth();
-        var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
         Theme.drawFrameRing(dc);
         Theme.drawBrandArc(dc, Theme.COLOR_ACCENT);
+        drawTitle(dc);
+        drawOptions(dc);
+    }
 
-        // Title, with a short accent underline for a designed touch.
+    hidden function drawTitle(dc as Dc) as Void {
         dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 15 / 100, Graphics.FONT_SMALL, _title,
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 15 / 100, Graphics.FONT_SMALL, _title,
                     Graphics.TEXT_JUSTIFY_CENTER);
+    }
 
-        // Option pills: only the highlighted one is colored, the rest are
-        // quiet gray outlines, so the screen never feels busy.
+    hidden function drawOptions(dc as Dc) as Void {
+        var w = dc.getWidth();
+        var h = dc.getHeight();
         var rowH = h / 6;
         var gap = rowH / 3;
         var totalH = _labels.size() * rowH + (_labels.size() - 1) * gap;
         var y = h * 34 / 100 + (h * 60 / 100 - totalH) / 2;
         var boxW = (w * 72) / 100;
         var x = (w - boxW) / 2;
-
         for (var i = 0; i < _labels.size(); i++) {
-            var color = _colors[i] as Number;
-            var radius = rowH / 2;
-            if (i == selected) {
-                // Highlighted choice: a solid colored pill with dark text.
-                dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-                dc.fillRoundedRectangle(x, y, boxW, rowH, radius);
-                dc.setColor(Theme.COLOR_BG, Graphics.COLOR_TRANSPARENT);
-            } else {
-                // Other choices recede as quiet gray labels.
-                dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-            }
-            dc.drawText(w / 2, y + rowH / 2, Graphics.FONT_SMALL,
-                        _labels[i] as String,
-                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            drawOption(dc, i, x, y, boxW, rowH);
             y += rowH + gap;
         }
+    }
+
+    // Only the highlighted choice is a colored pill; the rest recede as quiet
+    // gray labels so the screen never feels busy.
+    hidden function drawOption(dc as Dc, i as Number, x as Number, y as Number,
+                               boxW as Number, rowH as Number) as Void {
+        if (i == selected) {
+            dc.setColor(_colors[i] as Number, Graphics.COLOR_TRANSPARENT);
+            dc.fillRoundedRectangle(x, y, boxW, rowH, rowH / 2);
+            dc.setColor(Theme.COLOR_BG, Graphics.COLOR_TRANSPARENT);
+        } else {
+            dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
+        }
+        dc.drawText(dc.getWidth() / 2, y + rowH / 2, Graphics.FONT_SMALL,
+                    _labels[i] as String,
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }
 
