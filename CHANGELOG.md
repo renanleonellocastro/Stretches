@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-08-10
+
+### Fixed
+
+- **Crash when accepting the scheduled-reminder wake prompt.** The
+  background-data callback pushed a view during the app's cold launch,
+  before any view existed. It no longer touches the UI: the launch path
+  shows the Start / Snooze / Skip prompt itself, and the home screen's poll
+  picks up alarms flagged while the app was already open.
+- Guard the workout backlight hold against BacklightOnTooLongException on
+  devices that cap how long the backlight may stay forced on (e.g.
+  Forerunner 55) — the screen now simply times out instead of crashing.
+
 ## [1.0.1] - 2026-08-10
 
 ### Added

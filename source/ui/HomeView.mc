@@ -30,8 +30,11 @@ class HomeView extends WatchUi.View {
         }
     }
 
+    // Fires the alarm prompt for alarms that come due while the app is open
+    // — either detected by the foreground clock or flagged by the background
+    // service (whose data callback must not push views itself).
     function onPoll() as Void {
-        if (AlertKit.checkForegroundDue()) {
+        if (AlertKit.checkForegroundDue() || AlertKit.hasPendingAlert()) {
             AlertFlow.push();
             return;
         }
