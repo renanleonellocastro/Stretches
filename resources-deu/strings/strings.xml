@@ -43,6 +43,10 @@
     <string id="SettingLanguage">Sprache</string>
     <string id="PickerTitle">Dehnen</string>
     <string id="InRoutine">In der Routine</string>
+    <string id="FitStretchesLabel">Dehnübungen</string>
+    <string id="FitStretchLabel">Übung</string>
+    <string id="FitHoldLabel">Dauer</string>
+    <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
     <string id="AboutText">Stretches 1.0.0 MIT</string>
 

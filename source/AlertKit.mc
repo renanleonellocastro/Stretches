@@ -3,22 +3,44 @@ import Toybox.Lang;
 import Toybox.Time;
 
 // Foreground attention helpers (vibration + tones), honoring user settings.
+//
+// IMPORTANT: Attention.TONE_* constants do not exist on beeper-less devices
+// (the Venu / Venu Sq / Vívoactive families) — evaluating one there throws
+// Symbol Not Found at runtime. Every TONE_* reference must therefore sit
+// inside an `Attention has :playTone` guard, which is why the tone helpers
+// below take no tone argument from callers.
 module AlertKit {
     function alarm() as Void {
         vibrate([new Attention.VibeProfile(100, 1200), new Attention.VibeProfile(0, 300),
                  new Attention.VibeProfile(100, 1200)]);
-        tone(Attention.TONE_ALARM);
+        if (canTone()) {
+            Attention.playTone(Attention.TONE_ALARM);
+        }
+    }
+
+    function startTone() as Void {
+        if (canTone()) {
+            Attention.playTone(Attention.TONE_START);
+        }
     }
 
     function stretchDone() as Void {
         vibrate([new Attention.VibeProfile(80, 300)]);
-        tone(Attention.TONE_KEY);
+        if (canTone()) {
+            Attention.playTone(Attention.TONE_KEY);
+        }
     }
 
     function workoutDone() as Void {
         vibrate([new Attention.VibeProfile(100, 500), new Attention.VibeProfile(0, 200),
                  new Attention.VibeProfile(100, 700)]);
-        tone(Attention.TONE_SUCCESS);
+        if (canTone()) {
+            Attention.playTone(Attention.TONE_SUCCESS);
+        }
+    }
+
+    function canTone() as Boolean {
+        return Prefs.isToneOn() && (Attention has :playTone);
     }
 
     function vibrate(profile as Array) as Void {
@@ -27,15 +49,6 @@ module AlertKit {
         }
         if (Attention has :vibrate) {
             Attention.vibrate(profile as Array<Attention.VibeProfile>);
-        }
-    }
-
-    function tone(toneId as Attention.Tone) as Void {
-        if (!Prefs.isToneOn()) {
-            return;
-        }
-        if (Attention has :playTone) {
-            Attention.playTone(toneId);
         }
     }
 

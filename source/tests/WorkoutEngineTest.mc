@@ -147,3 +147,147 @@ function testProgressAdvances(logger as Test.Logger) as Boolean {
     Test.assert(engine.progress() > 0.15);
     return true;
 }
+
+// --- Additional edge cases ------------------------------------------------
+
+(:test)
+function testPauseDuringPrepPreservesPhase(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a"], {"a" => 5});
+    engine.pause();
+    Test.assertEqual(engine.state, STATE_PAUSED);
+    Test.assertEqual(engine.tick(), EVENT_NONE);
+    engine.resume();
+    Test.assertEqual(engine.state, STATE_PREP);
+    Test.assertEqual(engine.remaining(), 5);
+    return true;
+}
+
+(:test)
+function testPauseDuringAnnouncePreservesPhase(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a"], {"a" => 5});
+    for (var i = 0; i < 5; i++) { engine.tick(); }   // prep -> ANNOUNCE
+    engine.tick();                                    // announce 3 -> 2
+    engine.pause();
+    Test.assertEqual(engine.tick(), EVENT_NONE);
+    engine.resume();
+    Test.assertEqual(engine.state, STATE_ANNOUNCE);
+    Test.assertEqual(engine.remaining(), 2);
+    return true;
+}
+
+(:test)
+function testSkipDuringStretchAnnouncesNext(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a", "b"], {"a" => 9, "b" => 9});
+    for (var i = 0; i < 5; i++) { engine.tick(); }   // prep
+    for (var i = 0; i < 3; i++) { engine.tick(); }   // announce -> STRETCH
+    Test.assertEqual(engine.state, STATE_STRETCH);
+    Test.assertEqual(engine.skip(), EVENT_STRETCH_STARTED);
+    Test.assertEqual(engine.state, STATE_ANNOUNCE);
+    Test.assertEqual(engine.position(), 2);
+    Test.assertEqual(engine.completedCount, 0);
+    return true;
+}
+
+(:test)
+function testProgressDuringPauseUsesPrePausePhase(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a"], {"a" => 10});
+    for (var i = 0; i < 5; i++) { engine.tick(); }   // prep
+    for (var i = 0; i < 3; i++) { engine.tick(); }   // announce -> STRETCH (10s)
+    engine.tick();                                    // 10 -> 9
+    var before = engine.progress();
+    engine.pause();
+    // Paused progress must keep using the stretch duration as phase total,
+    // not the prep length.
+    var during = engine.progress();
+    Test.assert(during > before - 0.001 && during < before + 0.001);
+    Test.assert(during > 0.09 && during < 0.11);      // 1/10 elapsed
+    return true;
+}
+
+(:test)
+function testCurrentDurationFallsBackForUnknownId(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["mystery"], {"other" => 5});
+    Test.assertEqual(engine.currentDuration(), 30);
+    for (var i = 0; i < 5; i++) { engine.tick(); }
+    for (var i = 0; i < 3; i++) { engine.tick(); }
+    Test.assertEqual(engine.state, STATE_STRETCH);
+    Test.assertEqual(engine.remaining(), 30);
+    return true;
+}
+
+(:test)
+function testPositionAndTotalAcrossWholeRun(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a", "b", "c"], {"a" => 1, "b" => 1, "c" => 1});
+    Test.assertEqual(engine.total(), 3);
+    Test.assertEqual(engine.position(), 1);
+    for (var i = 0; i < 5; i++) { engine.tick(); }   // prep
+    // Each stretch: 3 announce ticks + 1 stretch tick.
+    for (var i = 0; i < 4; i++) { engine.tick(); }   // finish "a"
+    Test.assertEqual(engine.position(), 2);
+    for (var i = 0; i < 4; i++) { engine.tick(); }   // finish "b"
+    Test.assertEqual(engine.position(), 3);
+    for (var i = 0; i < 3; i++) { engine.tick(); }   // announce "c"
+    Test.assertEqual(engine.tick(), EVENT_WORKOUT_DONE);
+    Test.assertEqual(engine.completedCount, 3);
+    Test.assertEqual(engine.total(), 3);
+    return true;
+}
+
+(:test)
+function testShuffleSingleElement(logger as Test.Logger) as Boolean {
+    var shuffled = WorkoutEngine.shuffle(["only"], new SequenceRandom([0]));
+    Test.assertEqual(shuffled.size(), 1);
+    Test.assertEqual(shuffled[0], "only");
+    return true;
+}
+
+(:test)
+function testShuffleEmpty(logger as Test.Logger) as Boolean {
+    Test.assertEqual(WorkoutEngine.shuffle([], new SequenceRandom([0])).size(), 0);
+    return true;
+}
+
+(:test)
+function testEngineWithDuplicateIds(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a", "a"], {"a" => 1});
+    Test.assertEqual(engine.total(), 2);
+    for (var i = 0; i < 5; i++) { engine.tick(); }   // prep
+    for (var i = 0; i < 3; i++) { engine.tick(); }   // announce
+    Test.assertEqual(engine.tick(), EVENT_STRETCH_DONE);
+    Test.assertEqual((engine.currentId() as Lang.String), "a");
+    for (var i = 0; i < 3; i++) { engine.tick(); }   // announce second "a"
+    Test.assertEqual(engine.tick(), EVENT_WORKOUT_DONE);
+    Test.assertEqual(engine.completedCount, 2);
+    return true;
+}
+
+(:test)
+function testTickAfterDoneReturnsNone(logger as Test.Logger) as Boolean {
+    var engine = makeEngine([], {});
+    for (var i = 0; i < 5; i++) { engine.tick(); }
+    Test.assertEqual(engine.state, STATE_DONE);
+    Test.assertEqual(engine.tick(), EVENT_NONE);
+    Test.assertEqual(engine.skip(), EVENT_NONE);
+    return true;
+}
+
+(:test)
+function testResumeWithoutPauseIsNoop(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a"], {});
+    engine.resume();
+    Test.assertEqual(engine.state, STATE_PREP);
+    Test.assert(!engine.isPaused());
+    return true;
+}
+
+(:test)
+function testCurrentIdNullWhenDone(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a"], {"a" => 1});
+    Test.assertEqual((engine.currentId() as Lang.String), "a");
+    for (var i = 0; i < 5; i++) { engine.tick(); }
+    for (var i = 0; i < 4; i++) { engine.tick(); }
+    Test.assertEqual(engine.state, STATE_DONE);
+    Test.assert(engine.currentId() == null);
+    Test.assertEqual(engine.currentDuration(), 30);   // falls back to default
+    return true;
+}

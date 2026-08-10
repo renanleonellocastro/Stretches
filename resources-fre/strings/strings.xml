@@ -43,6 +43,10 @@
     <string id="SettingLanguage">Langue</string>
     <string id="PickerTitle">Étirer</string>
     <string id="InRoutine">Dans la routine</string>
+    <string id="FitStretchesLabel">Étirements</string>
+    <string id="FitStretchLabel">Étirement</string>
+    <string id="FitHoldLabel">Durée</string>
+    <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
     <string id="AboutText">Stretches 1.0.0 MIT</string>
 
@@ -64,8 +68,8 @@
     <string id="s_neck_rot_left_up">Tourner Ga. + Haut</string>
     <string id="s_neck_chest_rot_right_up">Main Poitrine Dr. Haut</string>
     <string id="s_neck_chest_rot_left_up">Main Poitrine Ga. Haut</string>
-    <string id="s_wrist_flexor_right">Fléchisseur Poignet Dr.</string>
-    <string id="s_wrist_flexor_left">Fléchisseur Poignet Ga.</string>
+    <string id="s_wrist_flexor_right">Flexion Poignet Dr.</string>
+    <string id="s_wrist_flexor_left">Flexion Poignet Ga.</string>
     <string id="s_wrist_extensor_right">Extenseur Poignet Dr.</string>
     <string id="s_wrist_extensor_left">Extenseur Poignet Ga.</string>
     <string id="s_shoulder_cross_right">Épaule Croisée Dr.</string>
