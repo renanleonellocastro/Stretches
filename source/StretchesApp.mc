@@ -64,6 +64,9 @@ class StretchesServiceDelegate extends System.ServiceDelegate {
         Background.exit(due ? true : null);
     }
 
+    // The wake prompt is a compiled resource picked by the SYSTEM locale
+    // (runtime i18n is foreground-only), so it may differ from the in-app
+    // language choice. Acceptable: it is a one-line OS dialog.
     hidden function requestWake() as Void {
         if (Background has :requestApplicationWake) {
             try {

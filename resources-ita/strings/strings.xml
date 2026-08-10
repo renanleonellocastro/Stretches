@@ -43,6 +43,10 @@
     <string id="SettingLanguage">Lingua</string>
     <string id="PickerTitle">Stretch</string>
     <string id="InRoutine">Nella routine</string>
+    <string id="FitStretchesLabel">Esercizi</string>
+    <string id="FitStretchLabel">Esercizio</string>
+    <string id="FitHoldLabel">Durata</string>
+    <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
     <string id="AboutText">Stretches 1.0.0 MIT</string>
 

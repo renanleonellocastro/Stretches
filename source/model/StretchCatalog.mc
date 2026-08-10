@@ -29,8 +29,20 @@ module StretchCatalog {
         }
     }
 
+    // Lazily-built cache: entries() is called from menus and per-stretch
+    // lookups, and re-allocating 34 Entry objects each time wastes memory
+    // on small devices.
+    var _entries as Array? = null;
+
     // Order here is presentation order in the picker menu.
     function entries() as Array {
+        if (_entries == null) {
+            _entries = buildEntries();
+        }
+        return _entries as Array;
+    }
+
+    function buildEntries() as Array {
         return [
             new Entry("neck_tilt_right", "s_neck_tilt_right", Rez.Drawables.i_neck_tilt_right, GROUP_NECK),
             new Entry("neck_tilt_left", "s_neck_tilt_left", Rez.Drawables.i_neck_tilt_left, GROUP_NECK),

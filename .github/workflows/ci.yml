@@ -147,8 +147,15 @@ jobs:
             -in ~/.garmin-keys/developer_key.pem \
             -out ~/.garmin-keys/developer_key.der -nocrypt
 
-      # The real gate: the app must compile at type-check level 2 (warnings
-      # on) across a small, a large-AMOLED and a rectangular screen.
+      # Gate 1: every Toybox symbol the app references must exist on every
+      # target device (this is the class of bug that only crashes on-watch:
+      # e.g. TONE_* constants don't exist on beeper-less Venu/Vívoactive).
+      - name: Audit API usage against all target devices
+        if: env.HAS_CREDS == 'true'
+        run: python3 scripts/audit_api_usage.py
+
+      # Gate 2: the app must compile at type-check level 2 (warnings on)
+      # across a small, a large-AMOLED and a rectangular screen.
       - name: Compile for representative devices
         if: env.HAS_CREDS == 'true'
         run: |

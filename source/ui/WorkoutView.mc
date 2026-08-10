@@ -19,12 +19,12 @@ class WorkoutView extends WatchUi.View {
     hidden var _groupColor as Number = Theme.COLOR_ACCENT;
     hidden var _lapName as String = "";       // stretch currently being held
     hidden var _lapSeconds as Number = 0;
+    hidden var _abortRequested as Boolean = false;
 
     function initialize(engine as WorkoutEngine, recorder as WorkoutRecorder) {
         View.initialize();
         _engine = engine;
         _recorder = recorder;
-        Math.srand(System.getTimer());
     }
 
     function engine() as WorkoutEngine {
@@ -36,10 +36,34 @@ class WorkoutView extends WatchUi.View {
     }
 
     function onShow() as Void {
+        // Deferred from the end-workout confirmation: acting only after the
+        // dialog is fully dismissed keeps us independent of the (undocumented)
+        // order in which the system pops it around onResponse.
+        if (_abortRequested) {
+            _abortRequested = false;
+            abortWorkout();
+            return;
+        }
         if (_timer == null) {
             _timer = new Timer.Timer();
             (_timer as Timer.Timer).start(method(:onTick), 1000, true);
         }
+    }
+
+    function requestAbort() as Void {
+        _abortRequested = true;
+    }
+
+    // Pause/resume the state machine and the FIT timer together, so paused
+    // time never counts as activity time.
+    function pauseWorkout() as Void {
+        _engine.pause();
+        _recorder.pause();
+    }
+
+    function resumeWorkout() as Void {
+        _engine.resume();
+        _recorder.resume();
     }
 
     function onHide() as Void {
@@ -81,7 +105,7 @@ class WorkoutView extends WatchUi.View {
         if (event == EVENT_WORKOUT_STARTED) {
             _recorder.start();
             loadCurrentStretch();
-            AlertKit.tone(Attention.TONE_START);
+            AlertKit.startTone();
         } else if (event == EVENT_STRETCH_STARTED) {
             loadCurrentStretch();
             beginLap();
@@ -269,9 +293,9 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     function onSelect() as Boolean {
         var engine = _view.engine();
         if (engine.isPaused()) {
-            engine.resume();
+            _view.resumeWorkout();
         } else {
-            engine.pause();
+            _view.pauseWorkout();
         }
         WatchUi.requestUpdate();
         return true;
@@ -290,7 +314,7 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
 
     // BACK asks for confirmation, then ends the workout early.
     function onBack() as Boolean {
-        _view.engine().pause();
+        _view.pauseWorkout();
         var dialog = new WatchUi.Confirmation(
             Strings.t("EndWorkoutQ"));
         WatchUi.pushView(dialog, new EndWorkoutConfirmDelegate(_view), WatchUi.SLIDE_UP);
@@ -298,6 +322,8 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     }
 }
 
+// Only records the decision: the system pops the dialog around onResponse
+// in an undocumented order, so the view acts on the flag in its own onShow.
 class EndWorkoutConfirmDelegate extends WatchUi.ConfirmationDelegate {
     hidden var _view as WorkoutView;
 
@@ -308,9 +334,9 @@ class EndWorkoutConfirmDelegate extends WatchUi.ConfirmationDelegate {
 
     function onResponse(response as WatchUi.Confirm) as Boolean {
         if (response == WatchUi.CONFIRM_YES) {
-            _view.abortWorkout();
+            _view.requestAbort();
         } else {
-            _view.engine().resume();
+            _view.resumeWorkout();
         }
         return true;
     }

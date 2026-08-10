@@ -4,6 +4,48 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] - 2026-08-10
+
+### Fixed
+
+- **Beeper-less devices (Venu / Venu Sq / Vívoactive families) no longer
+  crash when a tone would play**: TONE_* constants don't exist on those
+  watches and are now only referenced behind capability guards.
+- FIT lap name field enlarged to 32 bytes and writes made fault-tolerant;
+  four Spanish/French stretch names that overflowed the old 24-byte field
+  were shortened. A test now enforces every translation fits.
+- Custom FIT fields (stretch count, per-lap stretch name and hold time) now
+  carry the required resource metadata, so they actually **display in Garmin
+  Connect** — previously they were recorded but invisible.
+- End-workout confirmation is order-independent: the decision is applied
+  after the dialog is dismissed, so the save prompt can no longer be lost.
+- Deleting a schedule rebuilds the schedules menu correctly (the stale list
+  could act on the wrong entry after indices shifted).
+- The random stretch order is now seeded before shuffling (cold starts used
+  to produce the same "random" order every time).
+
+### Changed
+
+- Pausing a workout now also pauses the FIT activity timer, so paused time
+  is not counted in the saved activity.
+- Touch devices: tapping an option row highlights it and tapping again
+  confirms (previously a tap triggered whatever was highlighted — tapping
+  "Skip" could start a workout); pickers accept tap zones (top +, bottom −,
+  middle confirm).
+- Performance: the stretch catalog is cached (was rebuilt per lookup) and
+  the English i18n fallback no longer duplicates the active-language table.
+
+### Added
+
+- `scripts/audit_api_usage.py` — CI gate verifying every Toybox symbol used
+  exists on all 28 target devices (the class of bug behind most on-device
+  crashes so far).
+- Test suite expanded from 35 to **125 tests**, including on-simulator
+  integration tests: real Storage round-trips, all 34 illustrations load,
+  complete i18n tables for six languages, FIT name-length constraints.
+- `docs/TESTING.md` — the full test strategy plus the scripted on-device
+  pass covering what simulators cannot verify.
+
 ## [1.0.2] - 2026-08-10
 
 ### Fixed
