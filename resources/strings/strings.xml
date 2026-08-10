@@ -26,7 +26,7 @@
     <string id="HomeNext">NEXT SESSION</string>
     <string id="HomeStretchesUnit">stretches ·</string>
     <string id="HomeMinutesUnit">min</string>
-    <string id="HomeHint">START: menu</string>
+    <string id="HomeHint">MENU</string>
 
     <!-- Menus -->
     <string id="MenuStartNow">Start now</string>

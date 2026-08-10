@@ -44,26 +44,37 @@ class CongratsView extends WatchUi.View {
         var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
-        Theme.drawGroupRing(dc);
+
+        // Clean success ring: a full frame with a bright accent sweep.
+        Theme.drawFrameRing(dc);
+        var cx = w / 2;
+        var cy = h / 2;
+        var r = (cx < cy ? cx : cy) - 3;
+        dc.setPenWidth(5);
+        dc.setColor(Theme.COLOR_SUCCESS, Graphics.COLOR_TRANSPARENT);
+        dc.drawArc(cx, cy, r, Graphics.ARC_CLOCKWISE, 135, 45);
+        dc.setPenWidth(1);
+
+        // Centered checkmark badge.
+        var badgeR = h / 9;
+        dc.setColor(Theme.COLOR_SUCCESS, Graphics.COLOR_TRANSPARENT);
+        dc.fillCircle(cx, h * 30 / 100, badgeR);
+        dc.setColor(Theme.COLOR_BG, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(4);
+        var bx = cx - badgeR / 2;
+        var by = h * 30 / 100;
+        dc.drawLine(bx, by, bx + badgeR * 4 / 10, by + badgeR * 5 / 10);
+        dc.drawLine(bx + badgeR * 4 / 10, by + badgeR * 5 / 10, bx + badgeR, by - badgeR * 5 / 10);
+        dc.setPenWidth(1);
 
         dc.setColor(Theme.COLOR_SUCCESS, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h / 3, Graphics.FONT_MEDIUM,
+        dc.drawText(cx, h * 56 / 100, Graphics.FONT_MEDIUM,
                     WatchUi.loadResource(Rez.Strings.CongratsTitle) as String,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h / 2, Graphics.FONT_SMALL,
+        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(cx, h * 70 / 100, Graphics.FONT_TINY,
                     WatchUi.loadResource(Rez.Strings.CongratsBody) as String,
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-
-        // A row of celebratory dots in the group colors.
-        var dotR = w / 40 + 2;
-        var spacing = dotR * 3;
-        var x = w / 2 - 2 * spacing;
-        for (var i = 0; i < 5; i++) {
-            dc.setColor(Theme.GROUP_COLORS[i] as Number, Graphics.COLOR_TRANSPARENT);
-            dc.fillCircle(x, (h * 2) / 3, dotR);
-            x += spacing;
-        }
     }
 }
 

@@ -15,6 +15,7 @@ module Prefs {
     const KEY_SNOOZE_UNTIL = "snoozeUntil";         // Number, epoch seconds
     const KEY_PENDING_ALERT = "pendingAlertTs";     // Number, epoch seconds
     const KEY_NEXT_ALARM = "nextAlarmEpoch";        // Number, epoch seconds
+    const KEY_SEEDED = "seeded";                     // Boolean, first-run flag
 
     const DEFAULT_DURATION_SECS = 30;
     const SNOOZE_SECS = 15 * 60;
@@ -90,6 +91,23 @@ module Prefs {
 
     function setPendingAlertTs(epoch as Number?) as Void {
         Application.Storage.setValue(KEY_PENDING_ALERT, epoch);
+    }
+
+    // On first launch, give the user a ready-to-use starter routine so the
+    // app is useful immediately (no schedule is enabled — no surprise
+    // alarms). Idempotent: runs at most once per install.
+    function seedDefaultsIfNeeded() as Void {
+        if (Application.Storage.getValue(KEY_SEEDED) != null) {
+            return;
+        }
+        Application.Storage.setValue(KEY_SEEDED, true);
+        if (getRoutine().size() == 0) {
+            setRoutine([
+                "neck_tilt_right", "neck_tilt_left",
+                "shoulder_cross_right", "shoulder_cross_left",
+                "side_bend_right", "side_bend_left"
+            ]);
+        }
     }
 
     function getNextAlarmEpoch() as Number? {

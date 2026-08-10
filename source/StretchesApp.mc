@@ -33,6 +33,7 @@ class StretchesApp extends Application.AppBase {
     }
 
     function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
+        Prefs.seedDefaultsIfNeeded();
         Scheduler.registerNext();
         if (AlertKit.hasPendingAlert()) {
             return AlertFlow.initialView();
