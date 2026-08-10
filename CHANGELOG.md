@@ -6,6 +6,20 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Crash opening "My stretches"** (and toggling Sound/Vibration or a
+  schedule's Enabled flag): `CheckboxMenuItem` is not available on every
+  target device (e.g. Forerunner 55). Replaced all checkbox/toggle items
+  with plain `MenuItem`s whose sub-label shows the state ("In routine",
+  "On"/"Off") and flips on tap — works on every device.
+- Workout countdown number shrunk (FONT_NUMBER_MILD) so it stays inside the
+  progress ring instead of spilling over it.
+- Shortened the stretch-picker title to a single word ("Stretches") so it no
+  longer wraps or clips in the Menu2 title bar.
+
+### Changed
+
 ### Changed
 
 - Refreshed the whole UI into one clean, cohesive design system: black

@@ -180,10 +180,10 @@ class WorkoutView extends WatchUi.View {
             dc.drawBitmap((w - img.getWidth()) / 2, iy, img);
         }
 
-        // Countdown number, centered, inside the ring (no filled badge, so
-        // nothing spills over the progress ring).
+        // Countdown number, centered, inside the ring. A smaller number font
+        // keeps it clear of the progress ring near the bottom of the screen.
         dc.setColor(_groupColor, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 85 / 100, Graphics.FONT_NUMBER_MEDIUM,
+        dc.drawText(w / 2, h * 84 / 100, Graphics.FONT_NUMBER_MILD,
                     _engine.remaining().toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 

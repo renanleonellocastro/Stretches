@@ -44,6 +44,8 @@
     <string id="SettingDefaultDuration">Default duration</string>
     <string id="SettingSound">Sound</string>
     <string id="SettingVibration">Vibration</string>
+    <string id="PickerTitle">Stretches</string>
+    <string id="InRoutine">In routine</string>
     <string id="SecondsUnit">s</string>
     <string id="AboutText">Stretches 1.0.0 MIT</string>
 
