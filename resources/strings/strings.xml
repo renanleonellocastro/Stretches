@@ -1,0 +1,92 @@
+<!-- Default language: English -->
+<strings>
+    <string id="AppName">Stretches</string>
+    <string id="WakeMessage" scope="background">Time to stretch!</string>
+
+    <!-- Alarm prompt -->
+    <string id="AlertTitle">Time to stretch!</string>
+    <string id="OptStart">Start</string>
+    <string id="OptSnooze">Snooze 15 min</string>
+    <string id="OptSkip">Skip</string>
+
+    <!-- Workout -->
+    <string id="GetReady">GET READY</string>
+    <string id="Paused">PAUSED</string>
+    <string id="EndWorkoutQ">End workout?</string>
+    <string id="CongratsTitle">Congratulations!</string>
+    <string id="CongratsBody">Routine complete</string>
+    <string id="SaveTitle">Save workout?</string>
+    <string id="OptSave">Save</string>
+    <string id="OptDiscard">Discard</string>
+    <string id="SavedMsg">Saved!</string>
+    <string id="DiscardedMsg">Discarded</string>
+    <string id="EmptyRoutineMsg">Pick stretches first</string>
+
+    <!-- Home -->
+    <string id="HomeNext">NEXT SESSION</string>
+    <string id="HomeStretchesUnit">stretches ·</string>
+    <string id="HomeMinutesUnit">min</string>
+    <string id="HomeHint">START: menu</string>
+
+    <!-- Menus -->
+    <string id="MenuStartNow">Start now</string>
+    <string id="MenuMyStretches">My stretches</string>
+    <string id="MenuDurations">Durations</string>
+    <string id="MenuSchedules">Schedules</string>
+    <string id="MenuSettings">Settings</string>
+    <string id="MenuAbout">About</string>
+    <string id="MenuAddTime">Add time</string>
+    <string id="MenuEditTime">Edit time</string>
+    <string id="MenuDelete">Delete</string>
+    <string id="MenuEnabled">Enabled</string>
+    <string id="StateOn">On</string>
+    <string id="StateOff">Off</string>
+    <string id="SettingDefaultDuration">Default duration</string>
+    <string id="SettingSound">Sound</string>
+    <string id="SettingVibration">Vibration</string>
+    <string id="SecondsUnit">s</string>
+    <string id="AboutText">Stretches 1.0.0 MIT</string>
+
+    <!-- Muscle groups -->
+    <string id="GroupNeck">Neck</string>
+    <string id="GroupWrist">Wrist &amp; forearm</string>
+    <string id="GroupShoulder">Shoulder &amp; chest</string>
+    <string id="GroupTorso">Torso &amp; back</string>
+    <string id="GroupLegs">Legs</string>
+
+    <!-- Stretch names -->
+    <string id="s_neck_tilt_right">Neck Tilt Right</string>
+    <string id="s_neck_tilt_left">Neck Tilt Left</string>
+    <string id="s_neck_tilt_down">Neck Tilt Down</string>
+    <string id="s_neck_tilt_up">Neck Tilt Up</string>
+    <string id="s_neck_rot_right">Neck Turn Right</string>
+    <string id="s_neck_rot_left">Neck Turn Left</string>
+    <string id="s_neck_rot_right_down">Neck Turn R + Down</string>
+    <string id="s_neck_rot_left_down">Neck Turn L + Down</string>
+    <string id="s_neck_rot_right_up">Neck Turn R + Up</string>
+    <string id="s_neck_rot_left_up">Neck Turn L + Up</string>
+    <string id="s_neck_chest_rot_right_up">Chest Hold Turn R Up</string>
+    <string id="s_neck_chest_rot_left_up">Chest Hold Turn L Up</string>
+    <string id="s_wrist_flexor_right">Wrist Flexor Right</string>
+    <string id="s_wrist_flexor_left">Wrist Flexor Left</string>
+    <string id="s_wrist_extensor_right">Wrist Extensor Right</string>
+    <string id="s_wrist_extensor_left">Wrist Extensor Left</string>
+    <string id="s_shoulder_cross_right">Cross-Body Shoulder R</string>
+    <string id="s_shoulder_cross_left">Cross-Body Shoulder L</string>
+    <string id="s_triceps_right">Overhead Triceps R</string>
+    <string id="s_triceps_left">Overhead Triceps L</string>
+    <string id="s_chest_opener">Chest Opener</string>
+    <string id="s_upper_back_reach">Upper Back Reach</string>
+    <string id="s_side_bend_right">Side Bend Right</string>
+    <string id="s_side_bend_left">Side Bend Left</string>
+    <string id="s_torso_twist_right">Torso Twist Right</string>
+    <string id="s_torso_twist_left">Torso Twist Left</string>
+    <string id="s_lower_back_child_pose">Child's Pose</string>
+    <string id="s_hamstring_fold">Forward Fold</string>
+    <string id="s_quad_right">Quad Stretch Right</string>
+    <string id="s_quad_left">Quad Stretch Left</string>
+    <string id="s_calf_right">Calf Stretch Right</string>
+    <string id="s_calf_left">Calf Stretch Left</string>
+    <string id="s_hip_flexor_right">Hip Flexor Lunge R</string>
+    <string id="s_hip_flexor_left">Hip Flexor Lunge L</string>
+</strings>
