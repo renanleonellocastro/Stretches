@@ -15,6 +15,7 @@ class WorkoutView extends WatchUi.View {
     hidden var _image as WatchUi.BitmapResource?;
     hidden var _imageId as String?;
     hidden var _nameLines as Array = [];
+    hidden var _fullName as String = "";
     hidden var _groupColor as Number = Theme.COLOR_ACCENT;
 
     function initialize(engine as WorkoutEngine, recorder as WorkoutRecorder) {
@@ -106,8 +107,8 @@ class WorkoutView extends WatchUi.View {
         _imageId = id;
         _image = WatchUi.loadResource((entry as StretchCatalog.Entry).imageRes) as WatchUi.BitmapResource;
         _groupColor = Theme.groupColor((entry as StretchCatalog.Entry).group);
-        var name = WatchUi.loadResource((entry as StretchCatalog.Entry).nameRes) as String;
-        _nameLines = Theme.splitTwoLines(name, 17);
+        _fullName = WatchUi.loadResource((entry as StretchCatalog.Entry).nameRes) as String;
+        _nameLines = Theme.splitTwoLines(_fullName, 17);
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -115,7 +116,11 @@ class WorkoutView extends WatchUi.View {
         dc.clear();
         var state = _engine.state;
         if (state == STATE_PREP) {
-            drawPrep(dc);
+            drawCountdown(dc, WatchUi.loadResource(Rez.Strings.GetReady) as String);
+        } else if (state == STATE_ANNOUNCE) {
+            // Preview the upcoming stretch: name + big centered countdown,
+            // no progress ring (mirrors the initial get-ready screen).
+            drawCountdown(dc, currentName());
         } else if (state == STATE_DONE) {
             // Transitioning to the congrats view; nothing to draw.
         } else {
@@ -123,16 +128,29 @@ class WorkoutView extends WatchUi.View {
         }
     }
 
-    hidden function drawPrep(dc as Dc) as Void {
+    hidden function currentName() as String {
+        if (_nameLines.size() == 0) {
+            return "";
+        }
+        return _fullName;
+    }
+
+    // Full-screen centered countdown used by both the initial get-ready and
+    // the per-stretch announce phases. `label` is shown above the number.
+    hidden function drawCountdown(dc as Dc, label as String) as Void {
         var w = dc.getWidth();
         var h = dc.getHeight();
-        Theme.drawProgressRing(dc, _engine.progress(), Theme.COLOR_ACCENT);
         dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h / 5, Graphics.FONT_SMALL,
-                    WatchUi.loadResource(Rez.Strings.GetReady) as String,
-                    Graphics.TEXT_JUSTIFY_CENTER);
+        var labelLines = Theme.splitTwoLines(label, 16);
+        var lineH = dc.getFontHeight(Graphics.FONT_SMALL);
+        var ly = h * 22 / 100 - (labelLines.size() - 1) * lineH / 2;
+        for (var i = 0; i < labelLines.size(); i++) {
+            dc.drawText(w / 2, ly, Graphics.FONT_SMALL, labelLines[i] as String,
+                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            ly += lineH;
+        }
         dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h / 2, Graphics.FONT_NUMBER_THAI_HOT,
+        dc.drawText(w / 2, h * 56 / 100, Graphics.FONT_NUMBER_THAI_HOT,
                     _engine.remaining().toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
@@ -140,52 +158,33 @@ class WorkoutView extends WatchUi.View {
     hidden function drawStretch(dc as Dc, state as Number) as Void {
         var w = dc.getWidth();
         var h = dc.getHeight();
-        var announcing = (state != STATE_STRETCH);
-        // Amber during the get-ready lead-in, the muscle-group color while
-        // the stretch is running.
-        var phaseColor = announcing ? Theme.COLOR_WARM : _groupColor;
-        Theme.drawProgressRing(dc, _engine.progress(), phaseColor);
+        Theme.drawProgressRing(dc, _engine.progress(), _groupColor);
 
-        // Stretch name, up to two lines near the top.
+        // Position and name stay in the safe zone near the top so they never
+        // touch the progress ring.
+        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h * 13 / 100, Graphics.FONT_XTINY,
+                    _engine.position().toString() + " / " + _engine.total().toString(),
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        var lineH = dc.getFontHeight(Graphics.FONT_TINY);
-        var y = h * 6 / 100;
-        for (var i = 0; i < _nameLines.size(); i++) {
-            dc.drawText(w / 2, y, Graphics.FONT_TINY, _nameLines[i] as String,
-                        Graphics.TEXT_JUSTIFY_CENTER);
-            y += lineH;
-        }
+        dc.drawText(w / 2, h * 22 / 100, Graphics.FONT_XTINY,
+                    Theme.fitText(dc, _fullName, Graphics.FONT_XTINY, w * 72 / 100),
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
-        // Countdown badge geometry (bottom-center). The illustration is a
-        // white card, so no text may sit on top of it: the name goes above
-        // and the countdown below.
-        var badgeR = h * 9 / 100;
-        var bx = w / 2;
-        var by = h - badgeR - h * 4 / 100;
-        var badgeTop = by - badgeR;
-
-        // Illustration card, centered in the band between name and badge.
+        // Illustration, centered in the band between the name and the number.
+        var bandTop = h * 27 / 100;
+        var bandBottom = h * 77 / 100;
         if (_image != null) {
             var img = _image as WatchUi.BitmapResource;
-            var nameBottom = y + h * 1 / 100;
-            var iy = nameBottom + (badgeTop - nameBottom - img.getHeight()) / 2;
-            if (iy < nameBottom) {
-                iy = nameBottom;
-            }
+            var iy = bandTop + (bandBottom - bandTop - img.getHeight()) / 2;
             dc.drawBitmap((w - img.getWidth()) / 2, iy, img);
         }
 
-        // Countdown badge.
-        dc.setColor(phaseColor, Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(bx, by, badgeR);
-        dc.setColor(Theme.COLOR_BG, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(bx, by, Graphics.FONT_NUMBER_MILD, _engine.remaining().toString(),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-
-        // Position ("2/8"), quiet, in the black area beside the badge.
-        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w * 20 / 100, by, Graphics.FONT_XTINY,
-                    _engine.position().toString() + "/" + _engine.total().toString(),
+        // Countdown number, centered, inside the ring (no filled badge, so
+        // nothing spills over the progress ring).
+        dc.setColor(_groupColor, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h * 85 / 100, Graphics.FONT_NUMBER_MEDIUM,
+                    _engine.remaining().toString(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 
         if (_engine.isPaused()) {
