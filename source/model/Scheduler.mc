@@ -3,19 +3,24 @@ import Toybox.Lang;
 import Toybox.Time;
 import Toybox.Time.Gregorian;
 
-// Alarm scheduling. The pure helpers (secondsToNext / nextAlarmEpoch) are
-// deterministic and unit-tested; registerNext() glues them to Storage and
-// the Background temporal-event API. Runs in both app and service contexts.
+// Alarm scheduling. The pure helpers are deterministic and unit-tested;
+// registerNext()/backgroundCheck() glue them to Storage and the Background
+// temporal-event API. Runs in both the app and the background service.
+//
+// Reminders use a repeating 5-minute temporal event (the finest the platform
+// allows) rather than a one-shot: on each wake the service checks whether any
+// enabled time has passed since the previous check, which is self-healing and
+// survives the app being closed. Alarms therefore fire within ~5 minutes of
+// the set time.
 (:background)
 module Scheduler {
     const SECS_PER_DAY = 86400;
-    // Temporal events cannot fire more often than every 5 minutes; clamp
-    // with a safety margin so registration never throws.
-    const MIN_LEAD_SECS = 5 * 60 + 30;
+    const POLL_SECS = 300;   // 5 min — the minimum temporal-event interval
 
-    // Seconds from nowSecOfDay (0..86399) until the next enabled schedule
-    // entry, looking at today first and wrapping to tomorrow. Returns null
-    // when no entry is enabled.
+    // --- Pure helpers (unit-tested) --------------------------------------
+
+    // Seconds from nowSecOfDay until the next enabled entry (today, wrapping
+    // to tomorrow). Null when nothing is enabled.
     function secondsToNext(nowSecOfDay as Number, schedules as Array) as Number? {
         var best = null;
         for (var i = 0; i < schedules.size(); i++) {
@@ -27,22 +32,22 @@ module Scheduler {
         return best;
     }
 
-    // Seconds from nowSecOfDay until an enabled schedule entry fires (today
-    // or wrapped to tomorrow). Null when the entry is disabled.
     function deltaToEntry(nowSecOfDay as Number, entry as Array) as Number? {
         if (!(entry[2] as Boolean)) {
             return null;
         }
-        var target = (entry[0] as Number) * 3600 + (entry[1] as Number) * 60;
-        var delta = target - nowSecOfDay;
+        var delta = entrySecondOfDay(entry) - nowSecOfDay;
         if (delta <= 0) {
             delta += SECS_PER_DAY;
         }
         return delta;
     }
 
-    // Epoch seconds of the next alarm: the earlier of the next schedule
-    // occurrence and a pending snooze. Returns null when nothing is due.
+    function entrySecondOfDay(entry as Array) as Number {
+        return (entry[0] as Number) * 3600 + (entry[1] as Number) * 60;
+    }
+
+    // Epoch of the next future alarm (schedule or snooze), for display.
     function nextAlarmEpoch(nowEpoch as Number, nowSecOfDay as Number,
                             schedules as Array, snoozeUntil as Number?) as Number? {
         var next = null;
@@ -58,61 +63,106 @@ module Scheduler {
         return next;
     }
 
-    // Recompute the next alarm from Storage and (re)register the temporal
-    // event. Also caches the alarm epoch so the foreground app can poll it.
-    function registerNext() as Void {
-        var nowEpoch = Time.now().value();
-        var snooze = activeSnooze(nowEpoch);
-        var next = nextAlarmEpoch(nowEpoch, nowSecOfDay(), Prefs.getSchedules(), snooze);
-        Prefs.setNextAlarmEpoch(next);
-        if (next == null) {
-            Background.deleteTemporalEvent();
-            return;
+    // True when any enabled schedule's most recent occurrence falls in the
+    // (lastEpoch, nowEpoch] window — i.e. it came due since the last check.
+    function isScheduleDueSince(lastEpoch as Number, nowEpoch as Number,
+                                nowSecOfDay as Number, schedules as Array) as Boolean {
+        for (var i = 0; i < schedules.size(); i++) {
+            var entry = schedules[i] as Array;
+            if (!(entry[2] as Boolean)) {
+                continue;
+            }
+            var secsAgo = ((nowSecOfDay - entrySecondOfDay(entry)) % SECS_PER_DAY
+                           + SECS_PER_DAY) % SECS_PER_DAY;
+            if (nowEpoch - secsAgo > lastEpoch) {
+                return true;
+            }
         }
-        scheduleTemporalEvent(next as Number, nowEpoch);
+        return false;
     }
+
+    // --- Storage / platform glue -----------------------------------------
 
     function nowSecOfDay() as Number {
         var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
         return (info.hour as Number) * 3600 + (info.min as Number) * 60 + (info.sec as Number);
     }
 
+    function hasActiveAlarms(nowEpoch as Number) as Boolean {
+        var schedules = Prefs.getSchedules();
+        for (var i = 0; i < schedules.size(); i++) {
+            if ((schedules[i] as Array)[2] as Boolean) {
+                return true;
+            }
+        }
+        var snooze = Prefs.getSnoozeUntil();
+        return snooze != null && (snooze as Number) > nowEpoch;
+    }
+
     function activeSnooze(nowEpoch as Number) as Number? {
         var snooze = Prefs.getSnoozeUntil();
         if (snooze != null && (snooze as Number) <= nowEpoch) {
-            // Expired snooze: it either fired or was missed; drop it.
-            Prefs.setSnoozeUntil(null);
+            Prefs.setSnoozeUntil(null);   // expired: fired or missed
             return null;
         }
         return snooze;
     }
 
-    function scheduleTemporalEvent(next as Number, nowEpoch as Number) as Void {
-        var eventEpoch = next;
-        if (eventEpoch < nowEpoch + MIN_LEAD_SECS) {
-            // The foreground poller covers alarms due sooner than the
-            // background API allows.
-            eventEpoch = nowEpoch + MIN_LEAD_SECS;
-        }
-        try {
-            Background.registerForTemporalEvent(new Time.Moment(eventEpoch));
-        } catch (e) {
-            try {
-                Background.registerForTemporalEvent(new Time.Moment(nowEpoch + 2 * MIN_LEAD_SECS));
-            } catch (e2) {
-                // Give up silently; next app launch re-registers.
+    // Refresh the cached next-alarm time and keep the 5-minute poll running
+    // while (and only while) something is scheduled.
+    function registerNext() as Void {
+        var now = Time.now().value();
+        Prefs.setNextAlarmEpoch(
+            nextAlarmEpoch(now, nowSecOfDay(), Prefs.getSchedules(), activeSnooze(now)));
+        if (hasActiveAlarms(now)) {
+            if (Prefs.getLastCheck() == null) {
+                Prefs.setLastCheck(now);
             }
+            registerPoll();
+        } else {
+            Background.deleteTemporalEvent();
+            Prefs.setLastCheck(null);
         }
     }
 
-    // Marks the alarm as fired and prepares the following one.
+    function registerPoll() as Void {
+        try {
+            Background.registerForTemporalEvent(new Time.Duration(POLL_SECS));
+        } catch (e) {
+            // Re-registered on the next app launch or schedule change.
+        }
+    }
+
+    // Called from the background service: has an alarm come due since the
+    // previous wake? Advances the check watermark and clears a fired snooze.
+    function backgroundCheck() as Boolean {
+        var now = Time.now().value();
+        var last = Prefs.getLastCheck();
+        if (last == null) {
+            last = now - 1;
+        }
+        var due = isScheduleDueSince(last as Number, now, nowSecOfDay(), Prefs.getSchedules())
+                  || snoozeDueSince(last as Number, now);
+        Prefs.setLastCheck(now);
+        return due;
+    }
+
+    function snoozeDueSince(lastEpoch as Number, nowEpoch as Number) as Boolean {
+        var snooze = Prefs.getSnoozeUntil();
+        if (snooze == null || (snooze as Number) > nowEpoch) {
+            return false;
+        }
+        Prefs.setSnoozeUntil(null);
+        return (snooze as Number) > lastEpoch;
+    }
+
+    // The user answered the prompt: clear pending state and line up the next.
     function consumeAlarm() as Void {
         Prefs.setSnoozeUntil(null);
         Prefs.setPendingAlertTs(null);
         registerNext();
     }
 
-    // Snooze the current alarm by SNOOZE_SECS.
     function snooze() as Void {
         Prefs.setPendingAlertTs(null);
         Prefs.setSnoozeUntil(Time.now().value() + Prefs.SNOOZE_SECS);

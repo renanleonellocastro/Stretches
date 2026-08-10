@@ -1,4 +1,3 @@
-import Toybox.Activity;
 import Toybox.Attention;
 import Toybox.Graphics;
 import Toybox.Lang;
@@ -18,6 +17,8 @@ class WorkoutView extends WatchUi.View {
     hidden var _nameLines as Array = [];
     hidden var _fullName as String = "";
     hidden var _groupColor as Number = Theme.COLOR_ACCENT;
+    hidden var _lapName as String = "";       // stretch currently being held
+    hidden var _lapSeconds as Number = 0;
 
     function initialize(engine as WorkoutEngine, recorder as WorkoutRecorder) {
         View.initialize();
@@ -53,13 +54,21 @@ class WorkoutView extends WatchUi.View {
     }
 
     function onTick() as Void {
+        keepScreenLit();
         var event = _engine.tick();
         if (event == EVENT_WORKOUT_DONE) {
-            finishWorkout();
+            finishWorkout(true);
             return;
         }
         applyTickEvent(event);
         WatchUi.requestUpdate();
+    }
+
+    // Hold the backlight on so the stretch stays readable throughout.
+    hidden function keepScreenLit() as Void {
+        if (Attention has :backlight) {
+            Attention.backlight(true);
+        }
     }
 
     hidden function applyTickEvent(event as Number) as Void {
@@ -69,21 +78,32 @@ class WorkoutView extends WatchUi.View {
             AlertKit.tone(Attention.TONE_START);
         } else if (event == EVENT_STRETCH_STARTED) {
             loadCurrentStretch();
+            beginLap();
         } else if (event == EVENT_STRETCH_DONE) {
             recordCompletedStretch();
             loadCurrentStretch();
         }
     }
 
+    // Remember which stretch is being held so its lap can be labelled.
+    hidden function beginLap() as Void {
+        _lapName = _fullName;
+        _lapSeconds = _engine.currentDuration();
+    }
+
     hidden function recordCompletedStretch() as Void {
-        _recorder.addLap();
+        _recorder.logStretchLap(_lapName, _lapSeconds);
         _recorder.setCompletedCount(_engine.completedCount);
         AlertKit.stretchDone();
     }
 
-    function finishWorkout() as Void {
+    // recordFinalLap is true only when the last stretch completed naturally
+    // (not skipped), so the final lap carries the right stretch.
+    function finishWorkout(recordFinalLap as Boolean) as Void {
         stopTimer();
-        _recorder.addLap();
+        if (recordFinalLap) {
+            _recorder.logStretchLap(_lapName, _lapSeconds);
+        }
         _recorder.setCompletedCount(_engine.completedCount);
         _recorder.stop();
         var congrats = new CongratsView(_recorder);
@@ -118,7 +138,7 @@ class WorkoutView extends WatchUi.View {
         _imageId = id;
         _image = WatchUi.loadResource(entry.imageRes) as WatchUi.BitmapResource;
         _groupColor = Theme.groupColor(entry.group);
-        _fullName = WatchUi.loadResource(entry.nameRes) as String;
+        _fullName = Strings.t(entry.nameKey);
         _nameLines = Theme.splitTwoLines(_fullName, 17);
     }
 
@@ -127,7 +147,7 @@ class WorkoutView extends WatchUi.View {
         dc.clear();
         var state = _engine.state;
         if (state == STATE_PREP) {
-            drawCountdown(dc, WatchUi.loadResource(Rez.Strings.GetReady) as String);
+            drawCountdown(dc, Strings.t("GetReady"));
         } else if (state == STATE_ANNOUNCE) {
             // Preview the upcoming stretch: name + big centered countdown,
             // no progress ring (mirrors the initial get-ready screen).
@@ -171,43 +191,12 @@ class WorkoutView extends WatchUi.View {
 
     hidden function drawStretch(dc as Dc) as Void {
         Theme.drawProgressRing(dc, _engine.progress(), _groupColor);
-        drawHeartRate(dc);
         drawStretchHeader(dc);
         drawIllustration(dc);
         drawStretchCountdown(dc);
         if (_engine.isPaused()) {
             drawPausedOverlay(dc, dc.getWidth(), dc.getHeight());
         }
-    }
-
-    // Live heart rate from the recording session's activity info — visible
-    // proof the workout is being tracked. Hidden until the sensor reports.
-    hidden function drawHeartRate(dc as Dc) as Void {
-        var bpm = currentHeartRate();
-        if (bpm == null) {
-            return;
-        }
-        var text = (bpm as Number).toString();
-        var r = 3;
-        var tw = dc.getTextWidthInPixels(text, Graphics.FONT_XTINY);
-        var startX = dc.getWidth() / 2 - (4 * r + 5 + tw) / 2;
-        var y = dc.getHeight() * 7 / 100;
-        drawHeart(dc, startX + 2 * r, y, r);
-        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(startX + 4 * r + 5, y, Graphics.FONT_XTINY, text,
-                    Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
-    }
-
-    hidden function currentHeartRate() as Number? {
-        var info = Activity.getActivityInfo();
-        return info == null ? null : info.currentHeartRate;
-    }
-
-    hidden function drawHeart(dc as Dc, cx as Number, cy as Number, r as Number) as Void {
-        dc.setColor(Theme.COLOR_DANGER, Graphics.COLOR_TRANSPARENT);
-        dc.fillCircle(cx - r, cy - r / 2, r);
-        dc.fillCircle(cx + r, cy - r / 2, r);
-        dc.fillPolygon([[cx - 2 * r, cy - r / 2], [cx + 2 * r, cy - r / 2], [cx, cy + 2 * r]]);
     }
 
     // Position and name stay in the safe zone near the top so they never
@@ -257,7 +246,7 @@ class WorkoutView extends WatchUi.View {
         dc.drawLine(w / 4, h / 2 + barH / 2, w * 3 / 4, h / 2 + barH / 2);
         dc.setPenWidth(1);
         dc.drawText(w / 2, h / 2, Graphics.FONT_MEDIUM,
-                    WatchUi.loadResource(Rez.Strings.Paused) as String,
+                    Strings.t("Paused"),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }
@@ -287,7 +276,7 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
         var engine = _view.engine();
         var event = engine.skip();
         if (event == EVENT_WORKOUT_DONE) {
-            _view.finishWorkout();
+            _view.finishWorkout(false);
         }
         WatchUi.requestUpdate();
         return true;
@@ -297,7 +286,7 @@ class WorkoutDelegate extends WatchUi.BehaviorDelegate {
     function onBack() as Boolean {
         _view.engine().pause();
         var dialog = new WatchUi.Confirmation(
-            WatchUi.loadResource(Rez.Strings.EndWorkoutQ) as String);
+            Strings.t("EndWorkoutQ"));
         WatchUi.pushView(dialog, new EndWorkoutConfirmDelegate(_view), WatchUi.SLIDE_UP);
         return true;
     }

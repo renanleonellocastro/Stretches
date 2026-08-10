@@ -3,16 +3,20 @@ import Toybox.ActivityRecording;
 import Toybox.FitContributor;
 import Toybox.Lang;
 
-// Thin wrapper around ActivityRecording. Records the routine as a
-// Training / Flexibility Training activity so it lands in Garmin Connect
-// with every sensor metric the watch captures (heart rate, calories, ...).
-// Each finished stretch is stored as a lap, and the number of completed
-// stretches is written to a custom FIT session field.
+// Records the routine as a Training / Flexibility Training activity so it
+// lands in Garmin Connect with every sensor metric the watch captures
+// (heart rate, calories, time). Each completed stretch is stored as a lap
+// carrying its name and hold time as custom FIT fields, and the total number
+// of completed stretches is written to a session field.
 class WorkoutRecorder {
-    const STRETCH_COUNT_FIELD_ID = 0;
+    const FIELD_COUNT = 0;
+    const FIELD_LAP_NAME = 1;
+    const FIELD_LAP_SECONDS = 2;
 
     hidden var _session as ActivityRecording.Session?;
     hidden var _countField as FitContributor.Field?;
+    hidden var _lapNameField as FitContributor.Field?;
+    hidden var _lapSecondsField as FitContributor.Field?;
 
     function start() as Void {
         if (_session != null) {
@@ -23,18 +27,24 @@ class WorkoutRecorder {
             :sport => Activity.SPORT_TRAINING,
             :subSport => Activity.SUB_SPORT_FLEXIBILITY_TRAINING
         });
-        _countField = createCountField(_session as ActivityRecording.Session);
+        createFields();
         (_session as ActivityRecording.Session).start();
     }
 
-    hidden function createCountField(session as ActivityRecording.Session) as FitContributor.Field? {
+    hidden function createFields() as Void {
+        var session = _session as ActivityRecording.Session;
         try {
-            return session.createField(
-                "stretches_completed", STRETCH_COUNT_FIELD_ID,
+            _countField = session.createField("stretches_completed", FIELD_COUNT,
                 FitContributor.DATA_TYPE_UINT16,
                 {:mesgType => FitContributor.MESG_TYPE_SESSION, :units => "count"});
+            _lapNameField = session.createField("stretch", FIELD_LAP_NAME,
+                FitContributor.DATA_TYPE_STRING,
+                {:mesgType => FitContributor.MESG_TYPE_LAP, :count => 24});
+            _lapSecondsField = session.createField("hold", FIELD_LAP_SECONDS,
+                FitContributor.DATA_TYPE_UINT16,
+                {:mesgType => FitContributor.MESG_TYPE_LAP, :units => "s"});
         } catch (e) {
-            return null;
+            // Custom fields are best-effort; recording still works without.
         }
     }
 
@@ -42,10 +52,18 @@ class WorkoutRecorder {
         return _session != null;
     }
 
-    function addLap() as Void {
-        if (_session != null) {
-            (_session as ActivityRecording.Session).addLap();
+    // Close a lap tagged with the completed stretch's name and hold time.
+    function logStretchLap(name as String, seconds as Number) as Void {
+        if (_session == null) {
+            return;
         }
+        if (_lapNameField != null) {
+            (_lapNameField as FitContributor.Field).setData(name);
+        }
+        if (_lapSecondsField != null) {
+            (_lapSecondsField as FitContributor.Field).setData(seconds);
+        }
+        (_session as ActivityRecording.Session).addLap();
     }
 
     function setCompletedCount(count as Number) as Void {
@@ -63,16 +81,21 @@ class WorkoutRecorder {
     function save() as Void {
         if (_session != null) {
             (_session as ActivityRecording.Session).save();
-            _session = null;
-            _countField = null;
+            reset();
         }
     }
 
     function discard() as Void {
         if (_session != null) {
             (_session as ActivityRecording.Session).discard();
-            _session = null;
-            _countField = null;
+            reset();
         }
+    }
+
+    hidden function reset() as Void {
+        _session = null;
+        _countField = null;
+        _lapNameField = null;
+        _lapSecondsField = null;
     }
 }
