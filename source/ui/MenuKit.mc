@@ -7,6 +7,10 @@ module MenuKit {
         return WatchUi.loadResource(res) as String;
     }
 
+    function onOff(on as Boolean) as String {
+        return str(on ? Rez.Strings.StateOn : Rez.Strings.StateOff);
+    }
+
     function pushMainMenu() as Void {
         var menu = new WatchUi.Menu2({:title => str(Rez.Strings.AppName)});
         menu.addItem(new WatchUi.MenuItem(str(Rez.Strings.MenuStartNow), null, :startNow, null));
@@ -18,14 +22,25 @@ module MenuKit {
         WatchUi.pushView(menu, new MainMenuDelegate(), WatchUi.SLIDE_LEFT);
     }
 
+    // Sub-label showing whether a stretch is part of the routine. Plain
+    // MenuItems (not CheckboxMenuItem) are used because the checkbox/toggle
+    // item types are not available on every target device (e.g. fr55).
+    function stretchSub(entry as StretchCatalog.Entry) as String {
+        if (RoutineModel.isSelected(entry.id)) {
+            return str(Rez.Strings.InRoutine);
+        }
+        return str(StretchCatalog.groupNameRes(entry.group));
+    }
+
     function pushStretchPicker() as Void {
-        var menu = new WatchUi.Menu2({:title => str(Rez.Strings.MenuMyStretches)});
+        // Short, single-word title so it never wraps or clips in the Menu2
+        // title bar (the menu item that opens it keeps the fuller wording).
+        var menu = new WatchUi.Menu2({:title => str(Rez.Strings.PickerTitle)});
         var all = StretchCatalog.entries();
         for (var i = 0; i < all.size(); i++) {
             var entry = all[i] as StretchCatalog.Entry;
-            menu.addItem(new WatchUi.CheckboxMenuItem(
-                str(entry.nameRes), str(StretchCatalog.groupNameRes(entry.group)),
-                entry.id, RoutineModel.isSelected(entry.id), null));
+            menu.addItem(new WatchUi.MenuItem(
+                str(entry.nameRes), stretchSub(entry), entry.id, null));
         }
         WatchUi.pushView(menu, new StretchPickerDelegate(), WatchUi.SLIDE_LEFT);
     }
@@ -77,10 +92,10 @@ module MenuKit {
             str(Rez.Strings.SettingDefaultDuration),
             Prefs.getDefaultDuration().toString() + " " + str(Rez.Strings.SecondsUnit),
             :defaultDuration, null));
-        menu.addItem(new WatchUi.CheckboxMenuItem(
-            str(Rez.Strings.SettingSound), null, :tone, Prefs.isToneOn(), null));
-        menu.addItem(new WatchUi.CheckboxMenuItem(
-            str(Rez.Strings.SettingVibration), null, :vibe, Prefs.isVibeOn(), null));
+        menu.addItem(new WatchUi.MenuItem(
+            str(Rez.Strings.SettingSound), onOff(Prefs.isToneOn()), :tone, null));
+        menu.addItem(new WatchUi.MenuItem(
+            str(Rez.Strings.SettingVibration), onOff(Prefs.isVibeOn()), :vibe, null));
         WatchUi.pushView(menu, new SettingsMenuDelegate(), WatchUi.SLIDE_LEFT);
     }
 }
@@ -119,8 +134,11 @@ class StretchPickerDelegate extends WatchUi.Menu2InputDelegate {
     }
 
     function onSelect(item as WatchUi.MenuItem) as Void {
-        if (item instanceof WatchUi.CheckboxMenuItem) {
-            RoutineModel.setSelected(item.getId() as String, item.isChecked());
+        var id = item.getId() as String;
+        RoutineModel.toggle(id);
+        var entry = StretchCatalog.find(id);
+        if (entry != null) {
+            item.setSubLabel(MenuKit.stretchSub(entry as StretchCatalog.Entry));
         }
     }
 
@@ -199,8 +217,9 @@ class SchedulesMenuDelegate extends WatchUi.Menu2InputDelegate {
         var entry = schedules[index] as Array;
         var menu = new WatchUi.Menu2({
             :title => TimeFormat.format(entry[0] as Number, entry[1] as Number)});
-        menu.addItem(new WatchUi.CheckboxMenuItem(
-            MenuKit.str(Rez.Strings.MenuEnabled), null, :enabled, entry[2] as Boolean, null));
+        menu.addItem(new WatchUi.MenuItem(
+            MenuKit.str(Rez.Strings.MenuEnabled), MenuKit.onOff(entry[2] as Boolean),
+            :enabled, null));
         menu.addItem(new WatchUi.MenuItem(MenuKit.str(Rez.Strings.MenuEditTime), null, :edit, null));
         menu.addItem(new WatchUi.MenuItem(MenuKit.str(Rez.Strings.MenuDelete), null, :delete, null));
         WatchUi.pushView(menu, new ScheduleItemDelegate(index, parentItem), WatchUi.SLIDE_LEFT);
@@ -240,13 +259,14 @@ class ScheduleItemDelegate extends WatchUi.Menu2InputDelegate {
             WatchUi.popView(WatchUi.SLIDE_RIGHT);
             return;
         }
-        if (id == :enabled && item instanceof WatchUi.CheckboxMenuItem) {
+        if (id == :enabled) {
             var entry = schedules[_index] as Array;
-            entry[2] = item.isChecked();
+            var nowOn = !(entry[2] as Boolean);
+            entry[2] = nowOn;
             Prefs.setSchedules(schedules);
             Scheduler.registerNext();
-            _parentItem.setSubLabel(MenuKit.str(
-                item.isChecked() ? Rez.Strings.StateOn : Rez.Strings.StateOff));
+            item.setSubLabel(MenuKit.onOff(nowOn));
+            _parentItem.setSubLabel(MenuKit.onOff(nowOn));
         } else if (id == :edit) {
             var entry = schedules[_index] as Array;
             var view = new TimePickerView(MenuKit.str(Rez.Strings.MenuEditTime),
@@ -314,10 +334,14 @@ class SettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
             var handler = new DefaultDurationHandler(item);
             WatchUi.pushView(view, new NumberPickerDelegate(view, handler.method(:onValue)),
                              WatchUi.SLIDE_LEFT);
-        } else if (id == :tone && item instanceof WatchUi.CheckboxMenuItem) {
-            Prefs.setToneOn(item.isChecked());
-        } else if (id == :vibe && item instanceof WatchUi.CheckboxMenuItem) {
-            Prefs.setVibeOn(item.isChecked());
+        } else if (id == :tone) {
+            var on = !Prefs.isToneOn();
+            Prefs.setToneOn(on);
+            item.setSubLabel(MenuKit.onOff(on));
+        } else if (id == :vibe) {
+            var on = !Prefs.isVibeOn();
+            Prefs.setVibeOn(on);
+            item.setSubLabel(MenuKit.onOff(on));
         }
     }
 
