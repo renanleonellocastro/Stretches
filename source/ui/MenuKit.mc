@@ -26,25 +26,36 @@ module MenuKit {
         WatchUi.pushView(menu, new MainMenuDelegate(), WatchUi.SLIDE_LEFT);
     }
 
-    // Sub-label showing whether a stretch is part of the routine. Plain
-    // MenuItems (not CheckboxMenuItem) are used because the checkbox/toggle
-    // item types are not available on every target device (e.g. fr55).
-    function stretchSub(entry as StretchCatalog.Entry) as String {
-        if (RoutineModel.isSelected(entry.id)) {
+    // Sub-label showing whether a stretch is part of the routine. `routine`
+    // is passed in so the picker reads storage once, not once per item.
+    // Plain MenuItems are used because CheckboxMenuItem is not available on
+    // every target device (e.g. fr55).
+    function stretchSub(entry as StretchCatalog.Entry, routine as Array) as String {
+        if (routineContains(routine, entry.id)) {
             return str(Rez.Strings.InRoutine);
         }
         return str(StretchCatalog.groupNameRes(entry.group));
+    }
+
+    function routineContains(routine as Array, id as String) as Boolean {
+        for (var i = 0; i < routine.size(); i++) {
+            if ((routine[i] as String).equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function pushStretchPicker() as Void {
         // Short, single-word title so it never wraps or clips in the Menu2
         // title bar (the menu item that opens it keeps the fuller wording).
         var menu = new WatchUi.Menu2({:title => str(Rez.Strings.PickerTitle)});
+        var routine = RoutineModel.selectedIds();
         var all = StretchCatalog.entries();
         for (var i = 0; i < all.size(); i++) {
             var entry = all[i] as StretchCatalog.Entry;
             menu.addItem(new WatchUi.MenuItem(
-                str(entry.nameRes), stretchSub(entry), entry.id, null));
+                str(entry.nameRes), stretchSub(entry, routine), entry.id, null));
         }
         WatchUi.pushView(menu, new StretchPickerDelegate(), WatchUi.SLIDE_LEFT);
     }
@@ -156,7 +167,8 @@ class StretchPickerDelegate extends WatchUi.Menu2InputDelegate {
         RoutineModel.toggle(id);
         var entry = StretchCatalog.find(id);
         if (entry != null) {
-            item.setSubLabel(MenuKit.stretchSub(entry as StretchCatalog.Entry));
+            item.setSubLabel(MenuKit.stretchSub(entry as StretchCatalog.Entry,
+                                                RoutineModel.selectedIds()));
         }
     }
 

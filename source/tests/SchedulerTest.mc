@@ -4,6 +4,44 @@ import Toybox.Test;
 // Unit tests for the pure scheduling math in Scheduler.
 
 (:test)
+function testDueWhenScheduleFiredSinceLastCheck(logger as Test.Logger) as Boolean {
+    // 09:00 alarm; now 09:02 (32520s of day); last check was at 08:58.
+    var now = 1000000;
+    var nowSec = 9 * 3600 + 2 * 60;
+    var schedules = [[9, 0, true]];
+    Test.assert(Scheduler.isScheduleDueSince(now - 240, now, nowSec, schedules));
+    return true;
+}
+
+(:test)
+function testNotDueWhenAlreadyCheckedAfterAlarm(logger as Test.Logger) as Boolean {
+    // Same 09:00 alarm at 09:02, but we already checked 1 minute ago (09:01).
+    var now = 1000000;
+    var nowSec = 9 * 3600 + 2 * 60;
+    var schedules = [[9, 0, true]];
+    Test.assert(!Scheduler.isScheduleDueSince(now - 60, now, nowSec, schedules));
+    return true;
+}
+
+(:test)
+function testNotDueBeforeAlarmTime(logger as Test.Logger) as Boolean {
+    // Now 08:59, alarm 09:00 — the last occurrence was yesterday, long ago.
+    var now = 1000000;
+    var nowSec = 8 * 3600 + 59 * 60;
+    var schedules = [[9, 0, true]];
+    Test.assert(!Scheduler.isScheduleDueSince(now - 600, now, nowSec, schedules));
+    return true;
+}
+
+(:test)
+function testDueIgnoresDisabledSchedule(logger as Test.Logger) as Boolean {
+    var now = 1000000;
+    var nowSec = 9 * 3600 + 2 * 60;
+    Test.assert(!Scheduler.isScheduleDueSince(now - 240, now, nowSec, [[9, 0, false]]));
+    return true;
+}
+
+(:test)
 function testSecondsToNextPicksEarliestToday(logger as Test.Logger) as Boolean {
     // 08:00:00 now; alarms at 09:30 and 18:00.
     var schedules = [[9, 30, true], [18, 0, true]];

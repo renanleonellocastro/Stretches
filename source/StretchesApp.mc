@@ -51,36 +51,17 @@ class StretchesServiceDelegate extends System.ServiceDelegate {
         ServiceDelegate.initialize();
     }
 
+    // Fires on the repeating 5-minute poll: if any alarm came due since the
+    // last wake, flag it and ask the system to launch the app so the user
+    // gets the Start / Snooze / Skip prompt.
     function onTemporalEvent() as Void {
-        var nowEpoch = Time.now().value();
-        if (alarmReached(nowEpoch)) {
-            triggerAlarm(nowEpoch);
-        } else {
-            Scheduler.registerNext();
-            Background.exit(null);
+        var due = Scheduler.backgroundCheck();
+        if (due) {
+            Prefs.setPendingAlertTs(Time.now().value());
+            requestWake();
         }
-    }
-
-    // Temporal events also fire for clamped/fallback registrations; only
-    // alert when a real alarm time has actually been reached.
-    hidden function alarmReached(nowEpoch as Number) as Boolean {
-        var next = Prefs.getNextAlarmEpoch();
-        return next != null && nowEpoch >= (next as Number) - 60;
-    }
-
-    hidden function triggerAlarm(nowEpoch as Number) as Void {
-        Prefs.setPendingAlertTs(nowEpoch);
-        clearExpiredSnooze(nowEpoch);
         Scheduler.registerNext();
-        requestWake();
-        Background.exit(true);
-    }
-
-    hidden function clearExpiredSnooze(nowEpoch as Number) as Void {
-        var snooze = Prefs.getSnoozeUntil();
-        if (snooze != null && (snooze as Number) <= nowEpoch) {
-            Prefs.setSnoozeUntil(null);
-        }
+        Background.exit(due ? true : null);
     }
 
     hidden function requestWake() as Void {
