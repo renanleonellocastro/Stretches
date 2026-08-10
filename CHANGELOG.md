@@ -14,8 +14,11 @@ and the project adheres to [Semantic Versioning](https://semver.org/).
   the home, alarm prompt, save prompt, messages, duration/time pickers, the
   workout and the celebration screens.
 - Reworked the workout screen so the stretch name, illustration and
-  countdown never overlap; illustrations are sized to fit the smallest
-  target screen (Forerunner 55).
+  countdown never overlap.
+- Illustrations now ship at eight per-resolution sizes (108–216 px) and each
+  device pulls the bucket matching its screen, so the artwork is crisp and
+  proportional from the 208x208 Forerunner 55 up to the 416x416 Venu 2.
+  Poses are authored in a fixed logical space so nothing is clipped.
 - Muscle-group colors are now used only where meaningful (illustration
   borders and the in-workout progress ring), not as decoration.
 

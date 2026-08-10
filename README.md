@@ -154,7 +154,8 @@ stretches/
 │   ├── session/             # activity recording (FIT)
 │   ├── ui/                  # views, menus, theme
 │   └── tests/               # Run No Evil unit tests
-├── resources*/              # drawables + per-language strings
+├── resources*/              # launcher icon + per-language strings
+├── assets/illus<size>/      # stretch illustrations, one PNG set per screen size
 ├── scripts/                 # illustration generator (Python + Pillow)
 └── .github/workflows/       # CI (build + tests) and release packaging
 ```

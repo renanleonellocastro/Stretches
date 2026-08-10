@@ -59,23 +59,42 @@ jobs:
           sys.exit(1 if failed else 0)
           EOF
 
-      - name: Verify illustration generator runs and covers the catalog
+      - name: Verify illustration generator runs and every size bucket covers the catalog
         run: |
           pip install --quiet pillow
           python3 scripts/generate_illustrations.py
           python3 - <<'EOF'
           import glob
+          import os
           import re
           import sys
 
-          pngs = {p.split("/")[-1][:-4] for p in glob.glob("resources/drawables/stretches/*.png")}
           with open("source/model/StretchCatalog.mc") as f:
               catalog = set(re.findall(r'new Entry\("([a-z_0-9]+)"', f.read()))
-          missing = catalog - pngs
-          if missing:
-              print(f"catalog entries without illustration: {sorted(missing)}")
+
+          buckets = sorted(glob.glob("assets/illus*"))
+          if not buckets:
+              print("no illustration buckets found under assets/")
               sys.exit(1)
-          print(f"{len(catalog)} catalog entries, {len(pngs)} illustrations - OK")
+
+          failed = False
+          for bucket in buckets:
+              pngs = {os.path.basename(p)[:-4]
+                      for p in glob.glob(os.path.join(bucket, "stretches", "*.png"))}
+              missing = catalog - pngs
+              if missing:
+                  print(f"{bucket}: missing {sorted(missing)}")
+                  failed = True
+          # Every device in the manifest must map to an existing bucket.
+          with open("monkey.jungle") as f:
+              mapped = set(re.findall(r"assets/(illus\d+)", f.read()))
+          for b in mapped:
+              if not os.path.isdir(os.path.join("assets", b)):
+                  print(f"monkey.jungle references missing bucket assets/{b}")
+                  failed = True
+          print(f"{len(catalog)} catalog entries across {len(buckets)} buckets - "
+                f"{'FAIL' if failed else 'OK'}")
+          sys.exit(1 if failed else 0)
           EOF
 
   build-and-test:

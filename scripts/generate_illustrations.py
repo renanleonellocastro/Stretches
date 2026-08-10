@@ -2,17 +2,21 @@
 """Generate the stretch illustration PNGs and the drawables resource XML.
 
 Every stretch in the catalog gets a clean, high-contrast line drawing
-rendered as a stick figure on a white rounded card. Drawings are rendered
-at 4x and downscaled for crisp anti-aliased strokes on MIP displays
-(e.g. Forerunner 55, 208x208, 64 colors).
+rendered as a stick figure on a white rounded card. Poses are authored in a
+fixed 140-unit logical space, rendered on a supersampled canvas, then
+downscaled to one PNG per screen-size bucket so the artwork looks crisp and
+proportional on every device from the 208x208 Forerunner 55 up to the
+416x416 Venu 2.
 
 Usage:
     python3 scripts/generate_illustrations.py
 
-Outputs:
-    resources/drawables/stretches/<id>.png   (one per stretch, 140x140)
+Outputs, per size bucket (see SIZES):
+    assets/illus<size>/drawables.xml         (resource declarations)
+    assets/illus<size>/stretches/<id>.png    (one per stretch)
+And, shared:
     resources/drawables/launcher_icon.png    (app launcher icon)
-    resources/drawables/drawables.xml        (resource declarations)
+    resources/drawables/drawables.xml        (launcher icon declaration)
 """
 
 import math
@@ -25,12 +29,31 @@ from PIL import Image, ImageDraw, ImageOps
 # ---------------------------------------------------------------------------
 
 SCALE = 5               # supersampling factor
-OUT = 108               # final image edge in pixels; sized so the workout
-                        # screen fits name + illustration + countdown on the
-                        # smallest target (Forerunner 55, 208x208) with no
-                        # overlap. Rendered at 5x then downscaled for crisp
-                        # strokes.
-S = OUT * SCALE         # working canvas edge (560)
+LOGICAL = 140           # coordinate space poses are authored in
+S = LOGICAL * SCALE      # working canvas edge (700)
+
+# One PNG size per screen-resolution bucket. Each is ~52% of the device
+# screen height, which is the illustration band the workout screen leaves
+# between the stretch name and the countdown badge.
+#   108 -> 208 (fr55)          113 -> 218        125 -> 240
+#   135 -> 260                 146 -> 280        187 -> 320x360 / 360
+#   203 -> 390                 216 -> 416
+SIZES = [108, 113, 125, 135, 146, 187, 203, 216]
+
+# Which PNG size each product uses. Keyed by device id (see manifest.xml).
+DEVICE_SIZE = {
+    "fr55": 108,
+    "fr255s": 113, "fr255sm": 113, "vivoactive4s": 113,
+    "fr245": 125, "fr245m": 125, "fr745": 125, "fr945": 125,
+    "fenix6s": 125, "fenix6spro": 125, "fenix7s": 125,
+    "venusq": 125, "venusqm": 125,
+    "fr255": 135, "fr255m": 135, "fr955": 135, "fenix6": 135,
+    "fenix6pro": 135, "fenix7": 135, "vivoactive4": 135,
+    "fenix6xpro": 146, "fenix7x": 146,
+    "venusq2": 187, "venusq2m": 187, "venu2s": 187,
+    "venu": 203,
+    "venu2": 216, "venu2plus": 216,
+}
 
 INK = (10, 10, 10, 255)             # figure strokes
 ARROW = (255, 0, 0, 255)            # motion arrows (pure red, MIP-safe)
@@ -52,14 +75,15 @@ GROUPS = {
 class Canvas:
     """Small helper wrapping the PIL drawing primitives we need."""
 
-    def __init__(self):
-        self.img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    def __init__(self, edge=S):
+        self.S = edge
+        self.img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
         self.draw = ImageDraw.Draw(self.img)
 
     def card(self, border_color):
         radius = 26 * SCALE
         self.draw.rounded_rectangle(
-            [3 * SCALE, 3 * SCALE, S - 3 * SCALE, S - 3 * SCALE],
+            [3 * SCALE, 3 * SCALE, self.S - 3 * SCALE, self.S - 3 * SCALE],
             radius=radius, fill=CARD, outline=border_color, width=4 * SCALE,
         )
 
@@ -110,11 +134,11 @@ class Canvas:
     def floor(self, y=126):
         self.line([(14, y), (126, y)], width=8, color=(120, 120, 120, 255))
 
-    def save(self, path, mirror=False):
+    def save(self, path, target, mirror=False):
         img = self.img
         if mirror:
             img = ImageOps.mirror(img)
-        img = img.resize((OUT, OUT), Image.LANCZOS)
+        img = img.resize((target, target), Image.LANCZOS)
         img.save(path)
 
 
@@ -398,9 +422,10 @@ CATALOG = {
 # ---------------------------------------------------------------------------
 
 def render_launcher_icon(path):
-    """White side-bend figure on a bright accent disk."""
-    c = Canvas()
-    c.draw.ellipse([0, 0, S - 1, S - 1], fill=(0, 170, 255, 255))
+    """White side-bend figure on a bright accent disk (80x80 icon)."""
+    edge = 80 * SCALE
+    c = Canvas(edge)
+    c.draw.ellipse([0, 0, edge - 1, edge - 1], fill=(0, 170, 255, 255))
     white = (255, 255, 255, 255)
     c.line([(64, 92), (72, 54)], width=18, color=white)   # tilted spine
     c.line([(52, 92), (76, 92)], width=18, color=white)   # hips
@@ -418,20 +443,17 @@ def render_launcher_icon(path):
 # Outputs
 # ---------------------------------------------------------------------------
 
-def render_all(out_dir):
+def render_bucket(size, out_dir):
+    """Render every stretch at the given pixel size into out_dir/stretches
+    and write the matching drawables.xml."""
     stretch_dir = os.path.join(out_dir, "stretches")
     os.makedirs(stretch_dir, exist_ok=True)
     for sid, (group, fn, mirror) in CATALOG.items():
         c = Canvas()
         c.card(GROUPS[group])
         fn(c)
-        c.save(os.path.join(stretch_dir, f"{sid}.png"), mirror=mirror)
-    render_launcher_icon(os.path.join(out_dir, "launcher_icon.png"))
-
-
-def write_drawables_xml(out_dir):
+        c.save(os.path.join(stretch_dir, f"{sid}.png"), size, mirror=mirror)
     lines = ['<drawables>']
-    lines.append('    <bitmap id="LauncherIcon" filename="launcher_icon.png"/>')
     for sid in CATALOG:
         lines.append(f'    <bitmap id="i_{sid}" filename="stretches/{sid}.png"/>')
     lines.append('</drawables>')
@@ -439,32 +461,61 @@ def write_drawables_xml(out_dir):
         f.write("\n".join(lines) + "\n")
 
 
-def write_montage(out_dir, path):
+def write_base_drawables(out_dir):
+    """Base resources hold only the (size-agnostic) launcher icon; the
+    per-size illustration buckets live under assets/."""
+    os.makedirs(out_dir, exist_ok=True)
+    render_launcher_icon(os.path.join(out_dir, "launcher_icon.png"))
+    with open(os.path.join(out_dir, "drawables.xml"), "w") as f:
+        f.write('<drawables>\n'
+                '    <bitmap id="LauncherIcon" filename="launcher_icon.png"/>\n'
+                '</drawables>\n')
+
+
+def write_jungle_fragment(root):
+    """Emit the per-product resourcePath mapping so each device pulls the
+    illustration bucket matching its screen size. Written next to the script
+    for reference; the mapping is committed into monkey.jungle."""
+    lines = []
+    for device, size in sorted(DEVICE_SIZE.items()):
+        lines.append(
+            f"{device}.resourcePath = $({device}.resourcePath);assets/illus{size}")
+    frag = os.path.join(root, "scripts", "resource_paths.jungle")
+    with open(frag, "w") as f:
+        f.write("\n".join(lines) + "\n")
+    return frag
+
+
+def write_montage(size, out_dir, path):
     """Contact sheet used to review all illustrations at once (not shipped)."""
     ids = list(CATALOG)
     cols = 6
     rows = (len(ids) + cols - 1) // cols
-    cell = OUT + 26
+    cell = size + 26
     sheet = Image.new("RGB", (cols * cell, rows * cell), (30, 30, 30))
     d = ImageDraw.Draw(sheet)
     for i, sid in enumerate(ids):
         img = Image.open(os.path.join(out_dir, "stretches", f"{sid}.png"))
         x, y = (i % cols) * cell, (i // cols) * cell
         sheet.paste(img, (x + 13, y + 4), img)
-        d.text((x + 6, y + OUT + 8), sid, fill=(255, 255, 255))
+        d.text((x + 6, y + size + 8), sid, fill=(255, 255, 255))
     sheet.save(path)
 
 
 def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    out_dir = os.path.join(root, "resources", "drawables")
-    os.makedirs(out_dir, exist_ok=True)
-    render_all(out_dir)
-    write_drawables_xml(out_dir)
+    write_base_drawables(os.path.join(root, "resources", "drawables"))
+    for size in SIZES:
+        out_dir = os.path.join(root, "assets", f"illus{size}")
+        render_bucket(size, out_dir)
+    write_jungle_fragment(root)
     montage = os.environ.get("MONTAGE_PATH")
     if montage:
-        write_montage(out_dir, montage)
-    print(f"Rendered {len(CATALOG)} illustrations + launcher icon -> {out_dir}")
+        # Preview from the smallest bucket (the reference Forerunner 55).
+        write_montage(SIZES[0], os.path.join(root, "assets", f"illus{SIZES[0]}"),
+                      montage)
+    print(f"Rendered {len(CATALOG)} illustrations x {len(SIZES)} sizes "
+          f"({', '.join(str(s) for s in SIZES)}) + launcher icon")
 
 
 if __name__ == "__main__":
