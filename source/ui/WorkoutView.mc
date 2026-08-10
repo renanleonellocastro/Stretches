@@ -65,9 +65,15 @@ class WorkoutView extends WatchUi.View {
     }
 
     // Hold the backlight on so the stretch stays readable throughout.
+    // Some devices cap how long the backlight may stay forced on and throw
+    // BacklightOnTooLongException — degrade gracefully instead of crashing.
     hidden function keepScreenLit() as Void {
         if (Attention has :backlight) {
-            Attention.backlight(true);
+            try {
+                Attention.backlight(true);
+            } catch (e) {
+                // Device refused; the screen simply times out as usual.
+            }
         }
     }
 
