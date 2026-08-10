@@ -31,9 +31,12 @@ class TimePickerView extends WatchUi.View {
         var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Theme.COLOR_BG);
         dc.clear();
+        Theme.drawFrameRing(dc);
+        Theme.drawBrandArc(dc, Theme.COLOR_ACCENT);
 
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h / 8, Graphics.FONT_TINY, _title, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(w / 2, h * 20 / 100, Graphics.FONT_TINY, _title,
+                    Graphics.TEXT_JUSTIFY_CENTER);
 
         var font = Graphics.FONT_NUMBER_HOT;
         var hourText = hour.format("%02d");
@@ -41,30 +44,37 @@ class TimePickerView extends WatchUi.View {
         var colonW = dc.getTextWidthInPixels(":", font);
         var hourW = dc.getTextWidthInPixels(hourText, font);
         var minW = dc.getTextWidthInPixels(minText, font);
-        var totalW = hourW + colonW + minW + 8;
+        var gap = 8;
+        var totalW = hourW + colonW + minW + gap * 2;
         var x = (w - totalW) / 2;
-        var cy = h / 2;
+        var cy = h * 48 / 100;
 
+        // Active field is accent; the other is white. The colon stays dim.
         dc.setColor(editingMinutes ? Theme.COLOR_TEXT : Theme.COLOR_ACCENT,
                     Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, cy, font, hourText, Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x + hourW + 4, cy, font, ":", Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(x + hourW + gap, cy, font, ":", Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(editingMinutes ? Theme.COLOR_ACCENT : Theme.COLOR_TEXT,
                     Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x + hourW + colonW + 8, cy, font, minText,
+        dc.drawText(x + hourW + colonW + gap * 2, cy, font, minText,
                     Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
 
-        // Underline the active field.
-        var lineY = cy + dc.getFontHeight(font) / 2 + 4;
+        // Chevrons above/below the active field hint at UP/DOWN.
+        var fieldX = editingMinutes ? (x + hourW + colonW + gap * 2) : x;
+        var fieldW = editingMinutes ? minW : hourW;
+        var midX = fieldX + fieldW / 2;
+        var fontH = dc.getFontHeight(font);
         dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth(4);
-        if (editingMinutes) {
-            dc.drawLine(x + hourW + colonW + 8, lineY, x + hourW + colonW + 8 + minW, lineY);
-        } else {
-            dc.drawLine(x, lineY, x + hourW, lineY);
-        }
-        dc.setPenWidth(1);
+        var topY = cy - fontH / 2 - 6;
+        var botY = cy + fontH / 2 + 6;
+        dc.fillPolygon([[midX - 8, topY], [midX + 8, topY], [midX, topY - 9]]);
+        dc.fillPolygon([[midX - 8, botY], [midX + 8, botY], [midX, botY + 9]]);
+
+        // Step hint at the bottom.
+        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h * 82 / 100, Graphics.FONT_XTINY,
+                    editingMinutes ? "min" : "h", Graphics.TEXT_JUSTIFY_CENTER);
     }
 }
 
