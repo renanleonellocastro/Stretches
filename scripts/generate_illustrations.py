@@ -555,19 +555,18 @@ CATALOG = {
 # ---------------------------------------------------------------------------
 
 def render_launcher_icon(path):
-    """White side-bend figure on a bright accent disk (80x80 icon)."""
+    """Simple, bold figure reaching both arms up — a clear "stretch" mark on
+    the brand teal disk. Authored in the icon's own 0..80 space."""
     edge = 80 * SCALE
     c = Canvas(edge)
     c.draw.ellipse([0, 0, edge - 1, edge - 1], fill=(0, 170, 170, 255))
-    white = (255, 255, 255, 255)
-    c.limb([(64, 92), (72, 54)], 14, fill=white)
-    c.limb([(52, 92), (76, 92)], 14, fill=white)
-    c.limb([(52, 92), (50, 122)], 14, fill=white)
-    c.limb([(76, 92), (80, 122)], 14, fill=white)
-    c.limb([(54, 58), (90, 48)], 14, fill=white)
-    c.limb([(90, 48), (94, 78)], 14, fill=white)
-    c.limb([(54, 58), (52, 28), (86, 18)], 14, fill=white)
-    c.blob(80, 34, 12, fill=white)
+    w = 9
+    c.limb([(40, 34), (40, 51)], w)          # torso
+    c.limb([(40, 37), (24, 21)], w)          # left arm raised
+    c.limb([(40, 37), (56, 21)], w)          # right arm raised
+    c.limb([(40, 51), (30, 66)], w)          # left leg
+    c.limb([(40, 51), (50, 66)], w)          # right leg
+    c.blob(40, 22, 8)                        # head
     c.img = c.img.resize((80, 80), Image.LANCZOS)
     c.img.save(path)
 
