@@ -1,7 +1,9 @@
 import Toybox.Lang;
 import Toybox.Test;
+import Toybox.WatchUi;
 
-// Integrity checks for the stretch catalog.
+// Integrity checks for the stretch catalog, including on-simulator
+// integration checks against the real resource system.
 
 (:test)
 function testCatalogHasAllStretches(logger as Test.Logger) as Boolean {
@@ -61,6 +63,68 @@ function testRequestedNeckStretchesPresent(logger as Test.Logger) as Boolean {
     for (var i = 0; i < required.size(); i++) {
         Test.assertMessage(StretchCatalog.find(required[i] as String) != null,
                            "missing: " + (required[i] as String));
+    }
+    return true;
+}
+
+(:test)
+function testFindReturnsMatchingEntryForEveryId(logger as Test.Logger) as Boolean {
+    var all = StretchCatalog.entries();
+    for (var i = 0; i < all.size(); i++) {
+        var expected = all[i] as StretchCatalog.Entry;
+        var found = StretchCatalog.find(expected.id);
+        Test.assertMessage(found != null, "find failed for: " + expected.id);
+        Test.assertEqual((found as StretchCatalog.Entry).id, expected.id);
+        Test.assertEqual((found as StretchCatalog.Entry).group, expected.group);
+    }
+    return true;
+}
+
+(:test)
+function testEveryCatalogImageResourceLoads(logger as Test.Logger) as Boolean {
+    // Integration: load every illustration through the real resource system
+    // so broken drawable wiring fails the suite, not the user.
+    var all = StretchCatalog.entries();
+    for (var i = 0; i < all.size(); i++) {
+        var entry = all[i] as StretchCatalog.Entry;
+        var res = WatchUi.loadResource(entry.imageRes);
+        Test.assertMessage(res != null, "image failed to load: " + entry.id);
+    }
+    return true;
+}
+
+(:test)
+function testGroupNameKeysResolveForAllGroups(logger as Test.Logger) as Boolean {
+    StorageSandbox.snapshot();
+    try {
+        StorageSandbox.useLanguage("eng");
+        for (var group = 0; group < StretchCatalog.GROUP_COUNT; group++) {
+            var key = StretchCatalog.groupNameKey(group);
+            var name = Strings.t(key);
+            Test.assertMessage(name.length() > 0, "empty group name: " + key);
+            // Strings.t returns the key itself when unresolved.
+            Test.assertMessage(!name.equals(key), "unresolved group key: " + key);
+        }
+    } finally {
+        StorageSandbox.restore();
+    }
+    return true;
+}
+
+(:test)
+function testEveryStretchNameKeyResolvesInEveryLanguage(logger as Test.Logger) as Boolean {
+    var all = StretchCatalog.entries();
+    var codes = I18n.CODES;
+    for (var c = 0; c < codes.size(); c++) {
+        var table = I18n.table(codes[c] as Lang.String);
+        for (var i = 0; i < all.size(); i++) {
+            var entry = all[i] as StretchCatalog.Entry;
+            var name = table.get(entry.nameKey);
+            Test.assertMessage(name != null,
+                "missing name for " + entry.id + " in " + (codes[c] as Lang.String));
+            Test.assertMessage((name as Lang.String).length() > 0,
+                "empty name for " + entry.id + " in " + (codes[c] as Lang.String));
+        }
     }
     return true;
 }

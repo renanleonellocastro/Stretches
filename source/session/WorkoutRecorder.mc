@@ -37,9 +37,12 @@ class WorkoutRecorder {
             _countField = session.createField("stretches_completed", FIELD_COUNT,
                 FitContributor.DATA_TYPE_UINT16,
                 {:mesgType => FitContributor.MESG_TYPE_SESSION, :units => "count"});
+            // :count is the max string bytes INCLUDING the null terminator;
+            // 32 leaves headroom for accented localized names (a unit test
+            // enforces every translation fits).
             _lapNameField = session.createField("stretch", FIELD_LAP_NAME,
                 FitContributor.DATA_TYPE_STRING,
-                {:mesgType => FitContributor.MESG_TYPE_LAP, :count => 24});
+                {:mesgType => FitContributor.MESG_TYPE_LAP, :count => 32});
             _lapSecondsField = session.createField("hold", FIELD_LAP_SECONDS,
                 FitContributor.DATA_TYPE_UINT16,
                 {:mesgType => FitContributor.MESG_TYPE_LAP, :units => "s"});
@@ -53,17 +56,35 @@ class WorkoutRecorder {
     }
 
     // Close a lap tagged with the completed stretch's name and hold time.
+    // Field writes are best-effort: a FIT hiccup must never crash a workout.
     function logStretchLap(name as String, seconds as Number) as Void {
         if (_session == null) {
             return;
         }
-        if (_lapNameField != null) {
-            (_lapNameField as FitContributor.Field).setData(name);
+        try {
+            if (_lapNameField != null) {
+                (_lapNameField as FitContributor.Field).setData(name);
+            }
+            if (_lapSecondsField != null) {
+                (_lapSecondsField as FitContributor.Field).setData(seconds);
+            }
+            (_session as ActivityRecording.Session).addLap();
+        } catch (e) {
         }
-        if (_lapSecondsField != null) {
-            (_lapSecondsField as FitContributor.Field).setData(seconds);
+    }
+
+    // Pause/resume the FIT timer so paused time is not counted as activity
+    // time (Session.start resumes a stopped session).
+    function pause() as Void {
+        if (_session != null) {
+            (_session as ActivityRecording.Session).stop();
         }
-        (_session as ActivityRecording.Session).addLap();
+    }
+
+    function resume() as Void {
+        if (_session != null) {
+            (_session as ActivityRecording.Session).start();
+        }
     }
 
     function setCompletedCount(count as Number) as Void {

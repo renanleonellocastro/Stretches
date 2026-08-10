@@ -1,0 +1,12 @@
+<!-- Metadata for the custom FIT fields written by WorkoutRecorder. Field
+     ids MUST match the ids passed to Session.createField, or Garmin Connect
+     will not display the recorded data. -->
+<fitContributions>
+    <fitField id="0" displayInActivitySummary="true" sortOrder="0"
+              precision="0" dataLabel="@Strings.FitStretchesLabel" unitLabel="@Strings.FitNoUnit"/>
+    <fitField id="1" displayInActivityLaps="true" sortOrder="1"
+              dataLabel="@Strings.FitStretchLabel" unitLabel="@Strings.FitNoUnit"/>
+    <fitField id="2" displayInActivityLaps="true" sortOrder="2"
+              precision="0" dataLabel="@Strings.FitHoldLabel"
+              unitLabel="@Strings.SecondsUnit"/>
+</fitContributions>

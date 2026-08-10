@@ -65,8 +65,13 @@ Every PR must pass CI:
 
 - XML validity + string catalogs in sync across languages
 - Illustration coverage for every catalog entry
+- Device API audit: every Toybox symbol used must exist on all target
+  devices (`python3 scripts/audit_api_usage.py`)
 - Clean compile at type-check level 2 with warnings enabled
-- All unit tests green on the simulator
+- All unit + integration tests green on the simulator (`make test`)
+
+See [docs/TESTING.md](docs/TESTING.md) for the full strategy, including the
+manual on-device pass required before releases.
 
 ## Conventions
 

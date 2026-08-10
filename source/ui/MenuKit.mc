@@ -345,6 +345,10 @@ class ScheduleItemDelegate extends WatchUi.Menu2InputDelegate {
         }
         Prefs.setSchedules(updated);
         Scheduler.registerNext();
+        // Pop this item menu FIRST, then replace the now-stale schedules
+        // menu underneath — otherwise the old menu (with shifted indices)
+        // stays on the stack and BACK would resurrect the deleted row.
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
         MenuKit.switchToSchedulesMenu();
     }
 
@@ -372,9 +376,7 @@ class EditScheduleHandler {
         entry[1] = time[1];
         Prefs.setSchedules(schedules);
         Scheduler.registerNext();
-        if (_parentItem has :setLabel) {
-            _parentItem.setLabel(TimeFormat.format(time[0] as Number, time[1] as Number));
-        }
+        _parentItem.setLabel(TimeFormat.format(time[0] as Number, time[1] as Number));
     }
 }
 
