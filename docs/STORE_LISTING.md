@@ -21,33 +21,38 @@ Health & Fitness  ·  Type: Watch App
 
 ## Long description
 
-**Move better, every day. 🤸**
+> Note: the store rejects emojis in descriptions and renders plain text
+> only — this copy is deliberately emoji- and markdown-free. Paste as-is.
 
-Stretches turns your Garmin into a personal stretching coach. Choose the stretches you care about, set the times you want to be reminded, and let your watch guide you through each pose with clear illustrations and countdowns — then save the session to Garmin Connect like any other activity.
+```
+Move better, every day.
 
-Perfect for **desk breaks, warm-ups, cooldowns, post-run mobility, and stiff necks**.
+Stretches turns your Garmin into a personal stretching coach. Choose the stretches you care about, set the times you want to be reminded, and let your watch guide you through each pose with clear illustrations and countdowns - then save the session to Garmin Connect like any other activity.
 
-**✨ What you can do**
-- 🧘 **34 guided stretches** across neck, wrist & forearm, shoulder & chest, torso & back, and legs — including twelve dedicated neck positions.
-- 🎨 **Clear illustrations** with motion arrows show exactly what to do, on every screen size.
-- 🛠 **Your routine, your rules** — pick any set of stretches and give each one its own hold time (default 30 s).
-- ⏰ **Daily reminders** — add as many times as you like and switch each one on or off. Your watch vibrates and beeps when it's time.
-- ▶️ **A calm guided flow** — a get-ready countdown, a preview of each stretch, a live timer with a progress ring, and a gentle buzz between poses.
-- 🎉 **Finish strong** — a congratulations screen, then save or discard the session.
-- ❤️ **Real activity tracking** — every session records heart rate, calories and time and syncs to Garmin Connect as a Flexibility Training activity.
-- 🌍 **Six languages** — English, Português, Español, Français, Deutsch, Italiano — following your watch's language automatically.
-- 🔋 **Light on battery** — reminders use efficient background events; nothing runs while you're not stretching.
+Perfect for desk breaks, warm-ups, cooldowns, post-run mobility, and stiff necks.
 
-**How it works**
-1. Open the app and tap **Start now**, or set a **Schedule**.
-2. Pick your stretches and hold times under **My stretches** and **Durations**.
-3. When a reminder fires, choose **Start**, **Snooze 15 min**, or **Skip**.
-4. Follow the guided poses — pause, skip, or end any time.
-5. **Save** to see it in Garmin Connect.
+WHAT YOU CAN DO
+- 34 guided stretches across neck, wrist and forearm, shoulder and chest, torso and back, and legs - including twelve dedicated neck positions.
+- Clear illustrations with motion arrows show exactly what to do, on every screen size.
+- Your routine, your rules: pick any set of stretches and give each one its own hold time (default 30 seconds).
+- Daily reminders: add as many times as you like and switch each one on or off. Your watch vibrates and beeps when it is time.
+- A calm guided flow: a get-ready countdown, a preview of each stretch, a live timer with a progress ring, and a gentle buzz between poses.
+- Finish strong: a congratulations screen, then save or discard the session.
+- Real activity tracking: every session records heart rate, calories and time and syncs to Garmin Connect as a Flexibility Training activity, with one lap per stretch showing its name and hold time.
+- Six languages: English, Portugues, Espanol, Francais, Deutsch, Italiano - selectable in the app, following your watch language by default.
+- Light on battery: reminders use efficient background events; nothing runs while you are not stretching.
 
-Free, open-source, and privacy-friendly: Stretches has **no accounts, no ads, and no data collection** — everything stays on your watch and in your own Garmin Connect activities.
+HOW IT WORKS
+1. Open the app and choose Start now, or set a Schedule.
+2. Pick your stretches and hold times under My stretches and Durations.
+3. When a reminder fires, choose Start, Snooze 15 min, or Skip.
+4. Follow the guided poses - pause, skip, or end any time.
+5. Save to see it in Garmin Connect.
 
-Loosen up. Your neck will thank you. 💙
+Free, open source, and privacy-friendly: Stretches has no accounts, no ads, and no data collection - everything stays on your watch and in your own Garmin Connect activities.
+
+Loosen up. Your neck will thank you.
+```
 
 ---
 
