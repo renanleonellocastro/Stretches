@@ -27,7 +27,7 @@ Health & Fitness  ·  Type: Watch App
 ```
 Move better, every day.
 
-Stretches turns your Garmin into a personal stretching coach. Choose the stretches you care about, set the times you want to be reminded, and let your watch guide you through each pose with clear illustrations and countdowns - then save the session to Garmin Connect like any other activity.
+Stretches turns your watch into a personal stretching coach. Choose the stretches you care about, set the times you want to be reminded, and let your watch guide you through each pose with clear illustrations and countdowns - then save the session to Garmin Connect like any other activity.
 
 Perfect for desk breaks, warm-ups, cooldowns, post-run mobility, and stiff necks.
 
