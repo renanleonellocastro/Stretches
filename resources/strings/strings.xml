@@ -52,7 +52,7 @@
     <string id="FitHoldLabel">Hold</string>
     <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
-    <string id="AboutText">Stretches 1.0.0 MIT</string>
+    <string id="AboutText">Stretches 1.0.5 MIT</string>
 
     <!-- Muscle groups -->
     <string id="GroupNeck">Neck</string>
