@@ -29,7 +29,8 @@ ORANGE = (255, 170, 0)
 GREEN = (0, 200, 110)
 GROUP_TEAL = (0, 170, 255)
 
-W, H = 1600, 840
+# The Connect IQ store requires the hero image to be exactly 1440x720.
+W, H = 1440, 720
 
 
 def font(name, size):
@@ -117,10 +118,10 @@ def main():
     d = ImageDraw.Draw(canvas)
 
     # Left column: brand, tagline, feature highlights.
-    x = 90
-    d.text((x, 150), "Stretches", font=font("Arial Black.ttf", 120), fill=WHITE)
-    d.text((x, 285), "Your guided stretching coach", font=font("Arial Bold.ttf", 42), fill=TEAL)
-    d.text((x, 350), "on Garmin", font=font("Arial Bold.ttf", 42), fill=TEAL)
+    x = 80
+    d.text((x, 116), "Stretches", font=font("Arial Black.ttf", 104), fill=WHITE)
+    d.text((x, 236), "Your guided stretching coach", font=font("Arial Bold.ttf", 38), fill=TEAL)
+    d.text((x, 292), "on Garmin", font=font("Arial Bold.ttf", 38), fill=TEAL)
 
     feats = [
         (GROUP_TEAL, "34 illustrated stretches, 5 muscle groups"),
@@ -128,15 +129,15 @@ def main():
         (GREEN, "Heart rate & calories in Garmin Connect"),
         (WHITE, "6 languages  ·  free & open source"),
     ]
-    fy = 470
+    fy = 398
     for color, text in feats:
-        d.ellipse([x + 6, fy + 12, x + 26, fy + 32], fill=color)
-        d.text((x + 46, fy), text, font=font("Arial.ttf", 34), fill=(225, 230, 232))
-        fy += 62
+        d.ellipse([x + 6, fy + 10, x + 24, fy + 28], fill=color)
+        d.text((x + 42, fy), text, font=font("Arial.ttf", 30), fill=(225, 230, 232))
+        fy += 56
 
     # Right column: two watch mock-ups, lightly overlapping.
-    home = draw_watch(1130, 236, 176, render_home)
-    stretch = draw_watch(1372, 590, 190, render_stretch)
+    home = draw_watch(1018, 200, 156, render_home)
+    stretch = draw_watch(1236, 508, 166, render_stretch)
     canvas.alpha_composite(home)
     canvas.alpha_composite(stretch)
     if _ILLUS_LAYER is not None:
