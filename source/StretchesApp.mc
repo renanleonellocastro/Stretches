@@ -32,11 +32,19 @@ class StretchesApp extends Application.AppBase {
     function onBackgroundData(data as Application.PersistableType) as Void {
     }
 
+    // A cold launch from the accepted wake prompt lands here. The whole body
+    // is guarded: this path cannot be exercised in the simulator, so any
+    // unforeseen error must degrade to the home view (from which the user can
+    // still start a session) rather than surface the system "IQ!" crash screen.
     function getInitialView() as [WatchUi.Views] or [WatchUi.Views, WatchUi.InputDelegates] {
-        Prefs.seedDefaultsIfNeeded();
-        Scheduler.registerNext();
-        if (AlertKit.hasPendingAlert()) {
-            return AlertFlow.initialView();
+        try {
+            Prefs.seedDefaultsIfNeeded();
+            Scheduler.registerNext();
+            if (AlertKit.hasPendingAlert()) {
+                return AlertFlow.initialView();
+            }
+        } catch (e) {
+            // Fall through to the home view below.
         }
         return [new HomeView(), new HomeDelegate()];
     }
