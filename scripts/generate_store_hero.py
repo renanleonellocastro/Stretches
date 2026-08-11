@@ -121,7 +121,7 @@ def main():
     x = 80
     d.text((x, 116), "Stretches", font=font("Arial Black.ttf", 104), fill=WHITE)
     d.text((x, 236), "Your guided stretching coach", font=font("Arial Bold.ttf", 38), fill=TEAL)
-    d.text((x, 292), "on Garmin", font=font("Arial Bold.ttf", 38), fill=TEAL)
+    d.text((x, 292), "on Garmin devices", font=font("Arial Bold.ttf", 38), fill=TEAL)
 
     feats = [
         (GROUP_TEAL, "34 illustrated stretches, 5 muscle groups"),

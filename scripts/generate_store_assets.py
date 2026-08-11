@@ -84,9 +84,9 @@ def render_cover():
     icon = render_icon(300)
     img.paste(icon, ((size - 300) // 2, 55), icon)
     title = ImageFont.truetype(os.path.join(FONT_DIR, "Arial Black.ttf"), 58)
-    sub = ImageFont.truetype(os.path.join(FONT_DIR, "Arial.ttf"), 24)
+    sub = ImageFont.truetype(os.path.join(FONT_DIR, "Arial.ttf"), 22)
     d.text((size / 2, 405), "Stretches", font=title, fill=WHITE, anchor="mm")
-    d.text((size / 2, 455), "Guided stretching for Garmin", font=sub,
+    d.text((size / 2, 455), "Guided stretching for Garmin devices", font=sub,
            fill=TEAL_BRIGHT, anchor="mm")
     return img
 
