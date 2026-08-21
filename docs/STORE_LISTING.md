@@ -34,7 +34,7 @@ Perfect for desk breaks, warm-ups, cooldowns, post-run mobility, and stiff necks
 WHAT YOU CAN DO
 - 34 guided stretches across neck, wrist and forearm, shoulder and chest, torso and back, and legs - including twelve dedicated neck positions.
 - Clear illustrations with motion arrows show exactly what to do, on every screen size.
-- Your routine, your rules: pick any set of stretches and give each one its own hold time (default 30 seconds).
+- Your routine, your rules: pick any set of stretches, give each one its own hold time (default 30 seconds), and arrange the order with Reorder. Stretches play in the order you choose.
 - Daily reminders: add as many times as you like and switch each one on or off. Your watch vibrates and beeps when it is time.
 - A calm guided flow: a get-ready countdown, a preview of each stretch, a live timer with a progress ring, and a gentle buzz between poses.
 - Finish strong: a congratulations screen, then save or discard the session.

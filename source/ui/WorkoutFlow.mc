@@ -1,6 +1,4 @@
 import Toybox.Lang;
-import Toybox.Math;
-import Toybox.System;
 import Toybox.WatchUi;
 
 // Entry point into a workout: validates the routine and swaps in the
@@ -21,11 +19,8 @@ module WorkoutFlow {
             }
             return;
         }
-        // Seed BEFORE the engine shuffles, or every cold start would play
-        // the same "random" order.
-        Math.srand(System.getTimer());
         var engine = new WorkoutEngine(ids, Prefs.getDurations(),
-                                       Prefs.getDefaultDuration(), new RandomSource());
+                                       Prefs.getDefaultDuration());
         var recorder = new WorkoutRecorder();
         var view = new WorkoutView(engine, recorder);
         var delegate = new WorkoutDelegate(view);

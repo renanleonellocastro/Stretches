@@ -35,6 +35,10 @@
     <string id="MenuSchedules">Schedules</string>
     <string id="MenuSettings">Settings</string>
     <string id="MenuAbout">About</string>
+    <string id="MenuReorder">Reorder</string>
+    <string id="MoveUp">Move up</string>
+    <string id="MoveDown">Move down</string>
+    <string id="Done">Done</string>
     <string id="MenuAddTime">Add time</string>
     <string id="MenuEditTime">Edit time</string>
     <string id="MenuDelete">Delete</string>

@@ -41,12 +41,12 @@ illustrated stretches, and save every session to Garmin Connect.
   combined turn+tilt holds).
 - 🎨 **Illustrated guidance**: each stretch shows a clear drawing with a
   motion arrow, color-coded by muscle group.
-- 🛠 **Your routine, your rules**: pick any set of stretches and give each
-  one its own duration (default 30 s).
+- 🛠 **Your routine, your rules**: pick any set of stretches, give each one its
+  own duration (default 30 s), and set the play order under **Reorder**.
 - ⏰ **Daily schedules**: add as many alarm times as you want and toggle each
   one on/off individually.
-- 📳 **Smart reminders**: at the scheduled time the watch vibrates and beeps,
-  then asks — **Start** · **Snooze 15 min** · **Skip**.
+- 📳 **Smart reminders**: at the scheduled time the watch vibrates and shows a
+  calm *Time to stretch!* notification; open the app and press **Start now**.
 - 🚦 **Guided flow**: 5-second countdown → stretch preview with a 3-second
   lead-in → live countdown with progress ring → short buzz between
   stretches → 🎉 congratulations screen.
@@ -73,21 +73,22 @@ size, from the 208×208 Forerunner 55 to the 416×416 Venu 2.*
 
 ```mermaid
 flowchart LR
-    A[⏰ Scheduled time] -->|vibration + tone| B{Start / Snooze / Skip}
-    B -->|Snooze| A2[💤 +15 min] --> B
-    B -->|Skip| Z[😴 Session cancelled]
-    B -->|Start| C[5s countdown]
-    C --> D[🖼 Random stretch preview - 3s]
+    A[⏰ Scheduled time] -->|vibration| B[🔔 Time to stretch! reminder]
+    B -->|any key| H0[🏠 Home]
+    H0 -->|Start now| C[5s countdown]
+    C --> D[🖼 Stretch preview - 3s]
     D --> E[🧘 Stretch countdown]
     E -->|short buzz| D2{More stretches?}
-    D2 -->|yes, random pick| D
+    D2 -->|yes, next in order| D
     D2 -->|no| F[🎉 Congratulations!]
     F --> G{Save workout?}
     G -->|Save| H[📊 Garmin Connect]
     G -->|Discard| Z2[🗑]
 ```
 
-Stretches are shuffled every session, so routines never feel repetitive.
+Stretches play in the order you set — arrange them under **Reorder** in the menu.
+The scheduled reminder simply vibrates and shows a notification; open the app and
+press **Start now** to begin.
 
 ## 📱 Using the app
 

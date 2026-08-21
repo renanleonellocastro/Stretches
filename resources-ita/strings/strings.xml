@@ -31,6 +31,10 @@
     <string id="MenuSchedules">Orari</string>
     <string id="MenuSettings">Impostazioni</string>
     <string id="MenuAbout">Info</string>
+    <string id="MenuReorder">Riordina</string>
+    <string id="MoveUp">Sposta su</string>
+    <string id="MoveDown">Sposta giù</string>
+    <string id="Done">Fatto</string>
     <string id="MenuAddTime">Aggiungi orario</string>
     <string id="MenuEditTime">Modifica orario</string>
     <string id="MenuDelete">Elimina</string>

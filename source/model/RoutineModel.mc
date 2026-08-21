@@ -40,6 +40,39 @@ module RoutineModel {
         Prefs.setRoutine(result);
     }
 
+    function indexOf(ids as Array, id as String) as Number {
+        for (var i = 0; i < ids.size(); i++) {
+            if ((ids[i] as String).equals(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // Move a stretch one step earlier in the routine order, persisting the
+    // change. No-op when it is already first (or not in the routine).
+    function moveUp(id as String) as Void {
+        swap(id, -1);
+    }
+
+    // Move a stretch one step later in the routine order.
+    function moveDown(id as String) as Void {
+        swap(id, 1);
+    }
+
+    function swap(id as String, delta as Number) as Void {
+        var ids = Prefs.getRoutine();
+        var i = indexOf(ids, id);
+        var j = i + delta;
+        if (i < 0 || j < 0 || j >= ids.size()) {
+            return;
+        }
+        var tmp = ids[i];
+        ids[i] = ids[j];
+        ids[j] = tmp;
+        Prefs.setRoutine(ids);
+    }
+
     function durationFor(id as String) as Number {
         var durations = Prefs.getDurations();
         var v = durations.get(id);

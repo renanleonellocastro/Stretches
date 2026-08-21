@@ -31,6 +31,10 @@
     <string id="MenuSchedules">Zeitpläne</string>
     <string id="MenuSettings">Einstellungen</string>
     <string id="MenuAbout">Info</string>
+    <string id="MenuReorder">Neu ordnen</string>
+    <string id="MoveUp">Nach oben</string>
+    <string id="MoveDown">Nach unten</string>
+    <string id="Done">Fertig</string>
     <string id="MenuAddTime">Zeit hinzufügen</string>
     <string id="MenuEditTime">Zeit bearbeiten</string>
     <string id="MenuDelete">Löschen</string>
