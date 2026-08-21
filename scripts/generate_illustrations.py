@@ -555,43 +555,32 @@ CATALOG = {
 # ---------------------------------------------------------------------------
 
 def render_launcher_icon(path):
-    """Garmin-style activity icon: a clean white figure in a forward-stretch
-    (toe-touch) pose on a brand teal gradient disk — mirrors the flat,
-    single-color-figure look Garmin uses for its own activity icons. Authored
-    in 0..80 space and supersampled for crisp edges."""
+    """Garmin-style activity icon: a chunky, FILLED white silhouette in a
+    forward-stretch (toe-touch) pose on a solid brand-teal disk — no gradient
+    and no outline, mirroring the flat single-color figures Garmin uses for its
+    own activity icons. Authored in 0..80 space and supersampled."""
     ss = 8
     edge = 80 * ss
 
-    # Brand teal gradient, clipped to a disk.
-    top, bot = (0, 200, 200), (0, 120, 135)
-    grad = Image.new("RGB", (1, edge))
-    gp = grad.load()
-    for y in range(edge):
-        t = y / (edge - 1)
-        gp[0, y] = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
-    grad = grad.resize((edge, edge))
-    mask = Image.new("L", (edge, edge), 0)
-    ImageDraw.Draw(mask).ellipse([0, 0, edge - 1, edge - 1], fill=255)
     img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
-    img.paste(grad, (0, 0), mask)
-
     d = ImageDraw.Draw(img)
-    white = (255, 255, 255, 255)
-    w = int(6.5 * ss)
-    r = w // 2
+    d.ellipse([0, 0, edge - 1, edge - 1], fill=(0, 170, 170, 255))  # solid disk
 
-    def bar(points):
+    white = (255, 255, 255, 255)
+
+    def limb(points, w):                       # thick filled capsule chain
         pts = [(x * ss, y * ss) for x, y in points]
-        d.line(pts, fill=white, width=w, joint="curve")
-        for x, y in pts:                       # round caps / joints
+        d.line(pts, fill=white, width=int(w * ss), joint="curve")
+        r = int(w * ss) // 2
+        for x, y in pts:
             d.ellipse([x - r, y - r, x + r, y + r], fill=white)
 
-    bar([(33, 36), (49, 38)])                  # back, folded forward
-    bar([(35, 37), (31, 60)])                  # arms reaching toward shins
-    bar([(49, 38), (47, 66)])                  # leg
-    bar([(49, 38), (53, 66)])                  # leg
-    hr = int(6.5 * ss)
-    hx, hy = 27 * ss, 34 * ss                   # head
+    limb([(34, 32), (53, 41)], 16)             # thick folded trunk
+    limb([(36, 35), (32, 60)], 11)             # arms hanging toward shins
+    limb([(53, 41), (49, 68)], 12)             # leg
+    limb([(53, 41), (57, 68)], 12)             # leg
+    hr = 9 * ss
+    hx, hy = 27 * ss, 28 * ss                   # head
     d.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=white)
 
     img.resize((80, 80), Image.LANCZOS).save(path)

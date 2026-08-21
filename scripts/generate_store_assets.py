@@ -35,45 +35,36 @@ def rounded_line(draw, points, width, color):
 
 
 def draw_stretch_figure(draw, cx, cy, scale, color):
-    """Brand mark: a clean figure in a forward-stretch (toe-touch) pose, the
-    same figure used by the app launcher icon. Authored in a 0..80 space,
-    centered on (cx, cy) and scaled so the figure height maps to `scale`."""
-    u = scale / 40.0          # figure spans ~40 logical units tall
+    """Brand mark: a chunky FILLED silhouette in a forward-stretch (toe-touch)
+    pose, matching the app launcher icon and Garmin's own flat activity figures.
+    Authored in 0..80 space, centered on (cx, cy), scaled so the figure height
+    maps to `scale`."""
+    u = scale / 42.0
 
     def pt(x, y):             # 0..80 authoring space -> pixels, centered
-        return (cx + (x - 40) * u, cy + (y - 47) * u)
+        return (cx + (x - 44) * u, cy + (y - 48) * u)
 
-    w = int(6.5 * u)
+    def limb(points, w):
+        rounded_line(draw, [pt(x, y) for x, y in points], int(w * u), color)
 
-    def bar(points):
-        rounded_line(draw, [pt(x, y) for x, y in points], w, color)
-
-    bar([(33, 36), (49, 38)])                  # back, folded forward
-    bar([(35, 37), (31, 60)])                  # arms reaching toward shins
-    bar([(49, 38), (47, 66)])                  # leg
-    bar([(49, 38), (53, 66)])                  # leg
-    hr = 6.5 * u
-    hx, hy = pt(27, 34)                          # head
+    limb([(34, 32), (53, 41)], 16)             # thick folded trunk
+    limb([(36, 35), (32, 60)], 11)             # arms hanging toward shins
+    limb([(53, 41), (49, 68)], 12)             # leg
+    limb([(53, 41), (57, 68)], 12)             # leg
+    hr = 9 * u
+    hx, hy = pt(27, 28)                          # head
     draw.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=color)
 
 
 def render_icon(size):
-    """Brand teal gradient disk + white stretch figure, supersampled."""
+    """Solid brand-teal disk + white filled stretch figure (no gradient, no
+    outline), supersampled for crisp edges."""
     ss = 4
     edge = size * ss
-    top, bot = (0, 200, 200), (0, 120, 135)
-    grad = Image.new("RGB", (1, edge))
-    gp = grad.load()
-    for y in range(edge):
-        t = y / (edge - 1)
-        gp[0, y] = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
-    grad = grad.resize((edge, edge))
-    mask = Image.new("L", (edge, edge), 0)
-    ImageDraw.Draw(mask).ellipse([0, 0, edge - 1, edge - 1], fill=255)
     img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
-    img.paste(grad, (0, 0), mask)
+    ImageDraw.Draw(img).ellipse([0, 0, edge - 1, edge - 1], fill=(0, 170, 170, 255))
     draw_stretch_figure(ImageDraw.Draw(img), edge / 2, edge * 0.52,
-                        edge * 0.62, WHITE + (255,))
+                        edge * 0.60, WHITE + (255,))
     return img.resize((size, size), Image.LANCZOS)
 
 
