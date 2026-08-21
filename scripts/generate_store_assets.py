@@ -34,34 +34,46 @@ def rounded_line(draw, points, width, color):
         draw.ellipse([x - r, y - r, x + r, y + r], fill=color)
 
 
-def draw_reaching_figure(draw, cx, cy, scale, color):
-    """The brand mark: a bold figure reaching both arms up. `scale` is the
-    figure height in pixels."""
-    u = scale / 52.0          # logical unit (figure spans ~52 units tall)
-    w = int(9 * u)
+def draw_stretch_figure(draw, cx, cy, scale, color):
+    """Brand mark: a clean figure in a forward-stretch (toe-touch) pose, the
+    same figure used by the app launcher icon. Authored in a 0..80 space,
+    centered on (cx, cy) and scaled so the figure height maps to `scale`."""
+    u = scale / 40.0          # figure spans ~40 logical units tall
 
-    def pt(dx, dy):
-        return (cx + dx * u, cy + dy * u)
+    def pt(x, y):             # 0..80 authoring space -> pixels, centered
+        return (cx + (x - 40) * u, cy + (y - 47) * u)
 
-    rounded_line(draw, [pt(0, -8), pt(0, 9)], w, color)        # torso
-    rounded_line(draw, [pt(0, -5), pt(-16, -21)], w, color)    # left arm up
-    rounded_line(draw, [pt(0, -5), pt(16, -21)], w, color)     # right arm up
-    rounded_line(draw, [pt(0, 9), pt(-10, 24)], w, color)      # left leg
-    rounded_line(draw, [pt(0, 9), pt(10, 24)], w, color)       # right leg
-    head_r = 8 * u
-    hx, hy = pt(0, -20)
-    draw.ellipse([hx - head_r, hy - head_r, hx + head_r, hy + head_r],
-                 fill=color)
+    w = int(6.5 * u)
+
+    def bar(points):
+        rounded_line(draw, [pt(x, y) for x, y in points], w, color)
+
+    bar([(33, 36), (49, 38)])                  # back, folded forward
+    bar([(35, 37), (31, 60)])                  # arms reaching toward shins
+    bar([(49, 38), (47, 66)])                  # leg
+    bar([(49, 38), (53, 66)])                  # leg
+    hr = 6.5 * u
+    hx, hy = pt(27, 34)                          # head
+    draw.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=color)
 
 
 def render_icon(size):
-    """Teal disk + white reaching figure, supersampled for crisp edges."""
+    """Brand teal gradient disk + white stretch figure, supersampled."""
     ss = 4
     edge = size * ss
+    top, bot = (0, 200, 200), (0, 120, 135)
+    grad = Image.new("RGB", (1, edge))
+    gp = grad.load()
+    for y in range(edge):
+        t = y / (edge - 1)
+        gp[0, y] = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
+    grad = grad.resize((edge, edge))
+    mask = Image.new("L", (edge, edge), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, edge - 1, edge - 1], fill=255)
     img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    d.ellipse([0, 0, edge - 1, edge - 1], fill=TEAL + (255,))
-    draw_reaching_figure(d, edge / 2, edge * 0.54, edge * 0.62, WHITE + (255,))
+    img.paste(grad, (0, 0), mask)
+    draw_stretch_figure(ImageDraw.Draw(img), edge / 2, edge * 0.52,
+                        edge * 0.62, WHITE + (255,))
     return img.resize((size, size), Image.LANCZOS)
 
 

@@ -45,7 +45,7 @@ WHAT YOU CAN DO
 HOW IT WORKS
 1. Open the app and choose Start now, or set a Schedule.
 2. Pick your stretches and hold times under My stretches and Durations.
-3. When a reminder fires, choose Start, Snooze 15 min, or Skip.
+3. When a reminder fires, your watch vibrates; open the app and press Start now to begin.
 4. Follow the guided poses - pause, skip, or end any time.
 5. Save to see it in Garmin Connect.
 

@@ -555,20 +555,46 @@ CATALOG = {
 # ---------------------------------------------------------------------------
 
 def render_launcher_icon(path):
-    """Simple, bold figure reaching both arms up — a clear "stretch" mark on
-    the brand teal disk. Authored in the icon's own 0..80 space."""
-    edge = 80 * SCALE
-    c = Canvas(edge)
-    c.draw.ellipse([0, 0, edge - 1, edge - 1], fill=(0, 170, 170, 255))
-    w = 9
-    c.limb([(40, 34), (40, 51)], w)          # torso
-    c.limb([(40, 37), (24, 21)], w)          # left arm raised
-    c.limb([(40, 37), (56, 21)], w)          # right arm raised
-    c.limb([(40, 51), (30, 66)], w)          # left leg
-    c.limb([(40, 51), (50, 66)], w)          # right leg
-    c.blob(40, 22, 8)                        # head
-    c.img = c.img.resize((80, 80), Image.LANCZOS)
-    c.img.save(path)
+    """Garmin-style activity icon: a clean white figure in a forward-stretch
+    (toe-touch) pose on a brand teal gradient disk — mirrors the flat,
+    single-color-figure look Garmin uses for its own activity icons. Authored
+    in 0..80 space and supersampled for crisp edges."""
+    ss = 8
+    edge = 80 * ss
+
+    # Brand teal gradient, clipped to a disk.
+    top, bot = (0, 200, 200), (0, 120, 135)
+    grad = Image.new("RGB", (1, edge))
+    gp = grad.load()
+    for y in range(edge):
+        t = y / (edge - 1)
+        gp[0, y] = tuple(int(top[i] + (bot[i] - top[i]) * t) for i in range(3))
+    grad = grad.resize((edge, edge))
+    mask = Image.new("L", (edge, edge), 0)
+    ImageDraw.Draw(mask).ellipse([0, 0, edge - 1, edge - 1], fill=255)
+    img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
+    img.paste(grad, (0, 0), mask)
+
+    d = ImageDraw.Draw(img)
+    white = (255, 255, 255, 255)
+    w = int(6.5 * ss)
+    r = w // 2
+
+    def bar(points):
+        pts = [(x * ss, y * ss) for x, y in points]
+        d.line(pts, fill=white, width=w, joint="curve")
+        for x, y in pts:                       # round caps / joints
+            d.ellipse([x - r, y - r, x + r, y + r], fill=white)
+
+    bar([(33, 36), (49, 38)])                  # back, folded forward
+    bar([(35, 37), (31, 60)])                  # arms reaching toward shins
+    bar([(49, 38), (47, 66)])                  # leg
+    bar([(49, 38), (53, 66)])                  # leg
+    hr = int(6.5 * ss)
+    hx, hy = 27 * ss, 34 * ss                   # head
+    d.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=white)
+
+    img.resize((80, 80), Image.LANCZOS).save(path)
 
 
 # ---------------------------------------------------------------------------
