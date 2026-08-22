@@ -66,40 +66,48 @@ class HomeView extends WatchUi.View {
         var h = dc.getHeight();
         var hasAlarm = Prefs.getNextAlarmEpoch() != null;
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 27 / 100, Graphics.FONT_XTINY,
+        dc.drawText(w / 2, h * 24 / 100, Graphics.FONT_XTINY,
                     Strings.t("HomeNext"),
                     Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(hasAlarm ? Theme.COLOR_TEXT : Theme.COLOR_TEXT_DIM,
                     Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 50 / 100, Graphics.FONT_NUMBER_HOT, nextAlarmLabel(),
+        // FONT_NUMBER_MEDIUM: the label above is pulled up and the summary/menu
+        // below are pushed down to give this larger time clear spacing.
+        dc.drawText(w / 2, h * 44 / 100, Graphics.FONT_NUMBER_MEDIUM, nextAlarmLabel(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
+    // Two centered lines (count, then time). Splitting them keeps the summary
+    // inside the round bezel in every language — one line overflowed for the
+    // longer words (e.g. Spanish "estiramientos", Portuguese "alongamentos").
     hidden function drawSummary(dc as Dc) as Void {
+        var w = dc.getWidth();
+        var h = dc.getHeight();
+        var lh = dc.getFontHeight(Graphics.FONT_XTINY);
         var count = RoutineModel.selectedIds().size();
-        var summary;
         if (count == 0) {
-            summary = Strings.t("EmptyRoutineMsg");
             dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
-        } else {
-            summary = routineSummary(count);
-            dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
+            var lines = Theme.splitTwoLines(Strings.t("EmptyRoutineMsg"), 16);
+            var y = h * 66 / 100 - (lines.size() - 1) * lh / 2;
+            for (var i = 0; i < lines.size(); i++) {
+                dc.drawText(w / 2, y, Graphics.FONT_XTINY, lines[i] as String,
+                            Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+                y += lh;
+            }
+            return;
         }
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() * 69 / 100, Graphics.FONT_TINY, summary,
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-    }
-
-    // e.g. "8 stretches · ~5 min".
-    hidden function routineSummary(count as Number) as String {
         var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
-        return count.toString() + " " +
-               (Strings.t("HomeStretchesUnit")) +
-               " " + mins.toString() + " " +
-               (Strings.t("HomeMinutesUnit"));
+        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, h * 62 / 100, Graphics.FONT_XTINY,
+                    count.toString() + " " + Strings.t("HomeStretchesUnit"),
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(w / 2, h * 71 / 100, Graphics.FONT_XTINY,
+                    mins.toString() + " " + Strings.t("HomeMinutesUnit"),
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     hidden function drawMenuHint(dc as Dc) as Void {
-        Theme.drawPill(dc, dc.getWidth() / 2, dc.getHeight() * 83 / 100,
+        Theme.drawPill(dc, dc.getWidth() / 2, dc.getHeight() * 85 / 100,
                        Strings.t("HomeHint"),
                        Graphics.FONT_XTINY, Theme.COLOR_ACCENT, false);
     }

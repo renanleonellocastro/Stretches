@@ -5,23 +5,26 @@ import Toybox.Lang;
 // values that exist on 64-color MIP displays (each channel is a multiple
 // of 0x55), so the app looks identical on the Forerunner 55 and on AMOLED.
 module Theme {
+    // Warm, orange-forward palette matching the app's orange launcher icon.
+    // Every channel is a multiple of 0x55, so the colors render crisply on the
+    // 64-color MIP displays (e.g. Forerunner 55) with no dithering.
     const COLOR_BG = 0x000000;
     const COLOR_TEXT = 0xFFFFFF;
     const COLOR_TEXT_DIM = 0xAAAAAA;
     const COLOR_FRAME = 0x555555;    // subtle rings / dividers
-    const COLOR_ACCENT = 0x00AAAA;   // single brand accent (calm teal)
-    const COLOR_WARM = 0xFFAA00;     // amber (used sparingly, e.g. snooze)
-    const COLOR_SUCCESS = 0x00AA55;
-    const COLOR_DANGER = 0xFF5500;
-    const COLOR_PURPLE = 0xAA55FF;
+    const COLOR_ACCENT = 0xFF5500;   // single brand accent (orange)
+    const COLOR_WARM = 0xFFAA00;     // amber
+    const COLOR_SUCCESS = 0xFFAA00;  // warm positive (e.g. saved / congrats)
+    const COLOR_DANGER = 0xFF0000;   // red (discard / skip)
+    const COLOR_PURPLE = 0xAA55FF;   // retained for compatibility (unused)
 
-    // One accent per muscle group; keep in sync with the illustrations.
+    // One warm accent per muscle group; keep in sync with the illustrations.
     const GROUP_COLORS = [
-        0x00AAFF,  // neck
-        0xFFAA00,  // wrist / forearm
-        0xAA55FF,  // shoulder
-        0x00AA55,  // torso / back
-        0xFF5500   // legs
+        0xFFAA00,  // neck — amber
+        0xFF5500,  // wrist / forearm — orange
+        0xFF0000,  // shoulder — red
+        0xFFAA55,  // torso / back — light orange
+        0xAA5500   // legs — dark orange
     ];
 
     function groupColor(group as Number) as Number {

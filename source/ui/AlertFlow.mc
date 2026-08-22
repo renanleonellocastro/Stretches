@@ -1,46 +1,17 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// The "time to stretch" prompt flow: builds the Start / Snooze / Skip
-// chooser and reacts to the user's pick.
+// The "time to stretch" reminder flow. It shows a calm, button-free reminder
+// (see ReminderView); any input dismisses it. initialView() is used on a cold
+// launch from the wake prompt; push() is used when an alarm comes due while the
+// app is already open.
 module AlertFlow {
     function initialView() as [WatchUi.Views, WatchUi.InputDelegates] {
-        var view = buildView();
-        return [view, new OptionListDelegate(view, new AlertChoiceHandler().method(:onChosen))];
+        return [new ReminderView(), new ReminderDelegate(true)];
     }
 
     function push() as Void {
-        var view = buildView();
-        WatchUi.pushView(view, new OptionListDelegate(view, new AlertChoiceHandler().method(:onChosen)),
+        WatchUi.pushView(new ReminderView(), new ReminderDelegate(false),
                          WatchUi.SLIDE_UP);
-    }
-
-    function buildView() as OptionListView {
-        return new OptionListView(
-            Strings.t("AlertTitle"),
-            [
-                Strings.t("OptStart"),
-                Strings.t("OptSnooze"),
-                Strings.t("OptSkip")
-            ],
-            [Theme.COLOR_SUCCESS, Theme.COLOR_WARM, Theme.COLOR_DANGER],
-            true
-        );
-    }
-}
-
-class AlertChoiceHandler {
-    function onChosen(index as Number) as Void {
-        if (index == 0) {
-            Scheduler.consumeAlarm();
-            WorkoutFlow.start(true);
-        } else if (index == 1) {
-            Scheduler.snooze();
-            WatchUi.popView(WatchUi.SLIDE_DOWN);
-        } else {
-            // Explicit skip or BACK: this session is cancelled.
-            Scheduler.consumeAlarm();
-            WatchUi.popView(WatchUi.SLIDE_DOWN);
-        }
     }
 }

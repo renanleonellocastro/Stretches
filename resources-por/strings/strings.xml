@@ -21,7 +21,7 @@
     <string id="EmptyRoutineMsg">Escolha alongamentos</string>
 
     <string id="HomeNext">PRÓXIMA SESSÃO</string>
-    <string id="HomeStretchesUnit">alongamentos ·</string>
+    <string id="HomeStretchesUnit">alongamentos</string>
     <string id="HomeMinutesUnit">min</string>
     <string id="HomeHint">MENU</string>
 
@@ -31,6 +31,10 @@
     <string id="MenuSchedules">Horários</string>
     <string id="MenuSettings">Ajustes</string>
     <string id="MenuAbout">Sobre</string>
+    <string id="MenuReorder">Reordenar</string>
+    <string id="MoveUp">Mover para cima</string>
+    <string id="MoveDown">Mover para baixo</string>
+    <string id="Done">Concluído</string>
     <string id="MenuAddTime">Adicionar horário</string>
     <string id="MenuEditTime">Editar horário</string>
     <string id="MenuDelete">Excluir</string>
@@ -48,7 +52,7 @@
     <string id="FitHoldLabel">Duração</string>
     <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
-    <string id="AboutText">Stretches 1.0.0 MIT</string>
+    <string id="AboutText">Stretches 1.1.0 MIT</string>
 
     <string id="GroupNeck">Pescoço</string>
     <string id="GroupWrist">Punho e antebraço</string>

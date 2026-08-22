@@ -42,6 +42,35 @@ function testRoutineToggleKeepsOthersInOrder(logger as Test.Logger) as Boolean {
 }
 
 (:test)
+function testRoutineMoveUpDown(logger as Test.Logger) as Boolean {
+    StorageSandbox.snapshot();
+    try {
+        Prefs.setRoutine(["a", "b", "c"]);
+        RoutineModel.moveDown("a");                // a,b,c -> b,a,c
+        var ids = RoutineModel.selectedIds();
+        Test.assertEqual(ids[0], "b");
+        Test.assertEqual(ids[1], "a");
+        Test.assertEqual(ids[2], "c");
+        RoutineModel.moveUp("c");                   // b,a,c -> b,c,a
+        ids = RoutineModel.selectedIds();
+        Test.assertEqual(ids[1], "c");
+        Test.assertEqual(ids[2], "a");
+        // Edges are no-ops.
+        RoutineModel.moveUp("b");                   // already first
+        RoutineModel.moveDown("a");                 // already last
+        ids = RoutineModel.selectedIds();
+        Test.assertEqual(ids[0], "b");
+        Test.assertEqual(ids[2], "a");
+        // Unknown id is a no-op.
+        RoutineModel.moveUp("zzz");
+        Test.assertEqual(RoutineModel.selectedIds().size(), 3);
+    } finally {
+        StorageSandbox.restore();
+    }
+    return true;
+}
+
+(:test)
 function testRoutineSetSelectedIsIdempotent(logger as Test.Logger) as Boolean {
     StorageSandbox.snapshot();
     try {

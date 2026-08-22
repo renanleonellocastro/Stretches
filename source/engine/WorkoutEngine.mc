@@ -1,16 +1,4 @@
 import Toybox.Lang;
-import Toybox.Math;
-
-// Source of pseudo-randomness for the workout order. Tests substitute a
-// deterministic subclass.
-class RandomSource {
-    function initialize() {
-    }
-
-    function next(bound as Number) as Number {
-        return Math.rand() % bound;
-    }
-}
 
 // Workout phases.
 enum WorkoutState {
@@ -48,27 +36,18 @@ class WorkoutEngine {
     var state as Number = STATE_PREP;
     var completedCount as Number = 0;
 
+    // Stretches play in the routine's own order (the order shown in My
+    // stretches and adjustable via Reorder) — never shuffled.
     function initialize(routineIds as Array, durations as Dictionary,
-                        defaultDuration as Number, rng as RandomSource) {
-        _order = shuffle(routineIds, rng);
+                        defaultDuration as Number) {
+        var order = [] as Array;
+        for (var i = 0; i < routineIds.size(); i++) {
+            order = order.add(routineIds[i]);
+        }
+        _order = order;
         _durations = durations;
         _defaultDuration = defaultDuration;
         _remaining = WORKOUT_PREP_SECS;
-    }
-
-    // Fisher-Yates shuffle; returns a new array, input untouched.
-    static function shuffle(ids as Array, rng as RandomSource) as Array {
-        var order = [] as Array;
-        for (var i = 0; i < ids.size(); i++) {
-            order = order.add(ids[i]);
-        }
-        for (var i = order.size() - 1; i > 0; i--) {
-            var j = rng.next(i + 1);
-            var tmp = order[i];
-            order[i] = order[j];
-            order[j] = tmp;
-        }
-        return order;
     }
 
     function currentId() as String? {

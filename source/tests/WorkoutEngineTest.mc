@@ -3,43 +3,20 @@ import Toybox.Test;
 
 // Unit tests for the workout state machine.
 
-// Test helpers (not annotated with :test so the runner never invokes them).
-class SequenceRandom extends RandomSource {
-    hidden var _values as Array = [];
-    hidden var _i as Number = 0;
-
-    function initialize(values as Array) {
-        RandomSource.initialize();
-        _values = values;
-    }
-
-    function next(bound as Number) as Number {
-        var v = (_values[_i % _values.size()] as Number) % bound;
-        _i++;
-        return v;
-    }
-}
-
+// Test helper (not annotated with :test so the runner never invokes it).
 function makeEngine(ids as Array, durations as Dictionary) as WorkoutEngine {
-    return new WorkoutEngine(ids, durations, 30, new SequenceRandom([0]));
+    return new WorkoutEngine(ids, durations, 30);
 }
 
 (:test)
-function testShuffleIsPermutation(logger as Test.Logger) as Boolean {
-    var ids = ["a", "b", "c", "d"];
-    var shuffled = WorkoutEngine.shuffle(ids, new SequenceRandom([1, 0, 1]));
-    Test.assertEqual(shuffled.size(), 4);
-    for (var i = 0; i < ids.size(); i++) {
-        var found = false;
-        for (var j = 0; j < shuffled.size(); j++) {
-            if ((shuffled[j] as String).equals(ids[i])) {
-                found = true;
-            }
-        }
-        Test.assertMessage(found, "missing element after shuffle");
-    }
-    // Input untouched.
-    Test.assertEqual(ids[0], "a");
+function testPlaysInGivenOrder(logger as Test.Logger) as Boolean {
+    var engine = makeEngine(["a", "b", "c"], {"a" => 1, "b" => 1, "c" => 1});
+    for (var i = 0; i < 5; i++) { engine.tick(); }        // prep -> announce "a"
+    Test.assertEqual((engine.currentId() as Lang.String), "a");
+    engine.skip();                                          // -> "b"
+    Test.assertEqual((engine.currentId() as Lang.String), "b");
+    engine.skip();                                          // -> "c"
+    Test.assertEqual((engine.currentId() as Lang.String), "c");
     return true;
 }
 
@@ -230,20 +207,6 @@ function testPositionAndTotalAcrossWholeRun(logger as Test.Logger) as Boolean {
     Test.assertEqual(engine.tick(), EVENT_WORKOUT_DONE);
     Test.assertEqual(engine.completedCount, 3);
     Test.assertEqual(engine.total(), 3);
-    return true;
-}
-
-(:test)
-function testShuffleSingleElement(logger as Test.Logger) as Boolean {
-    var shuffled = WorkoutEngine.shuffle(["only"], new SequenceRandom([0]));
-    Test.assertEqual(shuffled.size(), 1);
-    Test.assertEqual(shuffled[0], "only");
-    return true;
-}
-
-(:test)
-function testShuffleEmpty(logger as Test.Logger) as Boolean {
-    Test.assertEqual(WorkoutEngine.shuffle([], new SequenceRandom([0])).size(), 0);
     return true;
 }
 

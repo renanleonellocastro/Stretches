@@ -126,6 +126,14 @@ module Scheduler {
     }
 
     function registerPoll() as Void {
+        // A repeating temporal event only needs to be registered once.
+        // Re-registering RESETS its countdown, so calling this on every app
+        // launch or schedule edit would keep pushing the next fire 5 minutes
+        // out and the alarm would never trigger. Register only when nothing is
+        // registered yet.
+        if (Background.getTemporalEventRegisteredTime() != null) {
+            return;
+        }
         try {
             Background.registerForTemporalEvent(new Time.Duration(POLL_SECS));
         } catch (e) {
