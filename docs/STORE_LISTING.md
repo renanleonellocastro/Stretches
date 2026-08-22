@@ -56,6 +56,12 @@ Loosen up. Your neck will thank you.
 
 ---
 
+## What's New (v1.1.0)
+- Fresh look: a bold new orange activity icon and a matching in-app theme.
+- Set your order: stretches now play in the order you choose, with a new Reorder screen to arrange them.
+- Simpler reminders: a calm, one-glance "time to stretch" notification.
+- Reliability: fixes to scheduled reminders and clearer text on smaller round screens.
+
 ## What's New (v1.0.0)
 - First release: 34 illustrated stretches, custom routines, scheduled reminders, guided workouts, and Garmin Connect activity recording in six languages.
 

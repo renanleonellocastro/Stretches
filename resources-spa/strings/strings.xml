@@ -21,7 +21,7 @@
     <string id="EmptyRoutineMsg">Elige estiramientos</string>
 
     <string id="HomeNext">PRÓXIMA SESIÓN</string>
-    <string id="HomeStretchesUnit">estiramientos ·</string>
+    <string id="HomeStretchesUnit">estiramientos</string>
     <string id="HomeMinutesUnit">min</string>
     <string id="HomeHint">MENÚ</string>
 
@@ -52,7 +52,7 @@
     <string id="FitHoldLabel">Duración</string>
     <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
-    <string id="AboutText">Stretches 1.0.5 MIT</string>
+    <string id="AboutText">Stretches 1.1.0 MIT</string>
 
     <string id="GroupNeck">Cuello</string>
     <string id="GroupWrist">Muñeca y antebrazo</string>

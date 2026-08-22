@@ -82,21 +82,25 @@ class ReminderView extends WatchUi.View {
         var w = dc.getWidth();
         var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 58 / 100, Graphics.FONT_MEDIUM, Strings.t("AlertTitle"),
+        dc.drawText(w / 2, h * 56 / 100, Graphics.FONT_SMALL,
+                    Theme.fitText(dc, Strings.t("AlertTitle"), Graphics.FONT_SMALL, w * 88 / 100),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 74 / 100, Graphics.FONT_XTINY, summary(),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-    }
-
-    hidden function summary() as String {
         var count = RoutineModel.selectedIds().size();
         if (count == 0) {
-            return Strings.t("EmptyRoutineMsg");
+            dc.drawText(w / 2, h * 73 / 100, Graphics.FONT_XTINY, Strings.t("EmptyRoutineMsg"),
+                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            return;
         }
+        // Two lines (count, then time) so the longer localized words stay
+        // inside the round bezel.
         var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
-        return count.toString() + " " + Strings.t("HomeStretchesUnit") +
-               " " + mins.toString() + " " + Strings.t("HomeMinutesUnit");
+        dc.drawText(w / 2, h * 71 / 100, Graphics.FONT_XTINY,
+                    count.toString() + " " + Strings.t("HomeStretchesUnit"),
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(w / 2, h * 80 / 100, Graphics.FONT_XTINY,
+                    mins.toString() + " " + Strings.t("HomeMinutesUnit"),
+                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }
 

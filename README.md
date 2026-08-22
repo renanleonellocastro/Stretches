@@ -10,9 +10,9 @@ Build your own routine, get reminded at the times you choose, follow guided
 illustrated stretches, and save every session to Garmin Connect.
 
 [![CI](https://github.com/renanleonellocastro/Stretches/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/renanleonellocastro/Stretches?include_prereleases&color=00aaff)](../../releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-00aa55.svg)](LICENSE)
-[![Connect IQ](https://img.shields.io/badge/Connect%20IQ-%E2%89%A53.2-aa55ff)](https://developer.garmin.com/connect-iq/)
+[![Release](https://img.shields.io/github/v/release/renanleonellocastro/Stretches?include_prereleases&color=ff5500)](../../releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-ffaa00.svg)](LICENSE)
+[![Connect IQ](https://img.shields.io/badge/Connect%20IQ-%E2%89%A53.2-ff8800)](https://developer.garmin.com/connect-iq/)
 [![Devices](https://img.shields.io/badge/devices-28-ffaa00)](#-supported-devices)
 [![Languages](https://img.shields.io/badge/languages-6-ff5500)](#-languages)
 

@@ -97,10 +97,14 @@ module MenuKit {
     function buildMoveMenu(id as String) as WatchUi.Menu2 {
         var ids = RoutineModel.selectedIds();
         var pos = RoutineModel.indexOf(ids, id) + 1;
-        var menu = new WatchUi.Menu2({
-            :title => stretchName(id) + "  " + pos.toString() + "/" + ids.size().toString()});
-        menu.addItem(new WatchUi.MenuItem(str("MoveUp"), null, :up, null));
-        menu.addItem(new WatchUi.MenuItem(str("MoveDown"), null, :down, null));
+        var total = ids.size();
+        // Position first in the title so it is never clipped, and repeated as
+        // each action's sub-label so the current spot is always obvious while
+        // moving. Both update on every Up/Down (the menu is rebuilt).
+        var where = pos.toString() + "/" + total.toString();
+        var menu = new WatchUi.Menu2({:title => where + "  " + stretchName(id)});
+        menu.addItem(new WatchUi.MenuItem(str("MoveUp"), where, :up, null));
+        menu.addItem(new WatchUi.MenuItem(str("MoveDown"), where, :down, null));
         menu.addItem(new WatchUi.MenuItem(str("Done"), null, :done, null));
         return menu;
     }
