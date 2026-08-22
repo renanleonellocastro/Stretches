@@ -66,12 +66,14 @@ class HomeView extends WatchUi.View {
         var h = dc.getHeight();
         var hasAlarm = Prefs.getNextAlarmEpoch() != null;
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 27 / 100, Graphics.FONT_XTINY,
+        dc.drawText(w / 2, h * 24 / 100, Graphics.FONT_XTINY,
                     Strings.t("HomeNext"),
                     Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(hasAlarm ? Theme.COLOR_TEXT : Theme.COLOR_TEXT_DIM,
                     Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 46 / 100, Graphics.FONT_NUMBER_HOT, nextAlarmLabel(),
+        // FONT_NUMBER_MEDIUM: the label above is pulled up and the summary/menu
+        // below are pushed down to give this larger time clear spacing.
+        dc.drawText(w / 2, h * 44 / 100, Graphics.FONT_NUMBER_MEDIUM, nextAlarmLabel(),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
@@ -96,16 +98,16 @@ class HomeView extends WatchUi.View {
         }
         var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 61 / 100, Graphics.FONT_XTINY,
+        dc.drawText(w / 2, h * 62 / 100, Graphics.FONT_XTINY,
                     count.toString() + " " + Strings.t("HomeStretchesUnit"),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(w / 2, h * 70 / 100, Graphics.FONT_XTINY,
+        dc.drawText(w / 2, h * 71 / 100, Graphics.FONT_XTINY,
                     mins.toString() + " " + Strings.t("HomeMinutesUnit"),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
     hidden function drawMenuHint(dc as Dc) as Void {
-        Theme.drawPill(dc, dc.getWidth() / 2, dc.getHeight() * 83 / 100,
+        Theme.drawPill(dc, dc.getWidth() / 2, dc.getHeight() * 85 / 100,
                        Strings.t("HomeHint"),
                        Graphics.FONT_XTINY, Theme.COLOR_ACCENT, false);
     }
