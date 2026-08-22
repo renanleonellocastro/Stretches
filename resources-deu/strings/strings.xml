@@ -21,7 +21,7 @@
     <string id="EmptyRoutineMsg">Erst Übungen wählen</string>
 
     <string id="HomeNext">NÄCHSTE EINHEIT</string>
-    <string id="HomeStretchesUnit">Übungen ·</string>
+    <string id="HomeStretchesUnit">Übungen</string>
     <string id="HomeMinutesUnit">Min</string>
     <string id="HomeHint">MENÜ</string>
 
@@ -31,6 +31,10 @@
     <string id="MenuSchedules">Zeitpläne</string>
     <string id="MenuSettings">Einstellungen</string>
     <string id="MenuAbout">Info</string>
+    <string id="MenuReorder">Neu ordnen</string>
+    <string id="MoveUp">Nach oben</string>
+    <string id="MoveDown">Nach unten</string>
+    <string id="Done">Fertig</string>
     <string id="MenuAddTime">Zeit hinzufügen</string>
     <string id="MenuEditTime">Zeit bearbeiten</string>
     <string id="MenuDelete">Löschen</string>
@@ -48,7 +52,7 @@
     <string id="FitHoldLabel">Dauer</string>
     <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
-    <string id="AboutText">Stretches 1.0.0 MIT</string>
+    <string id="AboutText">Stretches 1.1.0 MIT</string>
 
     <string id="GroupNeck">Nacken</string>
     <string id="GroupWrist">Handgelenk und Unterarm</string>

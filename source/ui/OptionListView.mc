@@ -3,9 +3,8 @@ import Toybox.Lang;
 import Toybox.System;
 import Toybox.WatchUi;
 
-// A colorful vertical option chooser used for the alarm prompt
-// (Start / Snooze / Skip) and the save prompt (Save / Discard).
-// UP/DOWN move the highlight, START confirms, BACK sends -1.
+// A vertical option chooser. Used by the save prompt (Save / Discard) after a
+// workout. UP/DOWN move the highlight, START confirms, BACK sends -1.
 class OptionListView extends WatchUi.View {
     var selected as Number = 0;
 
@@ -29,8 +28,8 @@ class OptionListView extends WatchUi.View {
 
     function onShow() as Void {
         if (_alarmOnShow) {
-            AlertKit.alarm();
             _alarmOnShow = false;
+            AlertKit.alarm();
         }
     }
 

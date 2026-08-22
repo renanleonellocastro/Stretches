@@ -48,11 +48,11 @@ WALL = (170, 170, 170, 255)       # props (wall / floor)
 
 # Muscle-group card border colors (kept meaningful: they match the app).
 GROUPS = {
-    "neck": (0, 170, 255, 255),      # #00AAFF
-    "wrist": (255, 170, 0, 255),     # #FFAA00
-    "shoulder": (170, 85, 255, 255), # #AA55FF
-    "torso": (0, 170, 85, 255),      # #00AA55
-    "legs": (255, 85, 0, 255),       # #FF5500
+    "neck": (255, 170, 0, 255),      # #FFAA00 amber
+    "wrist": (255, 85, 0, 255),      # #FF5500 orange
+    "shoulder": (255, 0, 0, 255),    # #FF0000 red
+    "torso": (255, 170, 85, 255),    # #FFAA55 light orange
+    "legs": (170, 85, 0, 255),       # #AA5500 dark orange
 }
 
 # Stroke widths (logical units).
@@ -555,20 +555,49 @@ CATALOG = {
 # ---------------------------------------------------------------------------
 
 def render_launcher_icon(path):
-    """Simple, bold figure reaching both arms up — a clear "stretch" mark on
-    the brand teal disk. Authored in the icon's own 0..80 space."""
-    edge = 80 * SCALE
-    c = Canvas(edge)
-    c.draw.ellipse([0, 0, edge - 1, edge - 1], fill=(0, 170, 170, 255))
-    w = 9
-    c.limb([(40, 34), (40, 51)], w)          # torso
-    c.limb([(40, 37), (24, 21)], w)          # left arm raised
-    c.limb([(40, 37), (56, 21)], w)          # right arm raised
-    c.limb([(40, 51), (30, 66)], w)          # left leg
-    c.limb([(40, 51), (50, 66)], w)          # right leg
-    c.blob(40, 22, 8)                        # head
-    c.img = c.img.resize((80, 80), Image.LANCZOS)
-    c.img.save(path)
+    """Garmin-style activity icon: a smooth, tapered silhouette in a lunge
+    (hip-flexor stretch) pose — limbs taper to the extremities, big round head —
+    in brand orange on a TRANSPARENT background (no disk). Authored in 0..80
+    space and supersampled."""
+    render_stretch_figure(path, (255, 85, 0, 255), size=80)
+
+
+# The single source of truth for the app's stretch figure (lunge pose), drawn
+# with tapered strokes so the limbs narrow to their extremities like Garmin's
+# own activity icons. Transparent background.
+def render_stretch_figure(path, color, size=80):
+    ss = 10
+    edge = 80 * ss
+    img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+
+    def taper(a, b, ra, rb, steps=80):
+        for i in range(steps + 1):
+            t = i / steps
+            x = (a[0] + (b[0] - a[0]) * t) * ss
+            y = (a[1] + (b[1] - a[1]) * t) * ss
+            r = (ra + (rb - ra) * t) * ss
+            d.ellipse([x - r, y - r, x + r, y + r], fill=color)
+
+    def chain(pts, rad):
+        for i in range(len(pts) - 1):
+            taper(pts[i], pts[i + 1], rad[i], rad[i + 1])
+
+    def blob(cx, cy, r):
+        d.ellipse([(cx - r) * ss, (cy - r) * ss, (cx + r) * ss, (cy + r) * ss], fill=color)
+
+    dx = 4                                         # nudge right to center the pose
+    def sh(pts):
+        return [(x + dx, y) for x, y in pts]
+
+    blob(40 + dx, 13, 7.0)                          # head
+    chain(sh([(40, 19), (38, 44)]), [3.6, 5.0])                     # torso
+    chain(sh([(38, 44), (54, 52), (55, 73), (61, 74)]), [5.2, 3.4, 1.9, 1.5])  # front leg
+    chain(sh([(38, 44), (24, 58), (13, 72), (8, 71)]), [5.2, 3.2, 1.7, 1.5])   # back leg
+    chain(sh([(39, 24), (49, 32), (56, 42)]), [3.6, 2.0, 0.9])      # front arm
+    chain(sh([(39, 24), (30, 31), (24, 38)]), [3.6, 2.0, 0.9])      # back arm
+
+    img.resize((size, size), Image.LANCZOS).save(path)
 
 
 # ---------------------------------------------------------------------------

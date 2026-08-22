@@ -34,7 +34,7 @@ Perfect for desk breaks, warm-ups, cooldowns, post-run mobility, and stiff necks
 WHAT YOU CAN DO
 - 34 guided stretches across neck, wrist and forearm, shoulder and chest, torso and back, and legs - including twelve dedicated neck positions.
 - Clear illustrations with motion arrows show exactly what to do, on every screen size.
-- Your routine, your rules: pick any set of stretches and give each one its own hold time (default 30 seconds).
+- Your routine, your rules: pick any set of stretches, give each one its own hold time (default 30 seconds), and arrange the order with Reorder. Stretches play in the order you choose.
 - Daily reminders: add as many times as you like and switch each one on or off. Your watch vibrates and beeps when it is time.
 - A calm guided flow: a get-ready countdown, a preview of each stretch, a live timer with a progress ring, and a gentle buzz between poses.
 - Finish strong: a congratulations screen, then save or discard the session.
@@ -45,7 +45,7 @@ WHAT YOU CAN DO
 HOW IT WORKS
 1. Open the app and choose Start now, or set a Schedule.
 2. Pick your stretches and hold times under My stretches and Durations.
-3. When a reminder fires, choose Start, Snooze 15 min, or Skip.
+3. When a reminder fires, your watch vibrates; open the app and press Start now to begin.
 4. Follow the guided poses - pause, skip, or end any time.
 5. Save to see it in Garmin Connect.
 
@@ -55,6 +55,12 @@ Loosen up. Your neck will thank you.
 ```
 
 ---
+
+## What's New (v1.1.0)
+- Fresh look: a bold new orange activity icon and a matching in-app theme.
+- Set your order: stretches now play in the order you choose, with a new Reorder screen to arrange them.
+- Simpler reminders: a calm, one-glance "time to stretch" notification.
+- Reliability: fixes to scheduled reminders and clearer text on smaller round screens.
 
 ## What's New (v1.0.0)
 - First release: 34 illustrated stretches, custom routines, scheduled reminders, guided workouts, and Garmin Connect activity recording in six languages.

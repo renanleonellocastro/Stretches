@@ -24,7 +24,7 @@
 
     <!-- Home -->
     <string id="HomeNext">NEXT SESSION</string>
-    <string id="HomeStretchesUnit">stretches ·</string>
+    <string id="HomeStretchesUnit">stretches</string>
     <string id="HomeMinutesUnit">min</string>
     <string id="HomeHint">MENU</string>
 
@@ -35,6 +35,10 @@
     <string id="MenuSchedules">Schedules</string>
     <string id="MenuSettings">Settings</string>
     <string id="MenuAbout">About</string>
+    <string id="MenuReorder">Reorder</string>
+    <string id="MoveUp">Move up</string>
+    <string id="MoveDown">Move down</string>
+    <string id="Done">Done</string>
     <string id="MenuAddTime">Add time</string>
     <string id="MenuEditTime">Edit time</string>
     <string id="MenuDelete">Delete</string>
@@ -52,7 +56,7 @@
     <string id="FitHoldLabel">Hold</string>
     <string id="FitNoUnit"></string>
     <string id="SecondsUnit">s</string>
-    <string id="AboutText">Stretches 1.0.0 MIT</string>
+    <string id="AboutText">Stretches 1.1.0 MIT</string>
 
     <!-- Muscle groups -->
     <string id="GroupNeck">Neck</string>

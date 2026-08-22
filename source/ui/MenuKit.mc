@@ -21,6 +21,7 @@ module MenuKit {
         var menu = new WatchUi.Menu2({:title => str("AppName")});
         menu.addItem(new WatchUi.MenuItem(str("MenuStartNow"), null, :startNow, null));
         menu.addItem(new WatchUi.MenuItem(str("MenuMyStretches"), null, :stretches, null));
+        menu.addItem(new WatchUi.MenuItem(str("MenuReorder"), null, :reorder, null));
         menu.addItem(new WatchUi.MenuItem(str("MenuDurations"), null, :durations, null));
         menu.addItem(new WatchUi.MenuItem(str("MenuSchedules"), null, :schedules, null));
         menu.addItem(new WatchUi.MenuItem(str("MenuSettings"), null, :settings, null));
@@ -60,6 +61,57 @@ module MenuKit {
                 str(entry.nameKey), stretchSub(entry, routine), entry.id, null));
         }
         WatchUi.pushView(menu, new StretchPickerDelegate(), WatchUi.SLIDE_LEFT);
+    }
+
+    // Reorder flow: a list of the routine in play order; selecting a stretch
+    // opens a small Up / Down / Done menu. Every step uses switchToView so the
+    // view stack stays one level deep and always reflects the saved order.
+    function pushReorderMenu() as Void {
+        if (RoutineModel.selectedIds().size() == 0) {
+            pushEmptyRoutineMessage();
+            return;
+        }
+        WatchUi.pushView(buildReorderMenu(), new ReorderMenuDelegate(), WatchUi.SLIDE_LEFT);
+    }
+
+    function switchToReorderMenu() as Void {
+        WatchUi.switchToView(buildReorderMenu(), new ReorderMenuDelegate(),
+                             WatchUi.SLIDE_IMMEDIATE);
+    }
+
+    function buildReorderMenu() as WatchUi.Menu2 {
+        var menu = new WatchUi.Menu2({:title => str("MenuReorder")});
+        var ids = RoutineModel.selectedIds();
+        for (var i = 0; i < ids.size(); i++) {
+            var id = ids[i] as String;
+            menu.addItem(new WatchUi.MenuItem(stretchName(id), (i + 1).toString(), id, null));
+        }
+        return menu;
+    }
+
+    function switchToMoveMenu(id as String) as Void {
+        WatchUi.switchToView(buildMoveMenu(id), new MoveMenuDelegate(id),
+                             WatchUi.SLIDE_IMMEDIATE);
+    }
+
+    function buildMoveMenu(id as String) as WatchUi.Menu2 {
+        var ids = RoutineModel.selectedIds();
+        var pos = RoutineModel.indexOf(ids, id) + 1;
+        var total = ids.size();
+        // Position first in the title so it is never clipped, and repeated as
+        // each action's sub-label so the current spot is always obvious while
+        // moving. Both update on every Up/Down (the menu is rebuilt).
+        var where = pos.toString() + "/" + total.toString();
+        var menu = new WatchUi.Menu2({:title => where + "  " + stretchName(id)});
+        menu.addItem(new WatchUi.MenuItem(str("MoveUp"), where, :up, null));
+        menu.addItem(new WatchUi.MenuItem(str("MoveDown"), where, :down, null));
+        menu.addItem(new WatchUi.MenuItem(str("Done"), null, :done, null));
+        return menu;
+    }
+
+    function stretchName(id as String) as String {
+        var entry = StretchCatalog.find(id);
+        return entry != null ? str((entry as StretchCatalog.Entry).nameKey) : id;
     }
 
     function pushDurationsMenu() as Void {
@@ -157,6 +209,8 @@ class MainMenuDelegate extends WatchUi.Menu2InputDelegate {
             WorkoutFlow.start(false);
         } else if (id == :stretches) {
             MenuKit.pushStretchPicker();
+        } else if (id == :reorder) {
+            MenuKit.pushReorderMenu();
         } else if (id == :durations) {
             MenuKit.pushDurationsMenu();
         } else if (id == :schedules) {
@@ -447,5 +501,48 @@ class LanguageMenuDelegate extends WatchUi.Menu2InputDelegate {
 
     function onBack() as Void {
         WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+}
+
+// The reorder list: selecting a stretch opens its move menu.
+class ReorderMenuDelegate extends WatchUi.Menu2InputDelegate {
+    function initialize() {
+        Menu2InputDelegate.initialize();
+    }
+
+    function onSelect(item as WatchUi.MenuItem) as Void {
+        MenuKit.switchToMoveMenu(item.getId() as String);
+    }
+
+    function onBack() as Void {
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+    }
+}
+
+// Up / Down / Done for a single stretch. Up and Down persist immediately and
+// refresh this menu; Done (or BACK) returns to the reorder list.
+class MoveMenuDelegate extends WatchUi.Menu2InputDelegate {
+    hidden var _id as String;
+
+    function initialize(id as String) {
+        Menu2InputDelegate.initialize();
+        _id = id;
+    }
+
+    function onSelect(item as WatchUi.MenuItem) as Void {
+        var which = item.getId();
+        if (which == :up) {
+            RoutineModel.moveUp(_id);
+            MenuKit.switchToMoveMenu(_id);
+        } else if (which == :down) {
+            RoutineModel.moveDown(_id);
+            MenuKit.switchToMoveMenu(_id);
+        } else {
+            MenuKit.switchToReorderMenu();
+        }
+    }
+
+    function onBack() as Void {
+        MenuKit.switchToReorderMenu();
     }
 }
