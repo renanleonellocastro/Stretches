@@ -24,59 +24,64 @@ FONT_DIR = "/System/Library/Fonts/Supplemental"
 TEAL = (0, 170, 170)
 TEAL_BRIGHT = (0, 190, 190)
 WHITE = (255, 255, 255)
+ORANGE = (255, 85, 0)
 BG = (8, 18, 22)
 
 
-def rounded_line(draw, points, width, color):
-    draw.line(points, fill=color, width=width, joint="curve")
-    r = width // 2
-    for x, y in points:
-        draw.ellipse([x - r, y - r, x + r, y + r], fill=color)
-
-
 def draw_stretch_figure(draw, cx, cy, scale, color):
-    """Brand mark: a chunky FILLED silhouette in a forward-stretch (toe-touch)
-    pose, matching the app launcher icon and Garmin's own flat activity figures.
-    Authored in 0..80 space, centered on (cx, cy), scaled so the figure height
-    maps to `scale`."""
-    u = scale / 42.0
+    """The app's stretch mark: a smooth, tapered silhouette in a lunge
+    (hip-flexor stretch) pose whose limbs narrow to their extremities, like
+    Garmin's own activity figures. Authored in 0..80 space, centered on
+    (cx, cy), scaled so the figure height maps to `scale`."""
+    u = scale / 68.0
 
-    def pt(x, y):             # 0..80 authoring space -> pixels, centered
-        return (cx + (x - 44) * u, cy + (y - 48) * u)
+    def pt(x, y):             # 0..80 authoring space -> pixels, centered on bbox
+        return (cx + (x - 34.5) * u, cy + (y - 40) * u)
 
-    def limb(points, w):
-        rounded_line(draw, [pt(x, y) for x, y in points], int(w * u), color)
+    def taper(a, b, ra, rb, steps=70):
+        for i in range(steps + 1):
+            t = i / steps
+            px, py = pt(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
+            r = (ra + (rb - ra) * t) * u
+            draw.ellipse([px - r, py - r, px + r, py + r], fill=color)
 
-    limb([(34, 32), (53, 41)], 16)             # thick folded trunk
-    limb([(36, 35), (32, 60)], 11)             # arms hanging toward shins
-    limb([(53, 41), (49, 68)], 12)             # leg
-    limb([(53, 41), (57, 68)], 12)             # leg
-    hr = 9 * u
-    hx, hy = pt(27, 28)                          # head
-    draw.ellipse([hx - hr, hy - hr, hx + hr, hy + hr], fill=color)
+    def chain(pts, rad):
+        for i in range(len(pts) - 1):
+            taper(pts[i], pts[i + 1], rad[i], rad[i + 1])
+
+    def blob(x, y, r):
+        px, py = pt(x, y)
+        rr = r * u
+        draw.ellipse([px - rr, py - rr, px + rr, py + rr], fill=color)
+
+    blob(40, 13, 7.0)                                             # head
+    chain([(40, 19), (38, 44)], [3.6, 5.0])                       # torso
+    chain([(38, 44), (54, 52), (55, 73), (61, 74)], [5.2, 3.4, 1.9, 1.5])  # front leg
+    chain([(38, 44), (24, 58), (13, 72), (8, 71)], [5.2, 3.2, 1.7, 1.5])   # back leg
+    chain([(39, 24), (49, 32), (56, 42)], [3.6, 2.0, 0.9])        # front arm
+    chain([(39, 24), (30, 31), (24, 38)], [3.6, 2.0, 0.9])        # back arm
 
 
 def render_icon(size):
-    """Solid brand-teal disk + white filled stretch figure (no gradient, no
-    outline), supersampled for crisp edges."""
+    """Orange tapered stretch figure on a TRANSPARENT background, supersampled."""
     ss = 4
     edge = size * ss
     img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
-    ImageDraw.Draw(img).ellipse([0, 0, edge - 1, edge - 1], fill=(0, 170, 170, 255))
-    draw_stretch_figure(ImageDraw.Draw(img), edge / 2, edge * 0.52,
-                        edge * 0.60, WHITE + (255,))
+    draw_stretch_figure(ImageDraw.Draw(img), edge / 2, edge * 0.5,
+                        edge * 0.82, ORANGE + (255,))
     return img.resize((size, size), Image.LANCZOS)
 
 
 def quantize_to_garmin_64(img):
-    """Snap every channel to the nearest of {0, 85, 170, 255} — the 64-color
-    MIP palette."""
-    rgb = img.convert("RGB")
-    px = rgb.load()
-    for y in range(rgb.height):
-        for x in range(rgb.width):
-            px[x, y] = tuple(round(v / 85) * 85 for v in px[x, y])
-    return rgb
+    """Snap RGB to the 64-color MIP palette ({0,85,170,255} per channel) while
+    preserving the alpha channel (the icon has a transparent background)."""
+    img = img.convert("RGBA")
+    px = img.load()
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b, a = px[x, y]
+            px[x, y] = (round(r / 85) * 85, round(g / 85) * 85, round(b / 85) * 85, a)
+    return img
 
 
 def render_cover():
@@ -90,7 +95,7 @@ def render_cover():
     sub = ImageFont.truetype(os.path.join(FONT_DIR, "Arial.ttf"), 22)
     d.text((size / 2, 405), "Stretches", font=title, fill=WHITE, anchor="mm")
     d.text((size / 2, 455), "Guided stretching for Garmin devices", font=sub,
-           fill=TEAL_BRIGHT, anchor="mm")
+           fill=(255, 170, 85), anchor="mm")
     return img
 
 
@@ -107,7 +112,7 @@ def main():
     render_cover().save(cover)
 
     icon24 = os.path.join(OUT_DIR, "store-icon-24bit.png")
-    render_icon(128).convert("RGB").save(icon24)
+    render_icon(128).save(icon24)                       # keep alpha (transparent bg)
 
     icon64 = os.path.join(OUT_DIR, "store-icon-64color.png")
     quantize_to_garmin_64(render_icon(128)).save(icon64)

@@ -22,12 +22,12 @@ FONT_DIR = "/System/Library/Fonts/Supplemental"
 
 BG_TOP = (10, 22, 26)
 BG_BOTTOM = (6, 12, 14)
-TEAL = (0, 190, 190)
+TEAL = (255, 85, 0)
 WHITE = (255, 255, 255)
 DIM = (170, 180, 182)
 ORANGE = (255, 170, 0)
-GREEN = (0, 200, 110)
-GROUP_TEAL = (0, 170, 255)
+GREEN = (255, 136, 0)
+GROUP_TEAL = (255, 136, 0)
 
 # The Connect IQ store requires the hero image to be exactly 1440x720.
 W, H = 1440, 720

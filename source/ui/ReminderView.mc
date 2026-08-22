@@ -35,32 +35,46 @@ class ReminderView extends WatchUi.View {
         drawText(dc);
     }
 
-    // Small brand figure (the same forward-stretch pose as the app icon).
+    // The same tapered lunge figure as the app icon, in the brand accent.
     hidden function drawFigure(dc as Dc) as Void {
         var w = dc.getWidth();
         var h = dc.getHeight();
-        var u = (h * 0.24) / 40.0;
-        var cx = w / 2;
-        var cy = h * 30 / 100;
+        _u = (h * 0.28) / 68.0;             // figure height ~28% of the screen
+        _cx = w / 2;
+        _cy = h * 29 / 100;
         dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
-        dc.setPenWidth((6.5 * u).toNumber());
-        limb(dc, cx, cy, u, [[33, 36], [49, 38]]);       // back
-        limb(dc, cx, cy, u, [[35, 37], [31, 60]]);       // arms
-        limb(dc, cx, cy, u, [[49, 38], [47, 66]]);       // leg
-        limb(dc, cx, cy, u, [[49, 38], [53, 66]]);       // leg
-        dc.setPenWidth(1);
-        var hr = (6.5 * u).toNumber();
-        dc.fillCircle(cx + (27 - 40) * u, cy + (34 - 47) * u, hr);
+        blob(dc, 40, 13, 7.0);                                           // head
+        chain(dc, [[40, 19], [38, 44]], [3.6, 5.0]);                     // torso
+        chain(dc, [[38, 44], [54, 52], [55, 73], [61, 74]], [5.2, 3.4, 1.9, 1.5]);  // front leg
+        chain(dc, [[38, 44], [24, 58], [13, 72], [8, 71]], [5.2, 3.2, 1.7, 1.5]);   // back leg
+        chain(dc, [[39, 24], [49, 32], [56, 42]], [3.6, 2.0, 0.9]);      // front arm
+        chain(dc, [[39, 24], [30, 31], [24, 38]], [3.6, 2.0, 0.9]);      // back arm
     }
 
-    // Draws a poly-line in the 0..80 authoring space, centered on (cx, cy).
-    hidden function limb(dc as Dc, cx as Number, cy as Number, u as Float,
-                         pts as Array) as Void {
-        for (var i = 0; i < pts.size() - 1; i++) {
-            var a = pts[i] as Array;
-            var b = pts[i + 1] as Array;
-            dc.drawLine(cx + ((a[0] as Number) - 40) * u, cy + ((a[1] as Number) - 47) * u,
-                        cx + ((b[0] as Number) - 40) * u, cy + ((b[1] as Number) - 47) * u);
+    hidden var _u as Float = 1.0;
+    hidden var _cx as Number = 0;
+    hidden var _cy as Number = 0;
+
+    // Filled dot at 0..80-space (x, y) with 0..80-space radius r.
+    hidden function blob(dc as Dc, x as Number, y as Number, r as Float) as Void {
+        dc.fillCircle(_cx + (x - 34.5) * _u, _cy + (y - 40) * _u, r * _u);
+    }
+
+    // A tapered stroke: steps along each segment drawing shrinking dots so the
+    // limb narrows to its extremity, mirroring the launcher icon.
+    hidden function chain(dc as Dc, pts as Array, rad as Array) as Void {
+        for (var s = 0; s < pts.size() - 1; s++) {
+            var a = pts[s] as Array;
+            var b = pts[s + 1] as Array;
+            var ra = rad[s] as Float;
+            var rb = rad[s + 1] as Float;
+            for (var i = 0; i <= 12; i++) {
+                var t = i / 12.0;
+                var x = (a[0] as Number) + ((b[0] as Number) - (a[0] as Number)) * t;
+                var y = (a[1] as Number) + ((b[1] as Number) - (a[1] as Number)) * t;
+                dc.fillCircle(_cx + (x - 34.5) * _u, _cy + (y - 40) * _u,
+                              (ra + (rb - ra) * t) * _u);
+            }
         }
     }
 
