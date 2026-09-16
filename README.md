@@ -13,7 +13,7 @@ illustrated stretches, and save every session to Garmin Connect.
 [![Release](https://img.shields.io/github/v/release/renanleonellocastro/Stretches?include_prereleases&color=ff5500)](../../releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-ffaa00.svg)](LICENSE)
 [![Connect IQ](https://img.shields.io/badge/Connect%20IQ-%E2%89%A53.2-ff8800)](https://developer.garmin.com/connect-iq/)
-[![Devices](https://img.shields.io/badge/devices-28-ffaa00)](#-supported-devices)
+[![Devices](https://img.shields.io/badge/devices-80-ffaa00)](#-supported-devices)
 [![Languages](https://img.shields.io/badge/languages-6-ff5500)](#-languages)
 
 <img src="docs/images/store-hero.png" alt="Stretches on Garmin — guided stretching coach" width="820"/>
@@ -66,7 +66,7 @@ illustrated stretches, and save every session to Garmin Connect.
 <img src="docs/images/catalog-preview.png" alt="All 34 stretch illustrations" width="760"/>
 
 *34 stretches · 5 muscle groups · hand-crafted figures rendered per screen
-size, from the 208×208 Forerunner 55 to the 416×416 Venu 2.*
+size, from the 208×208 Forerunner 55 to the 466×466 fēnix 9 Pro 51mm.*
 </div>
 
 ## 🎬 How a session works
@@ -110,17 +110,29 @@ press **Start now** to begin.
 
 ## ⌚ Supported devices
 
-Forerunner 55 (the reference device), Forerunner 245/255/745/945/955 series,
-Fēnix 6/7 series, Venu / Venu 2 / Venu Sq series, Vívoactive 4 — 28 models
-total, Connect IQ API ≥ 3.2.
+Forerunner 55 (the reference device) and the Forerunner 70/165/170/245/255/265/
+570/745/945/955/965/970 series, Fēnix 6/7/7 Pro/8/E/9 series, Epix 2 and Epix Pro,
+Enduro 3, Venu / Venu 2 / Venu 3 / Venu 4 / Venu X1 / Venu Sq series, Vívoactive
+4/5/6, Instinct 3 AMOLED and Instinct Crossover AMOLED, MARQ 2, Descent Mk3 and
+D2 Mach 1/2. That is 80 models in total, all on Connect IQ API ≥ 3.2.
 
 <details>
 <summary>Full device list</summary>
 
-`fr55` `fr245` `fr245m` `fr255` `fr255m` `fr255s` `fr255sm` `fr745` `fr945`
-`fr955` `fenix6` `fenix6pro` `fenix6s` `fenix6spro` `fenix6xpro` `fenix7`
-`fenix7s` `fenix7x` `venu` `venu2` `venu2plus` `venu2s` `venusq` `venusqm`
-`venusq2` `venusq2m` `vivoactive4` `vivoactive4s`
+`fr55` `fr70` `fr165` `fr165m` `fr170` `fr170m` `fr245` `fr245m` `fr255`
+`fr255m` `fr255s` `fr255sm` `fr265` `fr265s` `fr745` `fr945` `fr945lte`
+`fr955` `fr965` `fr970` `fr57042mm` `fr57047mm` `enduro3` `epix2`
+`epix2pro42mm` `epix2pro47mm` `epix2pro51mm` `fenix6` `fenix6pro` `fenix6s`
+`fenix6spro` `fenix6xpro` `fenix7` `fenix7pro` `fenix7pronowifi` `fenix7s`
+`fenix7spro` `fenix7x` `fenix7xpro` `fenix7xpronowifi` `fenix8pro47mm`
+`fenix8solar47mm` `fenix8solar51mm` `fenix9pro43mm` `fenix9pro47mm`
+`fenix9pro51mm` `fenix9prosolar47mm` `fenix9prosolar51mm` `fenix843mm`
+`fenix847mm` `fenix943mm` `fenix947mm` `fenixe` `venu` `venu2` `venu2plus`
+`venu2s` `venu3` `venu3s` `venu441mm` `venu445mm` `venusq` `venusq2`
+`venusq2m` `venusqm` `venux1` `vivoactive4` `vivoactive4s` `vivoactive5`
+`vivoactive6` `instinct3amoled45mm` `instinct3amoled50mm`
+`instinctcrossoveramoled` `d2mach1` `d2mach2` `d2mach2pro` `descentmk343mm`
+`descentmk351mm` `marq2` `marq2aviator`
 
 </details>
 
@@ -188,7 +200,7 @@ Every PR runs through CI:
 | 🧾 XML validation | Manifest and all resources parse |
 | 🌐 String sync | Every language ships every string id |
 | 🖼 Illustration coverage | Every catalog entry has an image in every size bucket |
-| 🔎 Device API audit | Every Toybox symbol used exists on **all 28 target devices** |
+| 🔎 Device API audit | Every Toybox symbol used exists on **all 80 target devices** |
 | 🛠 Compile | Type-check level 2 across three screen shapes, zero errors |
 | ✅ Tests | Unit + on-simulator integration suite (`make test`) |
 
