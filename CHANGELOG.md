@@ -4,6 +4,23 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-09-16
+
+### Added
+
+- **52 newer Garmin devices** are now supported (80 in total): fēnix 7 Pro,
+  fēnix 8 / 8 Solar / 8 Pro / E, fēnix 9 / 9 Pro, Epix 2 / Epix Pro, Enduro 3,
+  Forerunner 70 / 165 / 170 / 265 / 570 / 965 / 970 / 945 LTE, Venu 3 / 4 /
+  X1, Vívoactive 5 / 6, Instinct 3 AMOLED / Crossover AMOLED, MARQ 2,
+  Descent Mk3 and D2 Mach 1 / 2 (issue #13).
+- Three new illustration size buckets (213, 219 and 224 px) for the 454x454,
+  466x466 and 448x486 AMOLED screens.
+
+### Changed
+
+- CI now compiles the fēnix 8 47mm and the rectangular Venu X1 in addition to
+  the previous three representative devices.
+
 ## [1.0.3] - 2026-08-10
 
 ### Fixed

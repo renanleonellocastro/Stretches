@@ -9,7 +9,7 @@ API audit + a scripted manual pass for hardware behavior.**
 |---|---|---|---|
 | Unit + integration | Run No Evil suite (`source/tests/`) — pure logic **and** real Storage / resources / i18n on the simulator VM | `make test` (simulator) | Local before every commit; best-effort on CI |
 | Device API audit | Every Toybox symbol used vs. every target device's API database | `python3 scripts/audit_api_usage.py` | CI (blocking) |
-| Compile matrix | Type-check level 2, three screen shapes (fr55 / venu2 / venusq2) + full 28-device package on release | `make build` / `make package` | CI (blocking) |
+| Compile matrix | Type-check level 2, five screen shapes (fr55 / venu2 / venusq2 / fenix847mm / venux1) + full 80-device package on release | `make build` / `make package` | CI (blocking) |
 | On-device pass | Hardware behaviors that cannot be simulated | Real watch | Manual, before each release |
 
 ## Running the automated suite

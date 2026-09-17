@@ -155,11 +155,12 @@ jobs:
         run: python3 scripts/audit_api_usage.py
 
       # Gate 2: the app must compile at type-check level 2 (warnings on)
-      # across a small, a large-AMOLED and a rectangular screen.
+      # across a small MIP, a large AMOLED (416 and 454 px) and two
+      # rectangular screens.
       - name: Compile for representative devices
         if: env.HAS_CREDS == 'true'
         run: |
-          for D in fr55 venu2 venusq2; do
+          for D in fr55 venu2 venusq2 fenix847mm venux1; do
             echo "::group::$D"; make build DEVICE=$D; echo "::endgroup::"
           done
 
