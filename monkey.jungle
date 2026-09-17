@@ -7,7 +7,7 @@ project.manifest = manifest.xml
 # Stretch illustrations ship at several pixel sizes (see
 # scripts/generate_illustrations.py). Each product appends the illustration
 # bucket that matches its screen resolution, so the artwork stays crisp and
-# proportional from the 208x208 Forerunner 55 up to the 416x416 Venu 2.
+# proportional from the 208x208 Forerunner 55 up to the 466x466 fenix 9 Pro 51mm.
 # This mapping is generated into scripts/resource_paths.jungle; keep it in
 # sync by re-running the generator.
 
@@ -17,33 +17,88 @@ fr255s.resourcePath = $(fr255s.resourcePath);assets/illus102
 fr255sm.resourcePath = $(fr255sm.resourcePath);assets/illus102
 vivoactive4s.resourcePath = $(vivoactive4s.resourcePath);assets/illus102
 
+fenix6s.resourcePath = $(fenix6s.resourcePath);assets/illus113
+fenix6spro.resourcePath = $(fenix6spro.resourcePath);assets/illus113
+fenix7s.resourcePath = $(fenix7s.resourcePath);assets/illus113
+fenix7spro.resourcePath = $(fenix7spro.resourcePath);assets/illus113
 fr245.resourcePath = $(fr245.resourcePath);assets/illus113
 fr245m.resourcePath = $(fr245m.resourcePath);assets/illus113
 fr745.resourcePath = $(fr745.resourcePath);assets/illus113
 fr945.resourcePath = $(fr945.resourcePath);assets/illus113
-fenix6s.resourcePath = $(fenix6s.resourcePath);assets/illus113
-fenix6spro.resourcePath = $(fenix6spro.resourcePath);assets/illus113
-fenix7s.resourcePath = $(fenix7s.resourcePath);assets/illus113
+fr945lte.resourcePath = $(fr945lte.resourcePath);assets/illus113
 venusq.resourcePath = $(venusq.resourcePath);assets/illus113
 venusqm.resourcePath = $(venusqm.resourcePath);assets/illus113
 
-fr255.resourcePath = $(fr255.resourcePath);assets/illus122
-fr255m.resourcePath = $(fr255m.resourcePath);assets/illus122
-fr955.resourcePath = $(fr955.resourcePath);assets/illus122
 fenix6.resourcePath = $(fenix6.resourcePath);assets/illus122
 fenix6pro.resourcePath = $(fenix6pro.resourcePath);assets/illus122
 fenix7.resourcePath = $(fenix7.resourcePath);assets/illus122
+fenix7pro.resourcePath = $(fenix7pro.resourcePath);assets/illus122
+fenix7pronowifi.resourcePath = $(fenix7pronowifi.resourcePath);assets/illus122
+fenix8solar47mm.resourcePath = $(fenix8solar47mm.resourcePath);assets/illus122
+fenix9prosolar47mm.resourcePath = $(fenix9prosolar47mm.resourcePath);assets/illus122
+fr255.resourcePath = $(fr255.resourcePath);assets/illus122
+fr255m.resourcePath = $(fr255m.resourcePath);assets/illus122
+fr955.resourcePath = $(fr955.resourcePath);assets/illus122
 vivoactive4.resourcePath = $(vivoactive4.resourcePath);assets/illus122
 
+enduro3.resourcePath = $(enduro3.resourcePath);assets/illus132
 fenix6xpro.resourcePath = $(fenix6xpro.resourcePath);assets/illus132
 fenix7x.resourcePath = $(fenix7x.resourcePath);assets/illus132
+fenix7xpro.resourcePath = $(fenix7xpro.resourcePath);assets/illus132
+fenix7xpronowifi.resourcePath = $(fenix7xpronowifi.resourcePath);assets/illus132
+fenix8solar51mm.resourcePath = $(fenix8solar51mm.resourcePath);assets/illus132
+fenix9prosolar51mm.resourcePath = $(fenix9prosolar51mm.resourcePath);assets/illus132
 
 venusq2.resourcePath = $(venusq2.resourcePath);assets/illus160
 venusq2m.resourcePath = $(venusq2m.resourcePath);assets/illus160
 
+fr265s.resourcePath = $(fr265s.resourcePath);assets/illus169
 venu2s.resourcePath = $(venu2s.resourcePath);assets/illus169
 
+descentmk343mm.resourcePath = $(descentmk343mm.resourcePath);assets/illus183
+epix2pro42mm.resourcePath = $(epix2pro42mm.resourcePath);assets/illus183
+fr165.resourcePath = $(fr165.resourcePath);assets/illus183
+fr165m.resourcePath = $(fr165m.resourcePath);assets/illus183
+fr170.resourcePath = $(fr170.resourcePath);assets/illus183
+fr170m.resourcePath = $(fr170m.resourcePath);assets/illus183
+fr57042mm.resourcePath = $(fr57042mm.resourcePath);assets/illus183
+fr70.resourcePath = $(fr70.resourcePath);assets/illus183
+instinct3amoled45mm.resourcePath = $(instinct3amoled45mm.resourcePath);assets/illus183
+instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);assets/illus183
+marq2.resourcePath = $(marq2.resourcePath);assets/illus183
+marq2aviator.resourcePath = $(marq2aviator.resourcePath);assets/illus183
 venu.resourcePath = $(venu.resourcePath);assets/illus183
+venu3s.resourcePath = $(venu3s.resourcePath);assets/illus183
+venu441mm.resourcePath = $(venu441mm.resourcePath);assets/illus183
+vivoactive5.resourcePath = $(vivoactive5.resourcePath);assets/illus183
+vivoactive6.resourcePath = $(vivoactive6.resourcePath);assets/illus183
 
+d2mach1.resourcePath = $(d2mach1.resourcePath);assets/illus196
+epix2.resourcePath = $(epix2.resourcePath);assets/illus196
+epix2pro47mm.resourcePath = $(epix2pro47mm.resourcePath);assets/illus196
+fenix843mm.resourcePath = $(fenix843mm.resourcePath);assets/illus196
+fenix943mm.resourcePath = $(fenix943mm.resourcePath);assets/illus196
+fenix9pro43mm.resourcePath = $(fenix9pro43mm.resourcePath);assets/illus196
+fenixe.resourcePath = $(fenixe.resourcePath);assets/illus196
+fr265.resourcePath = $(fr265.resourcePath);assets/illus196
+instinct3amoled50mm.resourcePath = $(instinct3amoled50mm.resourcePath);assets/illus196
 venu2.resourcePath = $(venu2.resourcePath);assets/illus196
 venu2plus.resourcePath = $(venu2plus.resourcePath);assets/illus196
+
+d2mach2.resourcePath = $(d2mach2.resourcePath);assets/illus213
+d2mach2pro.resourcePath = $(d2mach2pro.resourcePath);assets/illus213
+descentmk351mm.resourcePath = $(descentmk351mm.resourcePath);assets/illus213
+epix2pro51mm.resourcePath = $(epix2pro51mm.resourcePath);assets/illus213
+fenix847mm.resourcePath = $(fenix847mm.resourcePath);assets/illus213
+fenix8pro47mm.resourcePath = $(fenix8pro47mm.resourcePath);assets/illus213
+fenix947mm.resourcePath = $(fenix947mm.resourcePath);assets/illus213
+fenix9pro47mm.resourcePath = $(fenix9pro47mm.resourcePath);assets/illus213
+fr57047mm.resourcePath = $(fr57047mm.resourcePath);assets/illus213
+fr965.resourcePath = $(fr965.resourcePath);assets/illus213
+fr970.resourcePath = $(fr970.resourcePath);assets/illus213
+venu3.resourcePath = $(venu3.resourcePath);assets/illus213
+venu445mm.resourcePath = $(venu445mm.resourcePath);assets/illus213
+
+fenix9pro51mm.resourcePath = $(fenix9pro51mm.resourcePath);assets/illus219
+
+venux1.resourcePath = $(venux1.resourcePath);assets/illus224

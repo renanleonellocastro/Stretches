@@ -56,6 +56,10 @@ Loosen up. Your neck will thank you.
 
 ---
 
+## What's New (v1.2.0)
+- Now available on 52 more watches (80 in total): fenix 7 Pro, fenix 8, fenix E, fenix 9, Epix 2 and Epix Pro, Enduro 3, Forerunner 70, 165, 170, 265, 570, 965 and 970, Venu 3, Venu 4 and Venu X1, vivoactive 5 and 6, Instinct 3 AMOLED, MARQ 2, Descent Mk3 and D2 Mach.
+- Crisper illustrations on the large AMOLED screens.
+
 ## What's New (v1.1.0)
 - Fresh look: a bold new orange activity icon and a matching in-app theme.
 - Set your order: stretches now play in the order you choose, with a new Reorder screen to arrange them.
