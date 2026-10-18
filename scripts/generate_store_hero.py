@@ -12,7 +12,6 @@ Output:
     docs/images/store-hero.png
 """
 
-import math
 import os
 
 from PIL import Image, ImageDraw, ImageFont
@@ -113,29 +112,33 @@ def _paste_illustration(cx, cy, size):
     _ILLUS_LAYER = (img, (cx - size // 2, cy - size // 2))
 
 
-def main():
-    canvas = vgradient((W, H), BG_TOP, BG_BOTTOM).convert("RGBA")
-    d = ImageDraw.Draw(canvas)
+FEATURES = [
+    (GROUP_TEAL, "34 illustrated stretches, 5 muscle groups"),
+    (ORANGE, "Custom routines & daily reminders"),
+    (GREEN, "Heart rate & calories in Garmin Connect"),
+    (WHITE, "6 languages  ·  free & open source"),
+]
+LEFT_MARGIN = 80
+FEATURE_TOP = 398
+FEATURE_SPACING = 56
+FEATURE_TEXT = (225, 230, 232)
 
-    # Left column: brand, tagline, feature highlights.
-    x = 80
-    d.text((x, 116), "Stretches", font=font("Arial Black.ttf", 104), fill=WHITE)
-    d.text((x, 236), "Your guided stretching coach", font=font("Arial Bold.ttf", 38), fill=TEAL)
-    d.text((x, 292), "on Garmin devices", font=font("Arial Bold.ttf", 38), fill=TEAL)
 
-    feats = [
-        (GROUP_TEAL, "34 illustrated stretches, 5 muscle groups"),
-        (ORANGE, "Custom routines & daily reminders"),
-        (GREEN, "Heart rate & calories in Garmin Connect"),
-        (WHITE, "6 languages  ·  free & open source"),
-    ]
-    fy = 398
-    for color, text in feats:
-        d.ellipse([x + 6, fy + 10, x + 24, fy + 28], fill=color)
-        d.text((x + 42, fy), text, font=font("Arial.ttf", 30), fill=(225, 230, 232))
-        fy += 56
+def draw_brand(d):
+    d.text((LEFT_MARGIN, 116), "Stretches", font=font("Arial Black.ttf", 104), fill=WHITE)
+    d.text((LEFT_MARGIN, 236), "Your guided stretching coach", font=font("Arial Bold.ttf", 38), fill=TEAL)
+    d.text((LEFT_MARGIN, 292), "on Garmin devices", font=font("Arial Bold.ttf", 38), fill=TEAL)
 
-    # Right column: two watch mock-ups, lightly overlapping.
+
+def draw_features(d):
+    for index, (color, text) in enumerate(FEATURES):
+        fy = FEATURE_TOP + index * FEATURE_SPACING
+        d.ellipse([LEFT_MARGIN + 6, fy + 10, LEFT_MARGIN + 24, fy + 28], fill=color)
+        d.text((LEFT_MARGIN + 42, fy), text, font=font("Arial.ttf", 30), fill=FEATURE_TEXT)
+
+
+def compose_watches(canvas):
+    """Two watch mock-ups, lightly overlapping, then the illustration on top."""
     home = draw_watch(1018, 200, 156, render_home)
     stretch = draw_watch(1236, 508, 166, render_stretch)
     canvas.alpha_composite(home)
@@ -144,6 +147,13 @@ def main():
         canvas.alpha_composite(_ILLUS_LAYER[0].resize(_ILLUS_LAYER[0].size),
                                _ILLUS_LAYER[1])
 
+
+def main():
+    canvas = vgradient((W, H), BG_TOP, BG_BOTTOM).convert("RGBA")
+    d = ImageDraw.Draw(canvas)
+    draw_brand(d)
+    draw_features(d)
+    compose_watches(canvas)
     out = os.path.join(ROOT, "docs", "images", "store-hero.png")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     canvas.convert("RGB").save(out)

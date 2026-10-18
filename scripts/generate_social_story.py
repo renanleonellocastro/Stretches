@@ -16,15 +16,22 @@ import os
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+from lunge_figure import render_lunge
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_DIR = "/System/Library/Fonts/Supplemental"
+HOME_SCREENSHOT = os.path.join(ROOT, "docs/images/screenshots/home.png")
+OUTPUT_PATH = os.path.join(ROOT, "docs/images/promo-story.png")
 
 W, H = 1080, 1920
+WATCH_CENTER_Y = 980
 ORANGE = (255, 85, 0)
 AMBER = (255, 170, 0)
 WHITE = (245, 245, 245)
 DIM = (170, 162, 156)
 BG_TOP = (20, 14, 11)
+FIGURE_SUPERSAMPLING = 8
+FIGURE_STEPS = 90
 BG_BOTTOM = (4, 3, 3)
 
 
@@ -43,37 +50,8 @@ def vgradient(size, top, bottom):
 
 
 def render_figure(size, color):
-    ss = 8
-    edge = 80 * ss
-    img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-
-    def taper(a, b, ra, rb, steps=90):
-        for i in range(steps + 1):
-            t = i / steps
-            x = (a[0] + (b[0] - a[0]) * t) * ss
-            y = (a[1] + (b[1] - a[1]) * t) * ss
-            r = (ra + (rb - ra) * t) * ss
-            d.ellipse([x - r, y - r, x + r, y + r], fill=color)
-
-    def chain(pts, rad):
-        for i in range(len(pts) - 1):
-            taper(pts[i], pts[i + 1], rad[i], rad[i + 1])
-
-    def blob(cx, cy, r):
-        d.ellipse([(cx - r) * ss, (cy - r) * ss, (cx + r) * ss, (cy + r) * ss], fill=color)
-
-    dx = 4
-    def sh(pts):
-        return [(x + dx, y) for x, y in pts]
-
-    blob(40 + dx, 13, 7.0)
-    chain(sh([(40, 19), (38, 44)]), [3.6, 5.0])
-    chain(sh([(38, 44), (54, 52), (55, 73), (61, 74)]), [5.2, 3.4, 1.9, 1.5])
-    chain(sh([(38, 44), (24, 58), (13, 72), (8, 71)]), [5.2, 3.2, 1.7, 1.5])
-    chain(sh([(39, 24), (49, 32), (56, 42)]), [3.6, 2.0, 0.9])
-    chain(sh([(39, 24), (30, 31), (24, 38)]), [3.6, 2.0, 0.9])
-    return img.resize((size, size), Image.LANCZOS)
+    """The same tapered lunge silhouette used by the app icon, at any size."""
+    return render_lunge(size, color, FIGURE_SUPERSAMPLING, FIGURE_STEPS)
 
 
 def radial_glow(size, center, radius, color, strength):
@@ -126,53 +104,63 @@ def pill_row(d, cy, items, fnt, gap=24):
         x += wd + gap
 
 
-def main():
+def compose_background():
     img = vgradient((W, H), BG_TOP, BG_BOTTOM).convert("RGBA")
     img.alpha_composite(radial_glow((W, H), (W // 2, 900), 620, ORANGE, 55))
     img.alpha_composite(radial_glow((W, H), (820, 360), 320, AMBER, 38))
-    d = ImageDraw.Draw(img)
+    return img
 
-    # --- Header lockup (icon + wordmark), inside the top safe zone ---
+
+def draw_header(img, d):
+    """Icon and wordmark lockup, inside the top safe zone."""
     f_word = font("Arial Black.ttf", 88)
     word = "STRETCHES"
     tw = d.textlength(word, font=f_word)
     fig_sz, gap = 96, 24
-    group_w = fig_sz + gap + tw
-    start_x = (W - group_w) / 2
+    start_x = (W - (fig_sz + gap + tw)) / 2
     hy = 320
     img.alpha_composite(render_figure(fig_sz, ORANGE), (int(start_x), int(hy - fig_sz / 2)))
     d.text((start_x + fig_sz + gap, hy), word, font=f_word, fill=WHITE, anchor="lm")
 
-    # --- Tagline ---
-    f_tag = font("Arial Bold.ttf", 58)
-    d.text((W / 2, 470), "Seu relógio vira seu", font=f_tag, fill=WHITE, anchor="mm")
-    f_tag2 = font("Arial Black.ttf", 66)
-    d.text((W / 2, 548), "treinador de alongamento", font=f_tag2, fill=ORANGE, anchor="mm")
 
-    # --- Watch mock-up showing the real Home screen ---
-    draw_watch(img, W // 2, 980, 300, os.path.join(ROOT, "docs/images/screenshots/home.png"))
+def draw_tagline(d):
+    d.text((W / 2, 470), "Seu relógio vira seu", font=font("Arial Bold.ttf", 58), fill=WHITE, anchor="mm")
+    d.text((W / 2, 548), "treinador de alongamento", font=font("Arial Black.ttf", 66), fill=ORANGE,
+           anchor="mm")
 
-    # --- Quick value line ---
+
+def draw_value_line(d):
     f_sub = font("Arial.ttf", 40)
     d.text((W / 2, 1360), "Monte sua rotina. Seja lembrado.", font=f_sub, fill=WHITE, anchor="mm")
     d.text((W / 2, 1414), "Alongue guiado pelo relógio.", font=f_sub, fill=DIM, anchor="mm")
 
-    # --- Badges ---
-    f_badge = font("Arial Bold.ttf", 34)
+
+def draw_badges(d):
     pill_row(d, 1510, [
         ("Grátis", (12, 10, 9), AMBER),
         ("Open source", (12, 10, 9), AMBER),
         ("Garmin", WHITE, (40, 30, 24)),
-    ], f_badge)
+    ], font("Arial Bold.ttf", 34))
 
-    # --- Link sticker cue (keep the very bottom clear for IG reply bar) ---
-    f_cue = font("Arial Bold.ttf", 44)
-    d.text((W / 2, 1660), "Toque no link para instalar", font=f_cue, fill=WHITE, anchor="mm")
+
+def draw_link_cue(d):
+    """Keeps the very bottom clear for the Instagram reply bar."""
+    d.text((W / 2, 1660), "Toque no link para instalar", font=font("Arial Bold.ttf", 44), fill=WHITE,
+           anchor="mm")
     d.text((W / 2, 1716), "▼", font=font("Arial.ttf", 46), fill=ORANGE, anchor="mm")
 
-    out = os.path.join(ROOT, "docs/images/promo-story.png")
-    img.convert("RGB").save(out, quality=95)
-    print("wrote", out, img.size)
+
+def main():
+    img = compose_background()
+    d = ImageDraw.Draw(img)
+    draw_header(img, d)
+    draw_tagline(d)
+    draw_watch(img, W // 2, WATCH_CENTER_Y, 300, HOME_SCREENSHOT)
+    draw_value_line(d)
+    draw_badges(d)
+    draw_link_cue(d)
+    img.convert("RGB").save(OUTPUT_PATH, quality=95)
+    print("wrote", OUTPUT_PATH, img.size)
 
 
 if __name__ == "__main__":

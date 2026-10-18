@@ -28,6 +28,8 @@ import os
 
 from PIL import Image, ImageDraw, ImageOps
 
+from lunge_figure import render_lunge
+
 # ---------------------------------------------------------------------------
 # Rendering constants
 # ---------------------------------------------------------------------------
@@ -35,6 +37,8 @@ from PIL import Image, ImageDraw, ImageOps
 SCALE = 5                # supersampling factor
 LOGICAL = 140            # coordinate space poses are authored in
 S = LOGICAL * SCALE       # working canvas edge
+ICON_SUPERSAMPLING = 10   # launcher icon figure
+ICON_STEPS = 80
 
 # Palette. All channels are multiples of 0x55 so the colors survive
 # quantization to the 64-color Garmin MIP palette.
@@ -585,42 +589,10 @@ def render_launcher_icon(path):
     render_stretch_figure(path, (255, 85, 0, 255), size=80)
 
 
-# The single source of truth for the app's stretch figure (lunge pose), drawn
-# with tapered strokes so the limbs narrow to their extremities like Garmin's
-# own activity icons. Transparent background.
+# The app's stretch figure (lunge pose) lives in lunge_figure.py, shared with
+# the store and social generators. Transparent background.
 def render_stretch_figure(path, color, size=80):
-    ss = 10
-    edge = 80 * ss
-    img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-
-    def taper(a, b, ra, rb, steps=80):
-        for i in range(steps + 1):
-            t = i / steps
-            x = (a[0] + (b[0] - a[0]) * t) * ss
-            y = (a[1] + (b[1] - a[1]) * t) * ss
-            r = (ra + (rb - ra) * t) * ss
-            d.ellipse([x - r, y - r, x + r, y + r], fill=color)
-
-    def chain(pts, rad):
-        for i in range(len(pts) - 1):
-            taper(pts[i], pts[i + 1], rad[i], rad[i + 1])
-
-    def blob(cx, cy, r):
-        d.ellipse([(cx - r) * ss, (cy - r) * ss, (cx + r) * ss, (cy + r) * ss], fill=color)
-
-    dx = 4                                         # nudge right to center the pose
-    def sh(pts):
-        return [(x + dx, y) for x, y in pts]
-
-    blob(40 + dx, 13, 7.0)                          # head
-    chain(sh([(40, 19), (38, 44)]), [3.6, 5.0])                     # torso
-    chain(sh([(38, 44), (54, 52), (55, 73), (61, 74)]), [5.2, 3.4, 1.9, 1.5])  # front leg
-    chain(sh([(38, 44), (24, 58), (13, 72), (8, 71)]), [5.2, 3.2, 1.7, 1.5])   # back leg
-    chain(sh([(39, 24), (49, 32), (56, 42)]), [3.6, 2.0, 0.9])      # front arm
-    chain(sh([(39, 24), (30, 31), (24, 38)]), [3.6, 2.0, 0.9])      # back arm
-
-    img.resize((size, size), Image.LANCZOS).save(path)
+    render_lunge(size, color, ICON_SUPERSAMPLING, ICON_STEPS).save(path)
 
 
 # ---------------------------------------------------------------------------

@@ -1,15 +1,10 @@
 {
-  "total": 32,
+  "total": 22,
   "functions": [
     {
       "path": "scripts/audit_api_usage.py",
       "name": "collect_used_symbols",
       "length": 17
-    },
-    {
-      "path": "scripts/audit_api_usage.py",
-      "name": "main",
-      "length": 31
     },
     {
       "path": "scripts/generate_illustrations.py",
@@ -47,24 +42,9 @@
       "length": 13
     },
     {
-      "path": "scripts/generate_illustrations.py",
-      "name": "render_stretch_figure",
-      "length": 26
-    },
-    {
       "path": "scripts/generate_social_promo.py",
       "name": "draw_watch",
       "length": 18
-    },
-    {
-      "path": "scripts/generate_social_promo.py",
-      "name": "main",
-      "length": 35
-    },
-    {
-      "path": "scripts/generate_social_promo.py",
-      "name": "render_figure",
-      "length": 27
     },
     {
       "path": "scripts/generate_social_story.py",
@@ -72,39 +52,9 @@
       "length": 16
     },
     {
-      "path": "scripts/generate_social_story.py",
-      "name": "main",
-      "length": 33
-    },
-    {
-      "path": "scripts/generate_social_story.py",
-      "name": "render_figure",
-      "length": 26
-    },
-    {
-      "path": "scripts/generate_store_assets.py",
-      "name": "draw_stretch_figure",
-      "length": 26
-    },
-    {
-      "path": "scripts/generate_store_hero.py",
-      "name": "main",
-      "length": 28
-    },
-    {
-      "path": "scripts/generate_strings.py",
-      "name": "main",
-      "length": 53
-    },
-    {
       "path": "source/model/RoutineModel.mc",
       "name": "RoutineModel.toggle",
       "length": 14
-    },
-    {
-      "path": "source/model/StretchCatalog.mc",
-      "name": "StretchCatalog.buildEntries",
-      "length": 36
     },
     {
       "path": "source/session/WorkoutRecorder.mc",

@@ -13,20 +13,26 @@ Output:
     docs/images/promo-instagram.png
 """
 
-import math
 import os
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+from lunge_figure import render_lunge
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_DIR = "/System/Library/Fonts/Supplemental"
+HOME_SCREENSHOT = os.path.join(ROOT, "docs/images/screenshots/home.png")
+OUTPUT_PATH = os.path.join(ROOT, "docs/images/promo-instagram.png")
 
 W = H = 1080
+WATCH_CENTER_Y = 470
 ORANGE = (255, 85, 0)
 AMBER = (255, 170, 0)
 WHITE = (245, 245, 245)
 DIM = (165, 158, 152)
 BG_TOP = (18, 13, 10)
+FIGURE_SUPERSAMPLING = 8
+FIGURE_STEPS = 90
 BG_BOTTOM = (5, 4, 4)
 
 
@@ -46,37 +52,7 @@ def vgradient(size, top, bottom):
 
 def render_figure(size, color):
     """The same tapered lunge silhouette used by the app icon, at any size."""
-    ss = 8
-    edge = 80 * ss
-    img = Image.new("RGBA", (edge, edge), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-
-    def taper(a, b, ra, rb, steps=90):
-        for i in range(steps + 1):
-            t = i / steps
-            x = (a[0] + (b[0] - a[0]) * t) * ss
-            y = (a[1] + (b[1] - a[1]) * t) * ss
-            r = (ra + (rb - ra) * t) * ss
-            d.ellipse([x - r, y - r, x + r, y + r], fill=color)
-
-    def chain(pts, rad):
-        for i in range(len(pts) - 1):
-            taper(pts[i], pts[i + 1], rad[i], rad[i + 1])
-
-    def blob(cx, cy, r):
-        d.ellipse([(cx - r) * ss, (cy - r) * ss, (cx + r) * ss, (cy + r) * ss], fill=color)
-
-    dx = 4
-    def sh(pts):
-        return [(x + dx, y) for x, y in pts]
-
-    blob(40 + dx, 13, 7.0)
-    chain(sh([(40, 19), (38, 44)]), [3.6, 5.0])
-    chain(sh([(38, 44), (54, 52), (55, 73), (61, 74)]), [5.2, 3.4, 1.9, 1.5])
-    chain(sh([(38, 44), (24, 58), (13, 72), (8, 71)]), [5.2, 3.2, 1.7, 1.5])
-    chain(sh([(39, 24), (49, 32), (56, 42)]), [3.6, 2.0, 0.9])
-    chain(sh([(39, 24), (30, 31), (24, 38)]), [3.6, 2.0, 0.9])
-    return img.resize((size, size), Image.LANCZOS)
+    return render_lunge(size, color, FIGURE_SUPERSAMPLING, FIGURE_STEPS)
 
 
 def radial_glow(size, center, radius, color, strength):
@@ -135,54 +111,53 @@ def pill_row(d, cy, items, fnt, gap=22):
         x += wd + gap
 
 
-def main():
+def compose_background():
     img = vgradient((W, H), BG_TOP, BG_BOTTOM).convert("RGBA")
     # Warm ambient glows.
-    img.alpha_composite(radial_glow((W, H), (W // 2, 470), 520, ORANGE, 60))
+    img.alpha_composite(radial_glow((W, H), (W // 2, WATCH_CENTER_Y), 520, ORANGE, 60))
     img.alpha_composite(radial_glow((W, H), (860, 180), 300, AMBER, 40))
-    d = ImageDraw.Draw(img)
+    return img
 
-    # --- Header: icon + wordmark, centered as one lockup ---
+
+def draw_header(img, d):
+    """Icon and wordmark, centered as one lockup."""
     f_word = font("Arial Black.ttf", 96)
     word = "STRETCHES"
     tw = d.textlength(word, font=f_word)
     fig_sz, gap = 104, 26
-    group_w = fig_sz + gap + tw
-    start_x = (W - group_w) / 2
+    start_x = (W - (fig_sz + gap + tw)) / 2
     hy = 132
-    fig = render_figure(fig_sz, ORANGE)
-    img.alpha_composite(fig, (int(start_x), int(hy - fig_sz / 2)))
+    img.alpha_composite(render_figure(fig_sz, ORANGE), (int(start_x), int(hy - fig_sz / 2)))
     d.text((start_x + fig_sz + gap, hy), word, font=f_word, fill=WHITE, anchor="lm")
 
-    # --- Center: watch mock-up showing the real Home screen ---
-    draw_watch(img, W // 2, 470, 220, os.path.join(ROOT, "docs/images/screenshots/home.png"))
 
-    # --- Tagline ---
-    f_tag = font("Arial Bold.ttf", 52)
-    d.text((W / 2, 762), "Your watch is your", font=f_tag, fill=WHITE, anchor="mm")
-    f_tag2 = font("Arial Black.ttf", 56)
-    d.text((W / 2, 822), "stretching coach.", font=f_tag2, fill=ORANGE, anchor="mm")
-
-    # --- Sub copy ---
-    f_sub = font("Arial.ttf", 34)
+def draw_tagline(d):
+    d.text((W / 2, 762), "Your watch is your", font=font("Arial Bold.ttf", 52), fill=WHITE, anchor="mm")
+    d.text((W / 2, 822), "stretching coach.", font=font("Arial Black.ttf", 56), fill=ORANGE, anchor="mm")
     d.text((W / 2, 892),
            "Build a routine. Get reminded. Follow guided, illustrated stretches.",
-           font=f_sub, fill=DIM, anchor="mm")
+           font=font("Arial.ttf", 34), fill=DIM, anchor="mm")
 
-    # --- Footer badges ---
-    f_badge = font("Arial Bold.ttf", 32)
+
+def draw_footer(d):
     pill_row(d, 985, [
         ("Free", (12, 10, 9), AMBER),
         ("Open source", (12, 10, 9), AMBER),
         ("Garmin Connect IQ", WHITE, (40, 30, 24)),
-    ], f_badge)
-    f_dev = font("Arial.ttf", 26)
+    ], font("Arial Bold.ttf", 32))
     d.text((W / 2, 1042), "34 guided stretches  ·  6 languages  ·  saves to Garmin Connect",
-           font=f_dev, fill=DIM, anchor="mm")
+           font=font("Arial.ttf", 26), fill=DIM, anchor="mm")
 
-    out = os.path.join(ROOT, "docs/images/promo-instagram.png")
-    img.convert("RGB").save(out, quality=95)
-    print("wrote", out, img.size)
+
+def main():
+    img = compose_background()
+    d = ImageDraw.Draw(img)
+    draw_header(img, d)
+    draw_watch(img, W // 2, WATCH_CENTER_Y, 220, HOME_SCREENSHOT)
+    draw_tagline(d)
+    draw_footer(d)
+    img.convert("RGB").save(OUTPUT_PATH, quality=95)
+    print("wrote", OUTPUT_PATH, img.size)
 
 
 if __name__ == "__main__":

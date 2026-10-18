@@ -90,41 +90,62 @@ def load_device_api(devices_dir, device):
     return open(path).read()
 
 
-def main():
+DEFAULT_DEVICES_DIR = os.path.expanduser("~/.Garmin/ConnectIQ/Devices")
+GUARDED_MARKER = " (has-guarded)"
+
+
+def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--devices-dir",
-                        default=os.path.expanduser("~/.Garmin/ConnectIQ/Devices"))
-    args = parser.parse_args()
+    parser.add_argument("--devices-dir", default=DEFAULT_DEVICES_DIR)
+    return parser.parse_args()
 
-    used, guarded = collect_used_symbols()
-    devices = manifest_devices()
-    print(f"Auditing {len(used)} Toybox symbol usages across "
-          f"{len(devices)} devices…")
 
-    failed = False
+def audit_device(device, api, used, guarded):
+    """Print every symbol missing on one device; True when an unguarded one is missing."""
+    has_unguarded_gap = False
+    for module, symbol in sorted(used):
+        # A quoted occurrence is also a plain substring, so one check covers all forms.
+        if symbol in api:
+            continue
+        is_guarded = (module, symbol) in guarded
+        print(f"MISSING on {device}: {module}.{symbol}{GUARDED_MARKER if is_guarded else ''}")
+        has_unguarded_gap = has_unguarded_gap or not is_guarded
+    return has_unguarded_gap
+
+
+def audit_devices(devices_dir, devices, used, guarded):
+    """Return (has_failed, devices without api.debug.xml)."""
+    has_failed = False
     missing_devices = []
     for device in devices:
-        api = load_device_api(args.devices_dir, device)
+        api = load_device_api(devices_dir, device)
         if api is None:
             missing_devices.append(device)
             continue
-        for module, symbol in sorted(used):
-            if f'"{symbol}"' in api or f"'{symbol}'" in api or symbol in api:
-                continue
-            marker = " (has-guarded)" if (module, symbol) in guarded else ""
-            print(f"MISSING on {device}: {module}.{symbol}{marker}")
-            if not marker:
-                failed = True
+        has_failed = audit_device(device, api, used, guarded) or has_failed
+    return has_failed, missing_devices
 
+
+def report_result(has_failed, devices, missing_devices, guarded):
     if missing_devices:
         print(f"WARNING: no api.debug.xml for: {', '.join(missing_devices)} "
               f"(download device files first)")
-    if failed:
+    if has_failed:
         print("AUDIT FAILED — some symbols are unavailable on target devices")
         sys.exit(1)
     print(f"AUDIT OK — every referenced Toybox symbol exists on all "
           f"{len(devices) - len(missing_devices)} audited devices "
           f"({len(guarded)} has-guarded)")
+
+
+def main():
+    args = parse_arguments()
+    used, guarded = collect_used_symbols()
+    devices = manifest_devices()
+    print(f"Auditing {len(used)} Toybox symbol usages across "
+          f"{len(devices)} devices…")
+    has_failed, missing_devices = audit_devices(args.devices_dir, devices, used, guarded)
+    report_result(has_failed, devices, missing_devices, guarded)
 
 
 if __name__ == "__main__":
