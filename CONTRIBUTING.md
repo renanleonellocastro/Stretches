@@ -59,9 +59,19 @@ Python 3 with Pillow is needed only if you touch the illustrations:
 2. Add `<iq:language><code></iq:language>` to `manifest.xml`.
 3. The CI string-sync check will confirm nothing is missing.
 
+## Quality bar
+
+All production code follows [docs/QUALITY.md](docs/QUALITY.md): function
+bodies of at most 12 lines, all of SOLID and meaningful names. Run
+`make check` before every commit (it needs the SDK, a signing key and `uv`),
+plus `make sim` and `make test` for the simulator suite. A ratchet blocks any
+new or grown long function, so the legacy ones only go down.
+
 ## Quality gates
 
 Every PR must pass CI:
+
+- The function length ratchet (`python3 tools/function_length_ratchet.py`)
 
 - XML validity + string catalogs in sync across languages
 - Illustration coverage for every catalog entry

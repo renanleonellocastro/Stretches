@@ -18,6 +18,10 @@ GarminDeviceLogs/
 __pycache__/
 *.pyc
 .venv/
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # OS / editor noise
 .DS_Store

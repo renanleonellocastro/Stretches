@@ -1,0 +1,8 @@
+{
+  "limit": 12,
+  "roots": ["source/", "scripts/", "tools/"],
+  "languages": {".py": "function_length_python", ".mc": "function_length_monkeyc"},
+  "excludedDirectories": ["__pycache__", "generated", "tests"],
+  "excludedFilePatterns": ["(^|/)(conftest|test_[^/]*)\\.py$"],
+  "areaPrefixes": ["source/"]
+}

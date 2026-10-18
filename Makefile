@@ -14,7 +14,12 @@ MONKEYC = "$(SDK_BIN)/monkeyc"
 MONKEYDO = "$(SDK_BIN)/monkeydo"
 SIMULATOR = "$(SDK_BIN)/connectiq"
 
-.PHONY: help key build test-build test sim package illustrations clean
+UV ?= uv
+RUN = $(UV) run --frozen
+TOOLS_COVERAGE = --cov=tools --cov-branch --cov-report=term-missing --cov-fail-under=100
+
+.PHONY: help key build test-build test sim package illustrations clean audit lint-tools test-tools \
+	function-length function-length-gate function-length-baseline check
 
 help:
 	@echo "Targets:"
@@ -25,6 +30,8 @@ help:
 	@echo "  test           Run unit tests on the simulator (start 'make sim' first)"
 	@echo "  package        Build the store-ready .iq package (all devices)"
 	@echo "  illustrations  Regenerate stretch illustrations from scripts/"
+	@echo "  check          Run every local quality gate (see docs/QUALITY.md)"
+	@echo "  function-length  List functions over 12 lines, longest first"
 	@echo "  clean          Remove build output"
 
 key:
@@ -62,3 +69,29 @@ illustrations:
 
 clean:
 	rm -rf bin dist
+
+audit:
+	python3 scripts/audit_api_usage.py
+
+lint-tools:
+	$(RUN) ruff check tools
+	$(RUN) ruff format --check tools
+	MYPYPATH=tools $(RUN) mypy --strict tools
+
+test-tools:
+	$(RUN) pytest tools/tests -q -p no:cacheprovider -o pythonpath=tools $(TOOLS_COVERAGE)
+
+# Functions whose body passes 12 lines (rule 1 of docs/QUALITY.md), longest first.
+function-length:
+	$(RUN) python tools/check_function_length.py
+
+# Ratchet: no new long function, no baselined function grows, the total never rises.
+function-length-gate:
+	$(RUN) python tools/function_length_ratchet.py check
+
+# Rewrites tools/function_length_baseline.json downward; ALLOW_GROWTH=1 is the documented exception.
+function-length-baseline:
+	$(RUN) python tools/function_length_ratchet.py $(if $(ALLOW_GROWTH),grow-baseline,baseline)
+
+# The simulator suite needs a running simulator, so it stays a separate step: make sim, then make test.
+check: audit build lint-tools test-tools function-length-gate

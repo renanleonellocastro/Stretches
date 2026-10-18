@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Function length ratchet (docs/QUALITY.md)
+        run: python3 tools/function_length_ratchet.py check
+
       - name: Validate XML resources and manifest
         run: |
           python3 - <<'EOF'
