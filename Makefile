@@ -19,7 +19,7 @@ RUN = $(UV) run --frozen
 TOOLS_COVERAGE = --cov=tools --cov-branch --cov-report=term-missing --cov-fail-under=100
 
 .PHONY: help key build test-build test sim package illustrations clean audit lint-tools test-tools \
-	function-length function-length-gate function-length-baseline check
+	function-length function-length-gate check
 
 help:
 	@echo "Targets:"
@@ -85,13 +85,9 @@ test-tools:
 function-length:
 	$(RUN) python tools/check_function_length.py
 
-# Ratchet: no new long function, no baselined function grows, the total never rises.
+# Strict: fails when any function body passes 12 lines.
 function-length-gate:
-	$(RUN) python tools/function_length_ratchet.py check
-
-# Rewrites tools/function_length_baseline.json downward; ALLOW_GROWTH=1 is the documented exception.
-function-length-baseline:
-	$(RUN) python tools/function_length_ratchet.py $(if $(ALLOW_GROWTH),grow-baseline,baseline)
+	$(RUN) python tools/check_function_length.py --strict
 
 # The simulator suite needs a running simulator, so it stays a separate step: make sim, then make test.
 check: audit build lint-tools test-tools function-length-gate

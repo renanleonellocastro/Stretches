@@ -8,6 +8,8 @@ import Toybox.WatchUi;
 // simply dismisses it and returns to the home screen, from which the user can
 // start a session. There are deliberately no Start / Snooze / Skip actions.
 class ReminderView extends WatchUi.View {
+    const SEGMENT_STEPS = 12;   // dots drawn along each limb segment
+
     hidden var _alarmDone as Boolean = false;
 
     function initialize() {
@@ -56,50 +58,50 @@ class ReminderView extends WatchUi.View {
     hidden var _cy as Number = 0;
 
     // Filled dot at 0..80-space (x, y) with 0..80-space radius r.
-    hidden function blob(dc as Dc, x as Number, y as Number, r as Float) as Void {
+    hidden function blob(dc as Dc, x as Numeric, y as Numeric, r as Float) as Void {
         dc.fillCircle(_cx + (x - 34.5) * _u, _cy + (y - 40) * _u, r * _u);
     }
 
     // A tapered stroke: steps along each segment drawing shrinking dots so the
     // limb narrows to its extremity, mirroring the launcher icon.
-    hidden function chain(dc as Dc, pts as Array, rad as Array) as Void {
-        for (var s = 0; s < pts.size() - 1; s++) {
-            var a = pts[s] as Array;
-            var b = pts[s + 1] as Array;
-            var ra = rad[s] as Float;
-            var rb = rad[s + 1] as Float;
-            for (var i = 0; i <= 12; i++) {
-                var t = i / 12.0;
-                var x = (a[0] as Number) + ((b[0] as Number) - (a[0] as Number)) * t;
-                var y = (a[1] as Number) + ((b[1] as Number) - (a[1] as Number)) * t;
-                dc.fillCircle(_cx + (x - 34.5) * _u, _cy + (y - 40) * _u,
-                              (ra + (rb - ra) * t) * _u);
-            }
+    hidden function chain(dc as Dc, points as Array, radii as Array) as Void {
+        for (var s = 0; s < points.size() - 1; s++) {
+            taperSegment(dc, points[s] as Array, points[s + 1] as Array,
+                         radii[s] as Float, radii[s + 1] as Float);
         }
     }
 
+    hidden function taperSegment(dc as Dc, from as Array, to as Array,
+                                 fromRadius as Float, toRadius as Float) as Void {
+        for (var i = 0; i <= SEGMENT_STEPS; i++) {
+            var t = i / SEGMENT_STEPS.toFloat();
+            blob(dc, interpolate(from[0] as Number, to[0] as Number, t),
+                 interpolate(from[1] as Number, to[1] as Number, t),
+                 fromRadius + (toRadius - fromRadius) * t);
+        }
+    }
+
+    hidden function interpolate(from as Number, to as Number, t as Float) as Float {
+        return from + (to - from) * t;
+    }
+
     hidden function drawText(dc as Dc) as Void {
-        var w = dc.getWidth();
-        var h = dc.getHeight();
-        dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 56 / 100, Graphics.FONT_SMALL,
-                    Theme.fitText(dc, Strings.t("AlertTitle"), Graphics.FONT_SMALL, w * 88 / 100),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        drawTitle(dc);
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
+        var h = dc.getHeight();
         var count = RoutineModel.selectedIds().size();
         if (count == 0) {
-            dc.drawText(w / 2, h * 73 / 100, Graphics.FONT_XTINY, Strings.t("EmptyRoutineMsg"),
-                        Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            RoutineSummary.drawLine(dc, h * 73 / 100, Strings.t("EmptyRoutineMsg"));
             return;
         }
-        // Two lines (count, then time) so the longer localized words stay
-        // inside the round bezel.
-        var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
-        dc.drawText(w / 2, h * 71 / 100, Graphics.FONT_XTINY,
-                    count.toString() + " " + Strings.t("HomeStretchesUnit"),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(w / 2, h * 80 / 100, Graphics.FONT_XTINY,
-                    mins.toString() + " " + Strings.t("HomeMinutesUnit"),
+        RoutineSummary.draw(dc, count, h * 71 / 100, h * 80 / 100);
+    }
+
+    hidden function drawTitle(dc as Dc) as Void {
+        var w = dc.getWidth();
+        dc.setColor(Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(w / 2, dc.getHeight() * 56 / 100, Graphics.FONT_SMALL,
+                    Theme.fitText(dc, Strings.t("AlertTitle"), Graphics.FONT_SMALL, w * 88 / 100),
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }

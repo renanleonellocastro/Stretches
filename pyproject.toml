@@ -27,5 +27,4 @@ known-first-party = [
   "function_length_model",
   "function_length_monkeyc",
   "function_length_python",
-  "function_length_ratchet",
 ]

@@ -8,13 +8,7 @@ module RoutineModel {
     }
 
     function isSelected(id as String) as Boolean {
-        var ids = Prefs.getRoutine();
-        for (var i = 0; i < ids.size(); i++) {
-            if ((ids[i] as String).equals(id)) {
-                return true;
-            }
-        }
-        return false;
+        return indexOf(Prefs.getRoutine(), id) >= 0;
     }
 
     function setSelected(id as String, on as Boolean) as Void {
@@ -23,21 +17,25 @@ module RoutineModel {
         }
     }
 
+    // Removes the stretch when it is in the routine, appends it otherwise.
     function toggle(id as String) as Void {
         var ids = Prefs.getRoutine();
-        var result = [] as Array;
-        var found = false;
-        for (var i = 0; i < ids.size(); i++) {
-            if ((ids[i] as String).equals(id)) {
-                found = true;
-            } else {
-                result = result.add(ids[i]);
-            }
-        }
-        if (!found) {
+        var result = withoutId(ids, id);
+        if (result.size() == ids.size()) {
             result = result.add(id);
         }
         Prefs.setRoutine(result);
+    }
+
+    // A new array with every occurrence of id left out.
+    function withoutId(ids as Array, id as String) as Array {
+        var result = [] as Array;
+        for (var i = 0; i < ids.size(); i++) {
+            if (!(ids[i] as String).equals(id)) {
+                result = result.add(ids[i]);
+            }
+        }
+        return result as Array;
     }
 
     function indexOf(ids as Array, id as String) as Number {

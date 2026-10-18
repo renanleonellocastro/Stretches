@@ -20,27 +20,30 @@ module SaveFlow {
 }
 
 class SaveChoiceHandler {
+    const SAVE_INDEX = 0;
+    const DISCARD_INDEX = 1;
+    const CONFIRMATION_MS = 1800;
+
     hidden var _recorder as WorkoutRecorder;
 
     function initialize(recorder as WorkoutRecorder) {
         _recorder = recorder;
     }
 
+    // index -1 (BACK) keeps the prompt on screen: an explicit choice is
+    // required so the recording is never lost silently.
     function onChosen(index as Number) as Void {
-        if (index == 0) {
+        if (index == SAVE_INDEX) {
             _recorder.save();
-            WatchUi.switchToView(
-                new MessageView(Strings.t("SavedMsg"),
-                                Theme.COLOR_SUCCESS, 1800),
-                new MessageDelegate(), WatchUi.SLIDE_UP);
-        } else if (index == 1) {
+            confirm("SavedMsg", Theme.COLOR_SUCCESS);
+        } else if (index == DISCARD_INDEX) {
             _recorder.discard();
-            WatchUi.switchToView(
-                new MessageView(Strings.t("DiscardedMsg"),
-                                Theme.COLOR_DANGER, 1800),
-                new MessageDelegate(), WatchUi.SLIDE_UP);
+            confirm("DiscardedMsg", Theme.COLOR_DANGER);
         }
-        // index -1 (BACK): keep the prompt on screen, an explicit choice is
-        // required so the recording is never lost silently.
+    }
+
+    hidden function confirm(messageKey as String, color as Number) as Void {
+        WatchUi.switchToView(new MessageView(Strings.t(messageKey), color, CONFIRMATION_MS),
+                             new MessageDelegate(), WatchUi.SLIDE_UP);
     }
 }

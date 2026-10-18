@@ -134,3 +134,22 @@ function testRoutineEstimatedTotalSecsEmptyRoutine(logger as Test.Logger) as Boo
     }
     return true;
 }
+
+(:test)
+function testRoutineWithoutIdDropsEveryOccurrenceAndKeepsTheInput(logger as Test.Logger) as Boolean {
+    var ids = ["a", "b", "a"];
+    var result = RoutineModel.withoutId(ids, "a");
+    Test.assertEqual(result.size(), 1);
+    Test.assertEqual(result[0], "b");
+    Test.assertEqual(ids.size(), 3);
+    return true;
+}
+
+(:test)
+function testRoutineSummaryRoundsSecondsUpToWholeMinutes(logger as Test.Logger) as Boolean {
+    Test.assertEqual(RoutineSummary.roundUpToMinutes(0), 0);
+    Test.assertEqual(RoutineSummary.roundUpToMinutes(1), 1);
+    Test.assertEqual(RoutineSummary.roundUpToMinutes(60), 1);
+    Test.assertEqual(RoutineSummary.roundUpToMinutes(61), 2);
+    return true;
+}

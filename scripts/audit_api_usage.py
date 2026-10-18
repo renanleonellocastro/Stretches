@@ -61,6 +61,8 @@ def strip_type_annotations(text):
 GUARD_FAMILIES = {
     ("Attention", "playTone"): re.compile(r"^TONE_"),
 }
+GUARD_PATTERN = r'\b(\w+) has :(\w+)'
+SYMBOL_PATTERN = r'\b([A-Z][A-Za-z]+)\.(\w+)'
 
 
 def collect_used_symbols():
@@ -69,18 +71,29 @@ def collect_used_symbols():
     used = set()
     guarded = set()
     for path in source_files():
-        text = strip_type_annotations(open(path).read())
-        file_guards = set(re.findall(r'\b(\w+) has :(\w+)', text))
-        guarded |= file_guards
-        for module, symbol in re.findall(r'\b([A-Z][A-Za-z]+)\.(\w+)', text):
-            if module not in TOYBOX_MODULES:
-                continue
-            used.add((module, symbol))
-            for (gmod, gsym), family in GUARD_FAMILIES.items():
-                if (gmod, gsym) in file_guards and module == gmod \
-                        and family.match(symbol):
-                    guarded.add((module, symbol))
+        file_used, file_guarded = file_symbols(strip_type_annotations(read_text(path)))
+        used |= file_used
+        guarded |= file_guarded
     return used, guarded
+
+
+def read_text(path):
+    with open(path) as handle:
+        return handle.read()
+
+
+def file_symbols(text):
+    """Return (Toybox symbols one file uses, symbols its `has` guards protect)."""
+    guards = set(re.findall(GUARD_PATTERN, text))
+    used = {(module, symbol) for module, symbol in re.findall(SYMBOL_PATTERN, text)
+            if module in TOYBOX_MODULES}
+    return used, guards | {reference for reference in used if is_family_guarded(reference, guards)}
+
+
+def is_family_guarded(reference, file_guards):
+    module, symbol = reference
+    return any(guard in file_guards and module == guard[0] and family.match(symbol)
+               for guard, family in GUARD_FAMILIES.items())
 
 
 def load_device_api(devices_dir, device):

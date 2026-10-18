@@ -17,16 +17,35 @@ module MenuKit {
         return seconds.toString() + " " + str("SecondsUnit");
     }
 
+    // Main menu rows in display order: label key, item id and the action the
+    // row runs. A new entry is one more row here.
+    function mainMenuRows() as Array {
+        return [
+            ["MenuStartNow", :startNow, new Lang.Method(WorkoutFlow, :start)],
+            ["MenuMyStretches", :stretches, new Lang.Method(MenuKit, :pushStretchPicker)],
+            ["MenuReorder", :reorder, new Lang.Method(MenuKit, :pushReorderMenu)],
+            ["MenuDurations", :durations, new Lang.Method(MenuKit, :pushDurationsMenu)],
+            ["MenuSchedules", :schedules, new Lang.Method(MenuKit, :pushSchedulesMenu)],
+            ["MenuSettings", :settings, new Lang.Method(MenuKit, :pushSettingsMenu)],
+            ["MenuAbout", :about, new Lang.Method(MenuKit, :pushAbout)]
+        ];
+    }
+
     function pushMainMenu() as Void {
         var menu = new WatchUi.Menu2({:title => str("AppName")});
-        menu.addItem(new WatchUi.MenuItem(str("MenuStartNow"), null, :startNow, null));
-        menu.addItem(new WatchUi.MenuItem(str("MenuMyStretches"), null, :stretches, null));
-        menu.addItem(new WatchUi.MenuItem(str("MenuReorder"), null, :reorder, null));
-        menu.addItem(new WatchUi.MenuItem(str("MenuDurations"), null, :durations, null));
-        menu.addItem(new WatchUi.MenuItem(str("MenuSchedules"), null, :schedules, null));
-        menu.addItem(new WatchUi.MenuItem(str("MenuSettings"), null, :settings, null));
-        menu.addItem(new WatchUi.MenuItem(str("MenuAbout"), null, :about, null));
-        WatchUi.pushView(menu, new MainMenuDelegate(), WatchUi.SLIDE_LEFT);
+        var rows = mainMenuRows();
+        var actions = {} as Dictionary<Symbol, Method>;
+        for (var i = 0; i < rows.size(); i++) {
+            var row = rows[i] as Array;
+            menu.addItem(new WatchUi.MenuItem(str(row[0] as String), null, row[1] as Symbol, null));
+            actions.put(row[1] as Symbol, row[2] as Method);
+        }
+        WatchUi.pushView(menu, new MainMenuDelegate(actions), WatchUi.SLIDE_LEFT);
+    }
+
+    // The action registered for the selected item, or null for an unknown id.
+    function actionFor(actions as Dictionary<Symbol, Method>, item as WatchUi.MenuItem) as Method? {
+        return actions.get(item.getId() as Symbol);
     }
 
     // Sub-label showing whether a stretch is part of the routine. `routine`
@@ -41,12 +60,7 @@ module MenuKit {
     }
 
     function routineContains(routine as Array, id as String) as Boolean {
-        for (var i = 0; i < routine.size(); i++) {
-            if ((routine[i] as String).equals(id)) {
-                return true;
-            }
-        }
-        return false;
+        return RoutineModel.indexOf(routine, id) >= 0;
     }
 
     function pushStretchPicker() as Void {
@@ -199,26 +213,17 @@ module MenuKit {
 }
 
 class MainMenuDelegate extends WatchUi.Menu2InputDelegate {
-    function initialize() {
+    hidden var _actions as Dictionary<Symbol, Method>;
+
+    function initialize(actions as Dictionary<Symbol, Method>) {
         Menu2InputDelegate.initialize();
+        _actions = actions;
     }
 
     function onSelect(item as WatchUi.MenuItem) as Void {
-        var id = item.getId();
-        if (id == :startNow) {
-            WorkoutFlow.start(false);
-        } else if (id == :stretches) {
-            MenuKit.pushStretchPicker();
-        } else if (id == :reorder) {
-            MenuKit.pushReorderMenu();
-        } else if (id == :durations) {
-            MenuKit.pushDurationsMenu();
-        } else if (id == :schedules) {
-            MenuKit.pushSchedulesMenu();
-        } else if (id == :settings) {
-            MenuKit.pushSettingsMenu();
-        } else if (id == :about) {
-            MenuKit.pushAbout();
+        var action = MenuKit.actionFor(_actions, item);
+        if (action != null) {
+            action.invoke();
         }
     }
 
@@ -348,11 +353,18 @@ class AddScheduleHandler {
 class ScheduleItemDelegate extends WatchUi.Menu2InputDelegate {
     hidden var _index as Number;
     hidden var _parentItem as WatchUi.MenuItem;
+    hidden var _actions as Dictionary<Symbol, Method>;
 
+    // Every action takes the selected item and the schedules just read.
     function initialize(index as Number, parentItem as WatchUi.MenuItem) {
         Menu2InputDelegate.initialize();
         _index = index;
         _parentItem = parentItem;
+        _actions = {
+            :enabled => method(:toggleEnabled),
+            :edit => method(:pushEditTimePicker),
+            :delete => method(:deleteSchedule)
+        };
     }
 
     function onSelect(item as WatchUi.MenuItem) as Void {
@@ -361,17 +373,13 @@ class ScheduleItemDelegate extends WatchUi.Menu2InputDelegate {
             WatchUi.popView(WatchUi.SLIDE_RIGHT);
             return;
         }
-        var id = item.getId();
-        if (id == :enabled) {
-            toggleEnabled(item, schedules);
-        } else if (id == :edit) {
-            pushEditTimePicker(schedules);
-        } else if (id == :delete) {
-            deleteSchedule(schedules);
+        var action = MenuKit.actionFor(_actions, item);
+        if (action != null) {
+            action.invoke(item, schedules);
         }
     }
 
-    hidden function toggleEnabled(item as WatchUi.MenuItem, schedules as Array) as Void {
+    function toggleEnabled(item as WatchUi.MenuItem, schedules as Array) as Void {
         var entry = schedules[_index] as Array;
         var nowOn = !(entry[2] as Boolean);
         entry[2] = nowOn;
@@ -381,7 +389,7 @@ class ScheduleItemDelegate extends WatchUi.Menu2InputDelegate {
         _parentItem.setSubLabel(MenuKit.onOff(nowOn));
     }
 
-    hidden function pushEditTimePicker(schedules as Array) as Void {
+    function pushEditTimePicker(item as WatchUi.MenuItem, schedules as Array) as Void {
         var entry = schedules[_index] as Array;
         var view = new TimePickerView(MenuKit.str("MenuEditTime"),
                                       entry[0] as Number, entry[1] as Number);
@@ -390,7 +398,7 @@ class ScheduleItemDelegate extends WatchUi.Menu2InputDelegate {
                          WatchUi.SLIDE_LEFT);
     }
 
-    hidden function deleteSchedule(schedules as Array) as Void {
+    function deleteSchedule(item as WatchUi.MenuItem, schedules as Array) as Void {
         var updated = [] as Array;
         for (var i = 0; i < schedules.size(); i++) {
             if (i != _index) {
@@ -435,28 +443,39 @@ class EditScheduleHandler {
 }
 
 class SettingsMenuDelegate extends WatchUi.Menu2InputDelegate {
+    hidden var _actions as Dictionary<Symbol, Method>;
+
+    // Every action takes the selected item, so it can refresh its sub-label.
     function initialize() {
         Menu2InputDelegate.initialize();
+        _actions = {
+            :defaultDuration => method(:pushDefaultDurationPicker),
+            :tone => method(:toggleTone),
+            :vibe => method(:toggleVibe),
+            :language => new Lang.Method(MenuKit, :pushLanguageMenu)
+        };
     }
 
     function onSelect(item as WatchUi.MenuItem) as Void {
-        var id = item.getId();
-        if (id == :defaultDuration) {
-            pushDefaultDurationPicker(item);
-        } else if (id == :tone) {
-            var on = !Prefs.isToneOn();
-            Prefs.setToneOn(on);
-            item.setSubLabel(MenuKit.onOff(on));
-        } else if (id == :vibe) {
-            var on = !Prefs.isVibeOn();
-            Prefs.setVibeOn(on);
-            item.setSubLabel(MenuKit.onOff(on));
-        } else if (id == :language) {
-            MenuKit.pushLanguageMenu(item);
+        var action = MenuKit.actionFor(_actions, item);
+        if (action != null) {
+            action.invoke(item);
         }
     }
 
-    hidden function pushDefaultDurationPicker(item as WatchUi.MenuItem) as Void {
+    function toggleTone(item as WatchUi.MenuItem) as Void {
+        var on = !Prefs.isToneOn();
+        Prefs.setToneOn(on);
+        item.setSubLabel(MenuKit.onOff(on));
+    }
+
+    function toggleVibe(item as WatchUi.MenuItem) as Void {
+        var on = !Prefs.isVibeOn();
+        Prefs.setVibeOn(on);
+        item.setSubLabel(MenuKit.onOff(on));
+    }
+
+    function pushDefaultDurationPicker(item as WatchUi.MenuItem) as Void {
         var view = new NumberPickerView(
             MenuKit.str("SettingDefaultDuration"),
             MenuKit.str("SecondsUnit"),

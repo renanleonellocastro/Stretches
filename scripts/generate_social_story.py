@@ -17,6 +17,7 @@ import os
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from lunge_figure import render_lunge
+from watch_mockup import WatchStyle, draw_watch
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT_DIR = "/System/Library/Fonts/Supplemental"
@@ -32,6 +33,8 @@ DIM = (170, 162, 156)
 BG_TOP = (20, 14, 11)
 FIGURE_SUPERSAMPLING = 8
 FIGURE_STEPS = 90
+WATCH_STYLE = WatchStyle(shadow_spread=16, shadow_drop=26, shadow_blur=30, ring_inset=5,
+                         ring_width=12, ring_color=ORANGE)
 BG_BOTTOM = (4, 3, 3)
 
 
@@ -62,25 +65,6 @@ def radial_glow(size, center, radius, color, strength):
     d.ellipse([cx - radius, cy - radius, cx + radius, cy + radius],
               fill=color + (strength,))
     return layer.filter(ImageFilter.GaussianBlur(radius // 2))
-
-
-def draw_watch(base, cx, cy, r, face_path):
-    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(layer)
-    sh = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    ds = ImageDraw.Draw(sh)
-    ds.ellipse([cx - r - 16, cy - r - 8, cx + r + 16, cy + r + 26], fill=(0, 0, 0, 150))
-    sh = sh.filter(ImageFilter.GaussianBlur(30))
-    base.alpha_composite(sh)
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(17, 17, 19, 255))
-    face = Image.open(face_path).convert("RGBA")
-    fr = int(r * 0.9)
-    face = face.resize((fr * 2, fr * 2), Image.LANCZOS)
-    mask = Image.new("L", (fr * 2, fr * 2), 0)
-    ImageDraw.Draw(mask).ellipse([0, 0, fr * 2, fr * 2], fill=255)
-    layer.paste(face, (cx - fr, cy - fr), mask)
-    d.arc([cx - r + 5, cy - r + 5, cx + r - 5, cy + r - 5], -60, 210, fill=ORANGE, width=12)
-    base.alpha_composite(layer)
 
 
 def pill_width(d, text, fnt, pad_x=30):
@@ -155,7 +139,7 @@ def main():
     d = ImageDraw.Draw(img)
     draw_header(img, d)
     draw_tagline(d)
-    draw_watch(img, W // 2, WATCH_CENTER_Y, 300, HOME_SCREENSHOT)
+    draw_watch(img, (W // 2, WATCH_CENTER_Y), 300, HOME_SCREENSHOT, WATCH_STYLE)
     draw_value_line(d)
     draw_badges(d)
     draw_link_cue(d)

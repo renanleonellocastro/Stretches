@@ -9,6 +9,7 @@ import Toybox.WatchUi;
 // to the menu. Also polls for alarms that come due while the app is open.
 class HomeView extends WatchUi.View {
     const POLL_MS = 5000;
+    const EMPTY_MESSAGE_LINE_CHARS = 16;
 
     hidden var _timer as Timer.Timer?;
 
@@ -77,33 +78,27 @@ class HomeView extends WatchUi.View {
                     Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
-    // Two centered lines (count, then time). Splitting them keeps the summary
-    // inside the round bezel in every language — one line overflowed for the
-    // longer words (e.g. Spanish "estiramientos", Portuguese "alongamentos").
     hidden function drawSummary(dc as Dc) as Void {
-        var w = dc.getWidth();
-        var h = dc.getHeight();
-        var lh = dc.getFontHeight(Graphics.FONT_XTINY);
         var count = RoutineModel.selectedIds().size();
         if (count == 0) {
-            dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
-            var lines = Theme.splitTwoLines(Strings.t("EmptyRoutineMsg"), 16);
-            var y = h * 66 / 100 - (lines.size() - 1) * lh / 2;
-            for (var i = 0; i < lines.size(); i++) {
-                dc.drawText(w / 2, y, Graphics.FONT_XTINY, lines[i] as String,
-                            Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-                y += lh;
-            }
+            drawEmptyRoutineMessage(dc);
             return;
         }
-        var mins = (RoutineModel.estimatedTotalSecs() + 59) / 60;
+        var h = dc.getHeight();
         dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(w / 2, h * 62 / 100, Graphics.FONT_XTINY,
-                    count.toString() + " " + Strings.t("HomeStretchesUnit"),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(w / 2, h * 71 / 100, Graphics.FONT_XTINY,
-                    mins.toString() + " " + Strings.t("HomeMinutesUnit"),
-                    Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        RoutineSummary.draw(dc, count, h * 62 / 100, h * 71 / 100);
+    }
+
+    // Wrapped in two lines and centered on the summary's place.
+    hidden function drawEmptyRoutineMessage(dc as Dc) as Void {
+        var lineHeight = dc.getFontHeight(Graphics.FONT_XTINY);
+        var lines = Theme.splitTwoLines(Strings.t("EmptyRoutineMsg"), EMPTY_MESSAGE_LINE_CHARS);
+        var y = dc.getHeight() * 66 / 100 - (lines.size() - 1) * lineHeight / 2;
+        dc.setColor(Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
+        for (var i = 0; i < lines.size(); i++) {
+            RoutineSummary.drawLine(dc, y, lines[i] as String);
+            y += lineHeight;
+        }
     }
 
     hidden function drawMenuHint(dc as Dc) as Void {

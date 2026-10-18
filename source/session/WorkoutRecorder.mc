@@ -12,6 +12,7 @@ class WorkoutRecorder {
     const FIELD_COUNT = 0;
     const FIELD_LAP_NAME = 1;
     const FIELD_LAP_SECONDS = 2;
+    const LAP_NAME_MAX_BYTES = 32;
 
     hidden var _session as ActivityRecording.Session?;
     hidden var _countField as FitContributor.Field?;
@@ -31,24 +32,34 @@ class WorkoutRecorder {
         (_session as ActivityRecording.Session).start();
     }
 
+    // Custom fields are best-effort; recording still works without them, so
+    // the first failure leaves the remaining fields unset.
     hidden function createFields() as Void {
         var session = _session as ActivityRecording.Session;
         try {
-            _countField = session.createField("stretches_completed", FIELD_COUNT,
-                FitContributor.DATA_TYPE_UINT16,
-                {:mesgType => FitContributor.MESG_TYPE_SESSION, :units => "count"});
-            // :count is the max string bytes INCLUDING the null terminator;
-            // 32 leaves headroom for accented localized names (a unit test
-            // enforces every translation fits).
-            _lapNameField = session.createField("stretch", FIELD_LAP_NAME,
-                FitContributor.DATA_TYPE_STRING,
-                {:mesgType => FitContributor.MESG_TYPE_LAP, :count => 32});
-            _lapSecondsField = session.createField("hold", FIELD_LAP_SECONDS,
-                FitContributor.DATA_TYPE_UINT16,
-                {:mesgType => FitContributor.MESG_TYPE_LAP, :units => "s"});
+            _countField = createCountField(session);
+            _lapNameField = createLapNameField(session);
+            _lapSecondsField = createLapSecondsField(session);
         } catch (e) {
-            // Custom fields are best-effort; recording still works without.
         }
+    }
+
+    hidden function createCountField(session as ActivityRecording.Session) as FitContributor.Field {
+        return session.createField("stretches_completed", FIELD_COUNT, FitContributor.DATA_TYPE_UINT16,
+            {:mesgType => FitContributor.MESG_TYPE_SESSION, :units => "count"});
+    }
+
+    // :count is the max string bytes INCLUDING the null terminator; 32 leaves
+    // headroom for accented localized names (a unit test enforces every
+    // translation fits).
+    hidden function createLapNameField(session as ActivityRecording.Session) as FitContributor.Field {
+        return session.createField("stretch", FIELD_LAP_NAME, FitContributor.DATA_TYPE_STRING,
+            {:mesgType => FitContributor.MESG_TYPE_LAP, :count => LAP_NAME_MAX_BYTES});
+    }
+
+    hidden function createLapSecondsField(session as ActivityRecording.Session) as FitContributor.Field {
+        return session.createField("hold", FIELD_LAP_SECONDS, FitContributor.DATA_TYPE_UINT16,
+            {:mesgType => FitContributor.MESG_TYPE_LAP, :units => "s"});
     }
 
     function isActive() as Boolean {
@@ -62,14 +73,17 @@ class WorkoutRecorder {
             return;
         }
         try {
-            if (_lapNameField != null) {
-                (_lapNameField as FitContributor.Field).setData(name);
-            }
-            if (_lapSecondsField != null) {
-                (_lapSecondsField as FitContributor.Field).setData(seconds);
-            }
+            writeField(_lapNameField, name);
+            writeField(_lapSecondsField, seconds);
             (_session as ActivityRecording.Session).addLap();
         } catch (e) {
+        }
+    }
+
+    // A field is null when the session could not create it.
+    hidden function writeField(field as FitContributor.Field?, value as Numeric or String) as Void {
+        if (field != null) {
+            field.setData(value);
         }
     }
 
@@ -88,9 +102,7 @@ class WorkoutRecorder {
     }
 
     function setCompletedCount(count as Number) as Void {
-        if (_countField != null) {
-            (_countField as FitContributor.Field).setData(count);
-        }
+        writeField(_countField, count);
     }
 
     function stop() as Void {

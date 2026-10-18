@@ -58,24 +58,33 @@ class TimePickerView extends WatchUi.View {
 
     // Active field is accent; the other is white. The colon stays dim.
     hidden function drawClockDigits(dc as Dc) as Void {
-        var font = Graphics.FONT_NUMBER_HOT;
-        var cy = dc.getHeight() * 48 / 100;
-        var l = clockLayout(dc);
-        var x = l[0] as Number;
-        var hourW = l[1] as Number;
-        var colonW = l[2] as Number;
-        var align = Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER;
-        dc.setColor(editingMinutes ? Theme.COLOR_TEXT : Theme.COLOR_ACCENT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x, cy, font, hour.format("%02d"), align);
-        dc.setColor(Theme.COLOR_TEXT_DIM, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x + hourW + GAP, cy, font, ":", align);
-        dc.setColor(editingMinutes ? Theme.COLOR_ACCENT : Theme.COLOR_TEXT, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(x + hourW + colonW + GAP * 2, cy, font, minute.format("%02d"), align);
+        var layout = clockLayout(dc);
+        var left = layout[0] as Number;
+        var hourWidth = layout[1] as Number;
+        var colonWidth = layout[2] as Number;
+        drawClockPart(dc, left, hour.format("%02d"), fieldColor(!editingMinutes));
+        drawClockPart(dc, left + hourWidth + GAP, ":", Theme.COLOR_TEXT_DIM);
+        drawClockPart(dc, left + hourWidth + colonWidth + GAP * 2, minute.format("%02d"),
+                      fieldColor(editingMinutes));
+    }
+
+    hidden function drawClockPart(dc as Dc, x as Number, text as String, color as Number) as Void {
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, clockCenterY(dc), Graphics.FONT_NUMBER_HOT, text,
+                    Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
+    }
+
+    hidden function fieldColor(isActive as Boolean) as Number {
+        return isActive ? Theme.COLOR_ACCENT : Theme.COLOR_TEXT;
+    }
+
+    hidden function clockCenterY(dc as Dc) as Number {
+        return dc.getHeight() * 48 / 100;
     }
 
     // Chevrons above/below the active field hint at UP/DOWN.
     hidden function drawActiveFieldChevrons(dc as Dc) as Void {
-        var cy = dc.getHeight() * 48 / 100;
+        var cy = clockCenterY(dc);
         var l = clockLayout(dc);
         var x = l[0] as Number;
         var hourW = l[1] as Number;

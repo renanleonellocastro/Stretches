@@ -1,33 +1,23 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// Entry point into a workout: validates the routine and swaps in the
-// workout view.
+// Entry point into a workout: validates the routine and stacks the workout
+// view on top of the menu.
 module WorkoutFlow {
-    // replaceCurrent: true when coming from the alarm prompt (the prompt is
-    // replaced), false when starting from the menu (stacked on top).
-    function start(replaceCurrent as Boolean) as Void {
+    const EMPTY_ROUTINE_MESSAGE_MS = 2500;
+
+    function start() as Void {
         var ids = RoutineModel.selectedIds();
         if (ids.size() == 0) {
-            var msg = new MessageView(
-                Strings.t("EmptyRoutineMsg"),
-                Theme.COLOR_WARM, 2500);
-            if (replaceCurrent) {
-                WatchUi.switchToView(msg, new MessageDelegate(), WatchUi.SLIDE_LEFT);
-            } else {
-                WatchUi.pushView(msg, new MessageDelegate(), WatchUi.SLIDE_LEFT);
-            }
+            WatchUi.pushView(new MessageView(Strings.t("EmptyRoutineMsg"), Theme.COLOR_WARM, EMPTY_ROUTINE_MESSAGE_MS),
+                             new MessageDelegate(), WatchUi.SLIDE_LEFT);
             return;
         }
-        var engine = new WorkoutEngine(ids, Prefs.getDurations(),
-                                       Prefs.getDefaultDuration());
-        var recorder = new WorkoutRecorder();
-        var view = new WorkoutView(engine, recorder);
-        var delegate = new WorkoutDelegate(view);
-        if (replaceCurrent) {
-            WatchUi.switchToView(view, delegate, WatchUi.SLIDE_LEFT);
-        } else {
-            WatchUi.pushView(view, delegate, WatchUi.SLIDE_LEFT);
-        }
+        var view = new WorkoutView(newEngine(ids), new WorkoutRecorder());
+        WatchUi.pushView(view, new WorkoutDelegate(view), WatchUi.SLIDE_LEFT);
+    }
+
+    function newEngine(ids as Array) as WorkoutEngine {
+        return new WorkoutEngine(ids, Prefs.getDurations(), Prefs.getDefaultDuration());
     }
 }

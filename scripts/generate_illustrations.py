@@ -218,23 +218,39 @@ class Figure:
     def __init__(self, c):
         self.c = c
         # Default: front-facing standing figure, centered.
+        self.profile = False      # side view: draw one arm/leg, torso slimmer
+        self._stand_head()
+        self._stand_arms()
+        self._stand_legs()
+
+    def _stand_head(self):
         self.head = (70, 24)
         self.head_r = 13
         self.face = 90            # nose direction in degrees (90 = toward viewer/down)
         self.neck = (70, 38)
+
+    def _stand_arms(self):
         self.shoulderL = (55, 49)
         self.shoulderR = (85, 49)
         self.elbowL = (50, 72)
         self.elbowR = (90, 72)
         self.handL = (50, 92)
         self.handR = (90, 92)
+
+    def _stand_legs(self):
         self.hipL = (61, 88)
         self.hipR = (79, 88)
         self.kneeL = (59, 108)
         self.kneeR = (81, 108)
         self.footL = (57, 126)
         self.footR = (83, 126)
-        self.profile = False      # side view: draw one arm/leg, torso slimmer
+
+    def move(self, **joints):
+        """Reposition named joints, e.g. ``move(head=(74, 26), face=180)``."""
+        for joint, position in joints.items():
+            if not hasattr(self, joint):
+                raise AttributeError(f"Figure has no joint named {joint!r}")
+            setattr(self, joint, position)
 
     # convenience ----------------------------------------------------------
     def mid(self, a, b, t=0.5):
@@ -244,56 +260,85 @@ class Figure:
         return [self.shoulderL, self.shoulderR, self.hipR, self.hipL]
 
     def draw(self):
-        c = self.c
-        # Legs (skin), back leg first for a bit of depth.
-        c.limb([self.hipR, self.kneeR, self.footR], LIMB_W)
-        c.limb([self.hipL, self.kneeL, self.footL], LIMB_W)
-        c.blob(*self.footR, 4)
-        c.blob(*self.footL, 4)
-
-        # Torso (white base) then the orange two-piece over it.
-        c.poly(self.torso_quad(), fill=BODY)
-        topL = self.mid(self.shoulderL, self.hipL, 0.02)
-        topR = self.mid(self.shoulderR, self.hipR, 0.02)
-        braL = self.mid(self.shoulderL, self.hipL, 0.42)
-        braR = self.mid(self.shoulderR, self.hipR, 0.42)
-        c.poly([topL, topR, braR, braL], fill=OUTFIT)          # sports top
-        shoTop_L = self.mid(self.shoulderL, self.hipL, 0.66)
-        shoTop_R = self.mid(self.shoulderR, self.hipR, 0.66)
-        c.poly([shoTop_L, shoTop_R, self.hipR, self.hipL], fill=OUTFIT)  # waistband
-        # Shorts wrap onto the upper thighs.
-        thighL = self.mid(self.hipL, self.kneeL, 0.32)
-        thighR = self.mid(self.hipR, self.kneeR, 0.32)
-        c.limb([self.mid(self.hipL, self.hipR, 0.30), thighL], LIMB_W + 2, fill=OUTFIT)
-        c.limb([self.mid(self.hipL, self.hipR, 0.70), thighR], LIMB_W + 2, fill=OUTFIT)
-
-        # Arms (skin), in front of the torso.
-        c.limb([self.shoulderR, self.elbowR, self.handR], ARM_W)
-        c.limb([self.shoulderL, self.elbowL, self.handL], ARM_W)
-        c.blob(*self.handR, 4)
-        c.blob(*self.handL, 4)
-
-        # Neck + head.
-        c.limb([self.neck, (self.head[0], self.head[1] + self.head_r - 2)], NECK_W)
+        self._draw_legs()
+        self._draw_torso()
+        self._draw_arms()
+        self._draw_neck()
         self.draw_head()
 
+    def _draw_legs(self):
+        """Legs (skin), back leg first for a bit of depth."""
+        self.c.limb([self.hipR, self.kneeR, self.footR], LIMB_W)
+        self.c.limb([self.hipL, self.kneeL, self.footL], LIMB_W)
+        self.c.blob(*self.footR, 4)
+        self.c.blob(*self.footL, 4)
+
+    def _draw_torso(self):
+        """White base, then the orange two-piece over it."""
+        self.c.poly(self.torso_quad(), fill=BODY)
+        self._draw_sports_top()
+        self._draw_waistband()
+        self._draw_shorts()
+
+    def _torso_band(self, top, bottom):
+        """Quad across the torso between two heights, as shares of shoulder to hip."""
+        return [self.mid(self.shoulderL, self.hipL, top), self.mid(self.shoulderR, self.hipR, top),
+                self.mid(self.shoulderR, self.hipR, bottom), self.mid(self.shoulderL, self.hipL, bottom)]
+
+    def _draw_sports_top(self):
+        self.c.poly(self._torso_band(0.02, 0.42), fill=OUTFIT)
+
+    def _draw_waistband(self):
+        waist_left = self.mid(self.shoulderL, self.hipL, 0.66)
+        waist_right = self.mid(self.shoulderR, self.hipR, 0.66)
+        self.c.poly([waist_left, waist_right, self.hipR, self.hipL], fill=OUTFIT)
+
+    def _draw_shorts(self):
+        """Shorts wrap onto the upper thighs."""
+        thigh_left = self.mid(self.hipL, self.kneeL, 0.32)
+        thigh_right = self.mid(self.hipR, self.kneeR, 0.32)
+        self.c.limb([self.mid(self.hipL, self.hipR, 0.30), thigh_left], LIMB_W + 2, fill=OUTFIT)
+        self.c.limb([self.mid(self.hipL, self.hipR, 0.70), thigh_right], LIMB_W + 2, fill=OUTFIT)
+
+    def _draw_arms(self):
+        """Arms (skin), in front of the torso."""
+        self.c.limb([self.shoulderR, self.elbowR, self.handR], ARM_W)
+        self.c.limb([self.shoulderL, self.elbowL, self.handL], ARM_W)
+        self.c.blob(*self.handR, 4)
+        self.c.blob(*self.handL, 4)
+
+    def _draw_neck(self):
+        self.c.limb([self.neck, (self.head[0], self.head[1] + self.head_r - 2)], NECK_W)
+
     def draw_head(self):
-        c = self.c
+        hx, hy = self.head
+        self.c.blob(hx, hy, self.head_r, fill=BODY)
+        self._draw_hair()
+        self._draw_nose()
+
+    def _draw_hair(self):
+        """A filled cap over the top ~two thirds of the head."""
         hx, hy = self.head
         r = self.head_r
-        c.blob(hx, hy, r, fill=BODY)
-        # Hair: a filled cap over the top ~two thirds of the head.
         bbox = [(hx - r) * SCALE, (hy - r) * SCALE, (hx + r) * SCALE, (hy + r) * SCALE]
-        c.draw.pieslice(bbox, 180, 360, fill=HAIR)             # top dome
-        c.draw.pieslice(bbox, 300, 360, fill=HAIR)             # side fringe
-        c.draw.pieslice(bbox, 180, 240, fill=HAIR)
-        # Nose bump in the facing direction.
+        self.c.draw.pieslice(bbox, 180, 360, fill=HAIR)             # top dome
+        self.c.draw.pieslice(bbox, 300, 360, fill=HAIR)             # side fringe
+        self.c.draw.pieslice(bbox, 180, 240, fill=HAIR)
+
+    def _draw_nose(self):
+        """Nose bump in the facing direction."""
         a = math.radians(self.face)
-        n1 = ((hx + r * math.cos(a - 0.3)) * SCALE, (hy + r * math.sin(a - 0.3)) * SCALE)
-        n2 = ((hx + r * math.cos(a + 0.3)) * SCALE, (hy + r * math.sin(a + 0.3)) * SCALE)
-        tip = ((hx + r * 1.28 * math.cos(a)) * SCALE, (hy + r * 1.28 * math.sin(a)) * SCALE)
-        c.draw.polygon([n1, tip, n2], fill=BODY)
-        c.draw.line([n1, tip, n2], fill=OUTLINE, width=OUTLINE_W * SCALE)
+        n1 = self._head_point(a - 0.3, 1.0)
+        n2 = self._head_point(a + 0.3, 1.0)
+        tip = self._head_point(a, 1.28)
+        self.c.draw.polygon([n1, tip, n2], fill=BODY)
+        self.c.draw.line([n1, tip, n2], fill=OUTLINE, width=OUTLINE_W * SCALE)
+
+    def _head_point(self, angle, reach):
+        """Canvas point at ``reach`` head radii from the head center, toward ``angle``."""
+        hx, hy = self.head
+        r = self.head_r * reach
+        return ((hx + r * math.cos(angle)) * SCALE, (hy + r * math.sin(angle)) * SCALE)
 
 
 # ---------------------------------------------------------------------------
@@ -501,34 +546,42 @@ def quad_right(c):
     c.arrow([(86, 102), (80, 88)])
 
 
+# Wall calf stretch, side view: hands on wall, front leg bent, back leg straight.
+CALF_POSE = {
+    "face": 180, "head": (74, 26),
+    "shoulderL": (66, 50), "shoulderR": (70, 50),
+    "elbowL": (48, 52), "handL": (30, 52),
+    "elbowR": (48, 64), "handR": (30, 64),
+    "hipL": (66, 88), "hipR": (70, 88),
+    "kneeL": (52, 108), "footL": (44, 126),
+    "kneeR": (86, 112), "footR": (98, 126),
+}
+
+
 def calf_right(c):
     f = base_standing(c)
-    # Wall calf stretch, side view: hands on wall, back leg straight.
-    f.face = 180
-    f.head = (74, 26)
-    f.shoulderL = (66, 50); f.shoulderR = (70, 50)
-    f.elbowL = (48, 52); f.handL = (30, 52)
-    f.elbowR = (48, 64); f.handR = (30, 64)
-    f.hipL = (66, 88); f.hipR = (70, 88)
-    f.kneeL = (52, 108); f.footL = (44, 126)     # front leg bent
-    f.kneeR = (86, 112); f.footR = (98, 126)     # back leg straight
+    f.move(**CALF_POSE)
     c.prop_line([(24, 18), (24, 126)], 6, WALL)  # wall
     c.prop_line([(24, 126), (126, 126)], 4, WALL)
     f.draw()
     c.arrow([(104, 112), (100, 124)])
 
 
+# Kneeling lunge, side view: front foot planted, back knee down.
+HIP_FLEXOR_POSE = {
+    "face": 180, "head": (66, 26),
+    "shoulderL": (64, 50), "shoulderR": (68, 50),
+    "elbowL": (60, 66), "handL": (58, 80),
+    "elbowR": (70, 66), "handR": (72, 82),
+    "hipL": (66, 86), "hipR": (68, 86),
+    "kneeL": (44, 102), "footL": (44, 126),
+    "kneeR": (94, 118), "footR": (114, 116),
+}
+
+
 def hip_flexor_right(c):
     f = base_standing(c)
-    # Kneeling lunge, side view.
-    f.face = 180
-    f.head = (66, 26)
-    f.shoulderL = (64, 50); f.shoulderR = (68, 50)
-    f.elbowL = (60, 66); f.handL = (58, 80)
-    f.elbowR = (70, 66); f.handR = (72, 82)
-    f.hipL = (66, 86); f.hipR = (68, 86)
-    f.kneeL = (44, 102); f.footL = (44, 126)     # front foot planted
-    f.kneeR = (94, 118); f.footR = (114, 116)    # back knee down
+    f.move(**HIP_FLEXOR_POSE)
     c.prop_line([(14, 126), (126, 126)], 4, WALL)
     f.draw()
     c.blob(94, 118, 4)
@@ -600,13 +653,20 @@ def render_stretch_figure(path, color, size=80):
 # ---------------------------------------------------------------------------
 
 def render_bucket(size, out_dir):
-    stretch_dir = os.path.join(out_dir, "stretches")
+    render_stretches(size, os.path.join(out_dir, "stretches"))
+    write_bucket_drawables(out_dir)
+
+
+def render_stretches(size, stretch_dir):
     os.makedirs(stretch_dir, exist_ok=True)
     for sid, (group, fn, mirror) in CATALOG.items():
         c = Canvas()
         c.card(GROUPS[group])
         fn(c)
         c.save(os.path.join(stretch_dir, f"{sid}.png"), size, mirror=mirror)
+
+
+def write_bucket_drawables(out_dir):
     lines = ['<drawables>']
     for sid in CATALOG:
         lines.append(f'    <bitmap id="i_{sid}" filename="stretches/{sid}.png"/>')
@@ -654,18 +714,22 @@ def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     write_base_drawables(os.path.join(root, "resources", "drawables"))
     grouped = buckets()
-    for size, devices in sorted(grouped.items()):
+    for size in sorted(grouped):
         render_bucket(size, os.path.join(root, "assets", f"illus{size}"))
-    size_map = {d: device_size(w, h) for d, (w, h) in DEVICE_RES.items()}
-    write_jungle_fragment(root, size_map)
+    write_jungle_fragment(root, {d: device_size(w, h) for d, (w, h) in DEVICE_RES.items()})
+    write_requested_montage(root, grouped)
+    sizes = ", ".join(str(s) for s in sorted(grouped))
+    print(f"Rendered {len(CATALOG)} illustrations x {len(grouped)} sizes "
+          f"({sizes}) + launcher icon")
+
+
+def write_requested_montage(root, grouped):
+    """Contact sheet of the smallest bucket, only when MONTAGE_PATH asks for one."""
     montage = os.environ.get("MONTAGE_PATH")
     if montage:
         smallest = min(grouped)
         write_montage(smallest, os.path.join(root, "assets", f"illus{smallest}"),
                       montage)
-    sizes = ", ".join(str(s) for s in sorted(grouped))
-    print(f"Rendered {len(CATALOG)} illustrations x {len(grouped)} sizes "
-          f"({sizes}) + launcher icon")
 
 
 if __name__ == "__main__":

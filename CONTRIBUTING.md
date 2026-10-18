@@ -64,14 +64,14 @@ Python 3 with Pillow is needed only if you touch the illustrations:
 All production code follows [docs/QUALITY.md](docs/QUALITY.md): function
 bodies of at most 12 lines, all of SOLID and meaningful names. Run
 `make check` before every commit (it needs the SDK, a signing key and `uv`),
-plus `make sim` and `make test` for the simulator suite. A ratchet blocks any
-new or grown long function, so the legacy ones only go down.
+plus `make sim` and `make test` for the simulator suite. The function length
+gate is strict: any function over 12 lines fails it.
 
 ## Quality gates
 
 Every PR must pass CI:
 
-- The function length ratchet (`python3 tools/function_length_ratchet.py`)
+- The strict function length gate (`python3 tools/check_function_length.py --strict`)
 
 - XML validity + string catalogs in sync across languages
 - Illustration coverage for every catalog entry

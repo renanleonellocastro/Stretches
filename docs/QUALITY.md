@@ -26,15 +26,10 @@ Tests keep covering everything testable (see [TESTING.md](TESTING.md)); the tool
 
 ## How `make check` enforces it
 
-`make check` runs the device API audit, a type checked build (`make build`), `ruff` and `mypy --strict` on the tools, the tool tests at 100% coverage (`make test-tools`) and the function length ratchet. The simulator suite needs a running simulator, so it stays a separate step: `make sim`, then `make test`. CI runs the ratchet in its static checks job.
+`make check` runs the device API audit, a type checked build (`make build`), `ruff` and `mypy --strict` on the tools, the tool tests at 100% coverage (`make test-tools`) and the strict function length gate. The simulator suite needs a running simulator, so it stays a separate step: `make sim`, then `make test`. CI runs the same gate in its static checks job.
 
-Rule 1 arrived after the code was written, so the gate works as a ratchet:
+* `make function-length-gate` fails when any production function passes 12 lines. There is no baseline and no exception list.
+* `make function-length` prints the full report, longest first, without failing.
+* Rule 1 arrived after the code was written, so the gate started as a ratchet over a baseline of the legacy long functions. Once the last of them was refactored, the ratchet and its baseline were removed and the gate became strict.
 
-* `tools/function_length_baseline.json` lists the long functions that existed when the rule arrived (path, qualified name and length).
-* `make function-length-gate` fails when a function outside the baseline passes 12 lines, when a baselined function grows, or when the total passes the baseline total.
-* When you shorten or fix baselined functions, the gate reports how much the baseline can shrink. Run `make function-length-baseline` and commit the file together with the refactor. That command only accepts a smaller baseline.
-* `make function-length` prints the full report, longest first.
-* Recording a larger baseline is exceptional: `make function-length-baseline ALLOW_GROWTH=1`, with the reason in the commit message.
-* When the baseline reaches zero, the gate becomes strict.
-
-The checker lives in `tools/check_function_length.py`, with one measurer per language (`tools/function_length_python.py` through the `ast` module and `tools/function_length_monkeyc.py`, a string and comment aware brace scanner that qualifies names by module and class). The ratchet lives in `tools/function_length_ratchet.py` and the settings (limit, measured folders, languages and exclusions) in `tools/function_length.json`. The tools run through `uv`, which installs Python 3.12 and the development dependencies from `pyproject.toml` on first use.
+The checker lives in `tools/check_function_length.py`, with one measurer per language (`tools/function_length_python.py` through the `ast` module and `tools/function_length_monkeyc.py`, a string and comment aware brace scanner that qualifies names by module and class). The settings (limit, measured folders, languages and exclusions) live in `tools/function_length.json`. The tools run through `uv`, which installs Python 3.12 and the development dependencies from `pyproject.toml` on first use.

@@ -18,8 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Function length ratchet (docs/QUALITY.md)
-        run: python3 tools/function_length_ratchet.py check
+      - name: Function length gate, strict (docs/QUALITY.md)
+        run: python3 tools/check_function_length.py --strict
 
       - name: Validate XML resources and manifest
         run: |

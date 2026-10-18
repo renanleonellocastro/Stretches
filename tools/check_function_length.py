@@ -1,7 +1,7 @@
 """Report functions whose body is longer than rule 1 of the quality bar allows.
 
 Each file suffix maps, in function_length.json, to a measurer module that exposes
-`measure(source) -> list[MeasuredFunction]`. The JSON format feeds function_length_ratchet.py.
+`measure(source) -> list[MeasuredFunction]`. The JSON format prints the same list in machine readable form.
 """
 
 from __future__ import annotations
