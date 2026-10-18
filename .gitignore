@@ -24,3 +24,7 @@ __pycache__/
 Thumbs.db
 .idea/
 *.swp
+
+# Local notes and tool settings, kept out of git
+CLAUDE.md
+.claude/
